@@ -53,10 +53,16 @@ plot(datetime(dataStruct.met.time,'ConvertFrom','datenum'), ...
 hold on
 offline = zeros(length(dataStruct.met.time),1);
 offline(~isnan(dataStruct.met.wind_spd)) = nan;
+off_pts = find(offline == 0);
 if sum(~isnan(offline(:))) > 0
     plot(datetime(dataStruct.met.time,'ConvertFrom','datenum'), ...
         offline,'ro','DisplayName','Missing Data')
+    interpolated = fillmissing(dataStruct.met.wind_spd,'linear');
+    plot(datetime(dataStruct.met.time(off_pts(:)), ... 
+        'ConvertFrom','datenum'),interpolated(off_pts),'k.', ...
+        'LineWidth',lw,'DisplayName','Linear Interpolation')
 end
+hold on
 xlim(xl)
 %xticks(xt)
 %xlabel('Time')

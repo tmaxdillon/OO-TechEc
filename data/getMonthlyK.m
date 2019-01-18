@@ -21,7 +21,7 @@ if isequal(type,'wind')
     dvymu = unique(dvall(:,1:2),'rows');
     K_avg = zeros(length(dvymu),2);
     K_avg(:,1) = datenum(num2str(dvymu(:,1:2)));
-    rho = 1020; %[kg/m^3]
+    rho = 1; %[kg/m^3]
     K = (1/2)*rho.*dataStruct.met.wind_spd.^3;
     for i = 1:length(dvymu)
         pts = find(dvall(:,1) == dvymu(i,1) & ...
