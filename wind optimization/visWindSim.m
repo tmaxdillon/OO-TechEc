@@ -1,16 +1,16 @@
-function [] = visWindSim(R_val,Smax_val,save,opt,output,data,atmo,batt,econ,load,turb)
+function [] = visWindSim(output,data,atmo,batt,econ,load,turb)
 
 %find indices/real values
-[~,R_ind] = min(abs(opt.R - R_val));
-R_real = opt.R(R_ind);
-[~,Smax_ind] = min(abs(opt.Smax - Smax_val));
-Smax_real = opt.R(Smax_ind);
+% [~,R_ind] = min(abs(opt.R - R_val));
+% R_real = opt.R(R_ind);
+% [~,Smax_ind] = min(abs(opt.Smax - Smax_val));
+% Smax_real = opt.R(Smax_ind);
 
 figure
 %STORAGE TIME SERIES
 ax(1) = subplot(3,1,1);
 plot(datetime(data.met.time,'ConvertFrom','datenum'), ...
-    squeeze(output.S(R_ind,Smax_ind,1:end-1))/1000,'Color',[255,69,0]/256, ... 
+    output.min.S(1:end-1)/1000,'Color',[255,69,0]/256, ... 
     'DisplayName','Battery Storage','LineWidth',2)
 legend('show')
 ylabel('[kWh]')
@@ -22,7 +22,7 @@ grid on
 %POWER TIME SERIES
 ax(2) = subplot(3,1,2);
 plot(datetime(data.met.time,'ConvertFrom','datenum'), ...
-    squeeze(output.P(R_ind,Smax_ind,:)/1000),'Color',[65,105,225]/256, ... 
+    output.min.P/1000,'Color',[65,105,225]/256, ... 
     'DisplayName','Power Produced','LineWidth',2)
 legend('show')
 ylabel('[kW]')
@@ -33,7 +33,7 @@ grid on
 %DUMPED POWER TIME SERIES
 ax(3) = subplot(3,1,3);
 plot(datetime(data.met.time,'ConvertFrom','datenum'), ...
-    squeeze(output.D(R_ind,Smax_ind,:))/1000,'Color',[75,0,130]/256, ... 
+    output.min.D/1000,'Color',[75,0,130]/256, ... 
     'DisplayName','Power Dumped','LineWidth',2)
 legend('show')
 ylabel('[kW]')
