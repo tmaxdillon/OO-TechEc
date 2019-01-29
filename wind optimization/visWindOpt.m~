@@ -1,12 +1,7 @@
-function [] = visWindOpt(optStruct)
+function [] = visWindOpt(opt,output,data)
 
 opt = optStruct.opt;
-output = optStruct.output;
-data = optStruct.data;
 
-%adjust to thousands
-output.cost = output.cost/1000;
-output.min.cost = output.min.cost/1000;
 
 [Smaxgrid,Rgrid] = meshgrid(opt.Smax,opt.R);
 ms = 100;
@@ -39,8 +34,9 @@ ylabel('Rotor Radius [m]')
 xlim([min(opt.Smax) inf])
 ylim([min(opt.R) inf])
 c = colorbar;
-c.Label.String = '[$] in thousands';
+c.Label.String = '[$]';
 colormap(ax(a),brewermap([],'Purples'))
+caxis([0 inf])
 hold on
 annotation('textbox',annodim1,'String',['$ ' num2str(round(output.min.cost,2))], ...
     'FitBoxToText','on','color','m','BackgroundColor','w')

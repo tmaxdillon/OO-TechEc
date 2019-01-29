@@ -3,16 +3,15 @@ function [cost,surv,CapEx,OpEx,kWcost,Scost,CF,S,P,D,L] =  ...
 
 wind = data.met.wind_spd; %extract wind speed
 dt = 24*(data.met.time(2) - data.met.time(1)); %time in hours
-lat = data.met.lat;
-lon = data.met.lon;
-[dist,~,~] = dist_from_coast(lat,lon,'great_circle',inf); %dist to shore
+dist = data.dist; %[m] dist to shore
 
 %compute cost
-kWcost = econ.rcost*(1/1000)*1/2*atmo.rho*pi*R^2*turb.ura^3*turb.eta;
+singletrip = (econ.ship*(dist*econ.speed^(-1)*(1/86400) + ...
+    econ.repairT) + econ.fuel*(dist*econ.speed^(-1)*(1/360)*econ.mileage));
+OpEx = turb.mtbf*(1/12)*singletrip;
+kWcost = econ.Tcost*(1/1000)*1/2*atmo.rho*pi*R^2*turb.ura^3*turb.eta;
 Scost = econ.Scost*Smax;
-CapEx = kWcost + Scost;
-OpEx = interp1([econ.OpEx.p1(1) econ.OpEx.p2(1)], ...
-    [econ.OpEx.p1(2) econ.OpEx.p2(2)],dist)*CapEx;
+CapEx = kWcost + Scost + singletrip;
 cost = CapEx + OpEx;
 
 %initialize

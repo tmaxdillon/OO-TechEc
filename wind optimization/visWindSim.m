@@ -1,10 +1,7 @@
-function [] = visWindSim(output,data,atmo,batt,econ,load,turb)
+function [] = visWindSim(optStruct)
 
-%find indices/real values
-% [~,R_ind] = min(abs(opt.R - R_val));
-% R_real = opt.R(R_ind);
-% [~,Smax_ind] = min(abs(opt.Smax - Smax_val));
-% Smax_real = opt.R(Smax_ind);
+data = optStruct.data;
+output = optStruct.output;
 
 figure
 %STORAGE TIME SERIES
