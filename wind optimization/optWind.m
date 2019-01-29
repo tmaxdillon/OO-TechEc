@@ -1,4 +1,15 @@
-function [output,opt] = optWind(opt,data,atmo,batt,econ,load,turb)
+function [output,opt] = optWind(opt,data,atmo,batt,econ,load,turb,tTot)
+
+%print status to command window
+if opt.mult
+    disp(['Simulation ' num2str(opt.s) ' out of ' num2str(opt.S) ...
+        ' beginning after ' num2str(round(toc(tTot)/60,2)) ' minutes. ' ...
+        opt.tuned_parameter ' tuned to ' ...
+        num2str(opt.tuning_array(opt.s)) '.'])
+else
+    disp('Simulation beginning')
+end
+tOpt = tic;
 
 %initialize inputs/outputs
 opt.R = linspace(opt.R_1,opt.R_m,opt.m);                %[m] radius
@@ -66,8 +77,8 @@ end
 %store outputs of minima into output.min
 output.min.R = opt_ind(1);
 output.min.Smax = opt_ind(2);
-[output.min.cost,output.min.surv,output.min.CapEx,output.min.OpEx,... 
-    output.min.kWcost,output.min.Scost,output.min.CF,output.min.S,output.min.P, ... 
+[output.min.cost,output.min.surv,output.min.CapEx,output.min.OpEx,...
+    output.min.kWcost,output.min.Scost,output.min.CF,output.min.S,output.min.P, ...
     output.min.D,output.min.L] ...
     = simWind(output.min.R,output.min.Smax,opt,data,atmo,batt,econ,load,turb);
 output.min.ratedP = (1/2*atmo.rho*pi*output.min.R^2*turb.ura^3*turb.eta);
@@ -76,6 +87,14 @@ if opt.surf && opt.show
     visWindSim(output,data,atmo,batt,econ,load,turb)
 end
 output.tFminOpt = toc(tFminOpt); %end timer
+
+%print status to command window
+if opt.mult
+    disp(['Simulation ' num2str(opt.s) ' out of ' num2str(opt.S) ...
+        ' complete after ' num2str(round(toc(tOpt)/60,2)) ' minutes.'])
+else
+    disp(['Simulation complete after ' num2str(round(toc(tTot)/60,2)) ' minutes.'])
+end
 
 end
 

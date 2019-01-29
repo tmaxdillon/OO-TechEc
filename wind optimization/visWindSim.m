@@ -47,21 +47,6 @@ set(gcf, 'Position', [100, 100, 1400, 650])
 linkaxes(ax,'x')
 linkaxes(ax(2:3),'y')
 
-if save
-    %set name
-    name = ['sim_R' round(num2str(R_real),2) 'Smax_real' ...
-        round(num2str(Smax_real),2)];
-    stru.(name).output = output;
-    stru.(name).data = data;
-    stru.(name).atmo = atmo;
-    stru.(name).batt = batt;
-    stru.(name).econ = econ;
-    stru.(name).load = load;
-    stru.(name).turb = turb;
-    save( ...
-        [name '.mat'],'-struct','stru','-v7.3');
-end
-
 
 end
 

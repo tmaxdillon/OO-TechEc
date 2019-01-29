@@ -4,9 +4,9 @@ clear all, close all, clc
 
 %% top do
 
-% 1 - adapt visWindSim() to work with data cursor from visWindOpt
-% 1 - fix issue of surface being faster than no surface (improve speed)
-% 2 - move dist from coast to a variable inside the structure
+% 1 - make uptimeval sensitivity analysis plot
+% 2 - fix issue of surface being faster than no surface (improve speed)
+% 3 - move dist from coast to a variable inside the structure
 
 %% setup
 
@@ -44,55 +44,47 @@ load = 200;                 %[W] - secondary node
 opt.m = 8;
 opt.n = 8;
 opt.R_1 = 0;
-opt.R_m = 4;
+opt.R_m = 2;
 opt.Smax_1 = 0;
-opt.Smax_n = 40;
+opt.Smax_n = 15;
 opt.save = false;
 opt.surf = true;
-opt.mult = false;
+opt.mult = true;
 opt.show = false;
+opt.constr.thresh = false;
+opt.constr.uptime = true;
+opt.constr.uptimeval = 0.95;
 
 %% implement nelder mead fminsearch optimization
 
+tTot = tic;
 if opt.mult
-    opt.tuning_array = [2 5 7 8 10 12 15 25].^2;
-    opt.A = length(opt.tuning_array);
-    opt.tuned_parameter = 'mxn';
-    opt.mult_surf = true;
+    opt.tuning_array = [1 .99 .98 .97 .96 .95 .925 .9 .85 .8];
+    opt.S = length(opt.tuning_array);
+    opt.tuned_parameter = 'utv';
     %initialize outputs
-    clear multStruct_ns multStruct_s
-    multStruct_s(opt.A) = struct();
-    multStruct_ns(opt.A) = struct();
-    opt.surf = false;
-    for i = 1:opt.A
+    clear multStruct
+    multStruct(opt.S) = struct();
+    for i = 1:opt.S
+        opt.s = i;
         %%%%%%%%%%%% TUNED PARAMETER UPDATE %%%%%%%%%%%%%%%%
-        opt.m = sqrt(opt.tuning_array(i));
-        opt.n = opt.m;
+        %opt.m = sqrt(opt.tuning_array(i));
+        %opt.n = opt.m;
+        opt.constr.uptimeval = opt.tuning_array(i);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        [output,opt] = optWind(opt,data,atmo,batt,econ,load,turb);
-        multStruct_ns(i).output = output;
-        multStruct_ns(i).opt = opt;
-        multStruct_ns(i).data = data;
-        multStruct_ns(i).atmo = atmo;
-        multStruct_ns(i).batt = batt;
-        multStruct_ns(i).econ = econ;
-        multStruct_ns(i).load = load;
-        multStruct_ns(i).turb = turb;
-        if opt.mult_surf == true
-            opt.surf = true;
-            [output,opt] = optWind(opt,data,atmo,batt,econ,load,turb);
-            multStruct_s(i).output = output;
-            multStruct_s(i).opt = opt;
-            multStruct_s(i).data = data;
-            multStruct_s(i).atmo = atmo;
-            multStruct_s(i).batt = batt;
-            multStruct_s(i).econ = econ;
-            multStruct_s(i).load = load;
-            multStruct_s(i).turb = turb;
-            opt.surf = false;
-        end
+        [output,opt] = optWind(opt,data,atmo,batt,econ,load,turb,tTot);
+        multStruct(i).output = output;
+        multStruct(i).opt = opt;
+        multStruct(i).data = data;
+        multStruct(i).atmo = atmo;
+        multStruct(i).batt = batt;
+        multStruct(i).econ = econ;
+        multStruct(i).load = load;
+        multStruct(i).turb = turb;
     end
     clear i
+    disp([num2str(opt.s) ' simulations complete after ' ...
+        num2str(round(toc(tTot)/60,2)) ' minutes. '])
 else
     [output,opt] = optWind(opt,data,atmo,batt,econ,load,turb);
 end
