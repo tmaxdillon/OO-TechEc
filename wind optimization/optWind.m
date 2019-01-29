@@ -1,4 +1,4 @@
-function [output,opt] = optWind(opt,data,atmo,batt,econ,load,turb,tTot)
+function [output,opt] = optWind(opt,data,atmo,batt,econ,node,turb,tTot)
 
 %print status to command window
 if opt.mult
@@ -36,7 +36,7 @@ for i = 1:opt.m
             output.OpEx(i,j),output.kWcost(i,j), ...
             output.Scost(i,j),output.CF(i,j),output.S(i,j,:), ...
             output.P(i,j,:),output.D(i,j,:),output.L(i,j,:)] ...
-            = simWind(opt.R(i),opt.Smax(j),opt,data,atmo,batt,econ,load,turb);
+            = simWind(opt.R(i),opt.Smax(j),opt,data,atmo,batt,econ,node,turb);
     end
 end
 
@@ -54,7 +54,7 @@ output.tInitOpt = toc(tInitOpt);
 tFminOpt = tic; %start timer
 opt.fmin = true; %let simWind know that fminsearch is on
 %objective function
-fun = @(x)simWind(x(1),x(2),opt,data,atmo,batt,econ,load,turb);
+fun = @(x)simWind(x(1),x(2),opt,data,atmo,batt,econ,node,turb);
 %set options (show convergence and objective space or not)
 options = [];
 if opt.show
@@ -69,7 +69,7 @@ output.min.Smax = opt_ind(2);
 [output.min.cost,output.min.surv,output.min.CapEx,output.min.OpEx,...
     output.min.kWcost,output.min.Scost,output.min.CF,output.min.S,output.min.P, ...
     output.min.D,output.min.L] ...
-    = simWind(output.min.R,output.min.Smax,opt,data,atmo,batt,econ,load,turb);
+    = simWind(output.min.R,output.min.Smax,opt,data,atmo,batt,econ,node,turb);
 output.min.ratedP = (1/2*atmo.rho*pi*output.min.R^2*turb.ura^3*turb.eta);
 output.tFminOpt = toc(tFminOpt); %end timer
 

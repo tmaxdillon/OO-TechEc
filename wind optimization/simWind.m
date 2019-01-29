@@ -1,5 +1,5 @@
 function [cost,surv,CapEx,OpEx,kWcost,Scost,CF,S,P,D,L] =  ...
-    simWind(R,Smax,opt,data,atmo,batt,econ,load,turb)
+    simWind(R,Smax,opt,data,atmo,batt,econ,node,turb)
 
 wind = data.met.wind_spd; %extract wind speed
 dt = 24*(data.met.time(2) - data.met.time(1)); %time in hours
@@ -19,7 +19,7 @@ S = zeros(1,length(wind));
 S(1) = Smax*1000;
 P = zeros(1,length(wind));
 D = zeros(1,length(wind));
-L = ones(1,length(wind))*load;
+L = ones(1,length(wind))*node;
 surv = 1;
 
 %run simulation
@@ -35,7 +35,7 @@ for t = 1:length(wind)
         P(t) = 0; %[W]
     end
     %find next storage state
-    S(t+1) = dt*(P(t) - load) + S(t); %[Wh]
+    S(t+1) = dt*(P(t) - node) + S(t); %[Wh]
     if S(t+1) > Smax*1000 %dump power if over limit
         D(t) = S(t+1) - Smax*1000; %[Wh]
         S(t+1) = Smax*1000; %[Wh]
@@ -53,7 +53,7 @@ end
 CF = nanmean(P)/(1/2*atmo.rho*pi*R^2*turb.ura^3*turb.eta);
 
 %check to see if we fell beneath uptime constraint
-if opt.constr.uptime && length(find(L==load))/length(L) < opt.constr.uptimeval
+if opt.constr.uptime && length(find(L==node))/length(L) < opt.constr.uptimeval
     surv = 0;
 end
 
