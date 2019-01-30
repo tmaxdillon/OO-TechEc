@@ -27,13 +27,14 @@ turb.mtbf = 12;             %[months], mean time between failure (made up)
 %battery parameters
 batt.lb = 0.2;              %floor = percentage of Smax
 
+
 %atmospheric parameters
 atmo.rho = 1;               %[kg/m^3] density
 %add surface roughness for vertical adjustment
 
 %load parameters
-node.draw = 200;            %[W] - secondary node
-node.lifetime = 5;          %[y]
+node.draw = 200;                 %[W] - secondary node
+node.lifetime = 5               %[y]
 
 %optimization parameters
 opt.m = 8;

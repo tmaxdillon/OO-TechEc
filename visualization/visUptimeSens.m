@@ -1,4 +1,4 @@
-function [] = visBattConstr(multStruct)
+function [] = visUptimeSens(multStruct)
 
 cost = zeros(1,length(multStruct));
 Scost = zeros(1,length(multStruct));
@@ -9,7 +9,7 @@ ratedP = zeros(1,length(multStruct));
 
 %unpack multStruct
 for i = 1:length(multStruct)
-    cost(i) = multStruct(i).output.min.cost;
+    cost(i) = multStruct(i).output.min.CapEx;
     Scost(i) = multStruct(i).output.min.Scost;
     kWcost(i) = multStruct(i).output.min.kWcost;
     R(i) = multStruct(i).output.min.R;
@@ -22,15 +22,15 @@ xt = multStruct(1).opt.tuning_array;
 %cost
 figure
 ax(1) = subplot(3,1,1);
-plot(multStruct(1).opt.tuning_array,cost(:),'LineWidth',1.3,'DisplayName', ... 
-    'Total Cost')
+plot(multStruct(1).opt.tuning_array,(Scost(:)+kWcost(:))./cost(:).*100, ...
+    'LineWidth',1.3,'DisplayName','Storage + Turbine')
 hold on
-plot(multStruct(1).opt.tuning_array,Scost(:),'LineWidth',1.3,'DisplayName', ...
+plot(multStruct(1).opt.tuning_array,Scost(:)./cost(:).*100,'LineWidth',1.3,'DisplayName', ...
     'Storage Cost')
 hold on
-plot(multStruct(1).opt.tuning_array,kWcost(:),'LineWidth',1.3,'DisplayName', ...
+plot(multStruct(1).opt.tuning_array,kWcost(:)./cost(:).*100,'LineWidth',1.3,'DisplayName', ...
     'Turbine Cost')
-ylabel('[$]')
+ylabel('% of total cost')
 xticks(fliplr(xt))
 legend('show','Location','NorthEast')
 set(gca,'LineWidth',1.1,'Fontsize',14,'xdir','reverse')
@@ -57,6 +57,6 @@ grid on
 
 linkaxes(ax,'x')
 
-set(gcf, 'Position', [100, 100, 1000, 500])
+set(gcf, 'Position', [100, 100, 800, 400])
 end
 

@@ -12,16 +12,14 @@ end
 tOpt = tic;
 
 %check to make sure coarse grid will work
-opt.fmin = false;
-[check_c,check_s] = simWind(opt.R_m,opt.Smax_n,opt,data,atmo,batt,econ,node,turb);
-if ~check_s
-    opt.R_m = 2*opt.R_m;
-    opt.Smax_n = 2*opt.Smax_n;
-end
+[check_c,check_s] = simWind(opt.R(i),opt.Smax(j),opt,data,atmo,batt,econ,node,turb)
+if 
 
 %initialize inputs/outputs
 opt.R = linspace(opt.R_1,opt.R_m,opt.m);                %[m] radius
 opt.Smax = linspace(opt.Smax_1,opt.Smax_n,opt.n);       %[kWh] maximum storage capacity
+opt.initmin = inf;
+opt.fmin = false;
 output.cost = zeros(opt.m,opt.n);
 output.surv = zeros(opt.m,opt.n);
 if opt.show

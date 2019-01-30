@@ -1,4 +1,4 @@
-%created by Trent Dillon on January 15th 2018
+%created by Trent Dillon on January 15th 2019
 
 clear all, close all, clc
 
@@ -14,8 +14,11 @@ if opt.mult %multiple simulations for sensitivity analysis
     for i = 1:opt.S
         opt.s = i;
         %update tuned parameter
-        if isequal(opt.tuned_parameter,'utv')
-            opt.constr.uptimeval = opt.tuning_array(i);
+        if isequal(opt.tuned_parameter,'utp')
+            opt.constr.uptimeper = opt.tuning_array(i);
+        end
+        if isequal(opt.tuned_parameter,'load')
+            node.draw = opt.tuning_array(i);
         end
         [output,opt] = optWind(opt,data,atmo,batt,econ,node,turb,tTot);
         multStruct(i).output = output;
@@ -37,11 +40,20 @@ clear i tTot
 
 %% save and visualize optimization outputs
 
-if opt.mult && isequal(opt.tuned_parameter,'utv')
-    name = ['multOpt_utv' num2str(opt.S)];
-    stru.(name) = multStruct;
-    save([name '.mat'],'-struct','stru','-v7.3');
-    visBattConstr(stru.(name))
+if opt.mult
+    if isequal(opt.tuned_parameter,'utp')
+        name = ['multOpt_utp' num2str(opt.S)];
+        stru.(name) = multStruct;
+        save([name '.mat'],'-struct','stru','-v7.3');
+        visUptimeSens(stru.(name))
+        load(name)
+    elseif isequal(opt.tuned_parameter,'load')
+        name = ['multOpt_load' num2str(opt.S)];
+        stru.(name) = multStruct;
+        save([name '.mat'],'-struct','stru','-v7.3');
+        visDrawSens(stru.(name))
+        load(name)
+    end
 else
     name = 'optStruct_';
     stru.(name).atmo = atmo;
