@@ -9,7 +9,7 @@ ratedP = zeros(1,length(multStruct));
 
 %unpack multStruct
 for i = 1:length(multStruct)
-    cost(i) = multStruct(i).output.min.CapEx;
+    cost(i) = multStruct(i).output.min.cost;
     Scost(i) = multStruct(i).output.min.Scost;
     kWcost(i) = multStruct(i).output.min.kWcost;
     R(i) = multStruct(i).output.min.R;
@@ -40,7 +40,7 @@ set(gca,'LineWidth',1.1,'Fontsize',14)
 grid on
 %rated power
 ax(2) = subplot(3,1,2);
-plot(multStruct(1).opt.tuning_array,ratedP/1000,'Color',[0,255,127]/256, ... 
+plot(multStruct(1).opt.tuning_array,ratedP,'Color',[0,255,127]/256, ... 
     'LineWidth',1.6,'DisplayName','Rated Power')
 ylabel('[kW]')
 xticks(xt)

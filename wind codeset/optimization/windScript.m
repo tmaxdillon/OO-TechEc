@@ -2,6 +2,10 @@
 
 clear all, close all, clc
 
+%% to do
+
+% 1 - consolidate visDrawSens and visTurbineCost to visMultSims
+
 %% run optimization
 
 tTot = tic;
@@ -15,7 +19,7 @@ if opt.mult %multiple simulations for sensitivity analysis
         opt.s = i;
         %update tuned parameter
         if isequal(opt.tuned_parameter,'utp')
-            opt.constr.uptimeper = opt.tuning_array(i);
+            node.uptime = opt.tuning_array(i);
         end
         if isequal(opt.tuned_parameter,'load')
             node.draw = opt.tuning_array(i);
@@ -36,7 +40,7 @@ else %just one simulation
     [output,opt] = optWind(opt,data,atmo,batt,econ,node,turb,tTot);
 end
 
-clear i tTot
+clear i tTot output opt
 
 %% save and visualize optimization outputs
 
