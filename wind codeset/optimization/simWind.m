@@ -12,8 +12,8 @@ trips = (node.lifetime*12)/(node.SI);
 %    econ.repairT) + econ.fuel*(dist*econ.speed^(-1)*(1/360)*econ.mileage));
 %OpEx = turb.mtbf*(1/12)*singletrip*node.lifetime;
 OpEx = econ.maintenance*kW*trips + econ.installed*kW;
-kWcost = calcTurbineCost(kW);
-Scost = econ.Scost*Smax;
+kWcost = calcDeviceCost(kW,'turbine',1);
+Scost = calcDeviceCost(Smax,'battery',2);
 CapEx = kWcost + Scost;
 cost = CapEx + OpEx;
 

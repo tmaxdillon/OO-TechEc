@@ -8,7 +8,7 @@ clear location
 
 %economic parameters
 %econ.Tcost = 1047.4;       %[$/rated kW] Nature Power 400 W turbine
-econ.Scost = 275;          %[$/kWh storage] lifeline GPL-L16T-2V (2.38 kWh)
+%econ.Scost = 275;          %[$/kWh storage] lifeline GPL-L16T-2V (2.38 kWh)
 econ.ship = 80000;          %[$/day] of vessel charter UNOLS global class vessels (Dana)
 %econ.speed = 5;            %[m/s] vessel speed of Roberston
 econ.repairT = 2/24;        %[d] additional repair time
@@ -47,7 +47,7 @@ opt.constr.uptime = true;
 
 %multiple optimization parameters
 opt.mult = true;
-%opt.tuning_array = [1 .99 .98 .97 .96 .95 .925 .9 .85 .8];
-%opt.tuned_parameter = 'utp';
-opt.tuning_array = [20:20:500];
-opt.tuned_parameter = 'load';
+opt.tuning_array = [1 .99 .98 .97 .96 .95 .925 .9 .85 .8];
+opt.tuned_parameter = 'utp';
+%opt.tuning_array = [20:20:500];
+%opt.tuned_parameter = 'load';

@@ -4,8 +4,7 @@ clear all, close all, clc
 
 %% to do
 
-% 1 - move linear regression OUTSIDE of sim so that it's not within the
-% optimizaton loop. compute polyvals once then done with it.
+% 1 - move linear regression OUTSIDE of sim so that it's not 
 % 2 - consolidate visDrawSens and visTurbineCost to visSens
 % 2 - make visSens() an area plot like the energy consumption/production
 % plots
