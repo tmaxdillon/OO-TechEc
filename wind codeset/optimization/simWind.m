@@ -1,5 +1,5 @@
 function [cost,surv,CapEx,OpEx,kWcost,Scost,CF,S,P,D,L] =  ...
-    simWind(R,Smax,opt,data,atmo,batt,econ,node,turb)
+    simWind(R,Smax,opt,data,atmo,batt,econ,node,turb,p)
 
 wind = data.met.wind_spd; %extract wind speed
 dt = 24*(data.met.time(2) - data.met.time(1)); %time in hours
@@ -11,9 +11,9 @@ trips = (node.lifetime*12)/(node.SI);
 %singletrip = 2*(econ.ship*(dist*econ.speed^(-1)*(1/86400) + ...
 %    econ.repairT) + econ.fuel*(dist*econ.speed^(-1)*(1/360)*econ.mileage));
 %OpEx = turb.mtbf*(1/12)*singletrip*node.lifetime;
-OpEx = econ.maintenance*kW*trips + econ.installed*kW;
-kWcost = calcDeviceCost(kW,'turbine',1);
-Scost = calcDeviceCost(Smax,'battery',2);
+OpEx = econ.maintenance*kW*trips;
+kWcost = polyval(p.t,kW);
+Scost = polyval(p.b,Smax);
 CapEx = kWcost + Scost;
 cost = CapEx + OpEx;
 

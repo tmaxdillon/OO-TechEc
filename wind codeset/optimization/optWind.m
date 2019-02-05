@@ -11,6 +11,10 @@ else
 end
 tOpt = tic;
 
+%curve-fit devices, find polyvals
+p.t = calcDeviceCost('turbine',2);
+p.b = calcDeviceCost('battery',2);
+
 %set R and Smax mesh
 opt.R_1 = 0;
 opt.R_m = sqrt(2*node.draw/(atmo.rho*turb.eta*turb.uci^3*pi)); %survive at cut in
@@ -19,7 +23,7 @@ opt.Smax_n = node.draw*24*30/1000; %one month without power
 
 %check to make sure coarse mesh will work
 opt.fmin = false;
-[~,check_s] = simWind(opt.R_m,opt.Smax_n,opt,data,atmo,batt,econ,node,turb);
+[~,check_s] = simWind(opt.R_m,opt.Smax_n,opt,data,atmo,batt,econ,node,turb,p);
 if ~check_s
     opt.R_m = 2*opt.R_m;
     opt.Smax_n = 2*opt.Smax_n;
@@ -50,7 +54,7 @@ for i = 1:opt.m
             output.OpEx(i,j),output.kWcost(i,j), ...
             output.Scost(i,j),output.CF(i,j),output.S(i,j,:), ...
             output.P(i,j,:),output.D(i,j,:),output.L(i,j,:)] ...
-            = simWind(opt.R(i),opt.Smax(j),opt,data,atmo,batt,econ,node,turb);
+            = simWind(opt.R(i),opt.Smax(j),opt,data,atmo,batt,econ,node,turb,p);
     end
 end
 X = output.cost;
@@ -66,7 +70,7 @@ output.tInitOpt = toc(tInitOpt);
 tFminOpt = tic; %start timer
 opt.fmin = true; %let simWind know that fminsearch is on
 %objective function
-fun = @(x)simWind(x(1),x(2),opt,data,atmo,batt,econ,node,turb);
+fun = @(x)simWind(x(1),x(2),opt,data,atmo,batt,econ,node,turb,p);
 %set options (show convergence and objective space or not)
 options = optimset('MaxFunEvals',10000,'Algorithm','sqp','MaxIter',10000, ...
     'TolFun',1e-5,'TolX',1e-5);
@@ -83,7 +87,7 @@ output.min.Smax = opt_ind(2);
 [output.min.cost,output.min.surv,output.min.CapEx,output.min.OpEx,...
     output.min.kWcost,output.min.Scost,output.min.CF,output.min.S, ... 
     output.min.P,output.min.D,output.min.L] ...
-    = simWind(output.min.R,output.min.Smax,opt,data,atmo,batt,econ,node,turb);
+    = simWind(output.min.R,output.min.Smax,opt,data,atmo,batt,econ,node,turb,p);
 output.min.ratedP = (1/1000)*(1/2*atmo.rho*pi*output.min.R^2*turb.ura^3*turb.eta);
 output.tFminOpt = toc(tFminOpt); %end timer
 

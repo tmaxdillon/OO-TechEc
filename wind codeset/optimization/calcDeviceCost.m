@@ -1,4 +1,4 @@
-function [cost,p] = calcDeviceCost(xq,type,n)
+function [p,cost] = calcDeviceCost(type,n,xq)
 
 %code inspired by: http://maggotroot.blogspot.com/2013/11/constrained-linear-
 %least-squares-in.html
@@ -39,7 +39,9 @@ C = V;
 d = y';
 p = lsqnonneg(C,d);
 
-cost = polyval(p,xq);
+if exist('xq','var')
+    cost = polyval(p,xq);
+end
 
 end
 

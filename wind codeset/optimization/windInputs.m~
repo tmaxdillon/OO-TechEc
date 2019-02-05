@@ -7,17 +7,23 @@ end
 clear location
 
 %economic parameters
-%econ.ship = 80000;          %[$/day] of vessel charter UNOLS global class vessels (Dana)
-%econ.repairT = 2/24;        %[d] additional repair time
+%econ.Tcost = 1047.4;       %[$/rated kW] Nature Power 400 W turbine
+%econ.Scost = 275;          %[$/kWh storage] lifeline GPL-L16T-2V (2.38 kWh)
+econ.ship = 80000;          %[$/day] of vessel charter UNOLS global class vessels (Dana)
+%econ.speed = 5;            %[m/s] vessel speed of Roberston
+econ.repairT = 2/24;        %[d] additional repair time
+%econ.fuel = 4;             %[$/gal] diesel fuel (in seattle)
+%econ.mileage = 23.4;       %[gal/hr] fuel consumption of Robertson
+econ.installed = 11953;     %[$/(kW*year)] installed costs(Orrell and Poehlman, 2017 + dwr)
+% ^^^^ one kW of wind costs $11k, installed costs == CapEx -- check this
+% out
 econ.maintenance = 37;      %[$/(kW*visit)] maintenance costs (Orrell and Poehlman, 2017 + dwr)
 %econ.marinize = ??
-%econ.install = ??
-%econ.tower = ??
 
 %turbine parameters
 turb.uci = 3;               %[m/s] guess
 turb.ura = 11;              %[m/s] awea
-turb.uco = 30;              %[m/s] guess, high? maybe 25-30
+turb.uco = 40;              %[m/s] guess
 turb.eta = 0.35;            %[~] guess
 %turb.mtbf = 12;             %[months], mean time between failure (made up)
 
@@ -30,10 +36,10 @@ atmo.rho = 1;               %[kg/m^3] density
 %add surface roughness for vertical adjustment
 
 %load parameters
-node.draw = 350;            %[W] - secondary node
+node.draw = 150;            %[W] - secondary node
 node.lifetime = 5;          %[y]
 node.SI = 6;                %[months] service interval
-node.uptime = .9;           %[%] uptime
+node.uptime = 1;            %[%] uptime
 
 %optimization parameters
 opt.m = 8;
