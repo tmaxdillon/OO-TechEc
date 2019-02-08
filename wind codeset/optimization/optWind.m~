@@ -22,8 +22,11 @@ opt.Smax_1 = 0;
 opt.Smax_n = node.draw*24*opt.battgriddur/1000; %one month without power
 
 if opt.enforcegrid
+    opt.R_1 = opt.enfR_1;
+    opt.Smax_1 = opt.enfSmax_1;
     opt.R_m = opt.enfR_m;
-    opt.Smax_n = opt.enfR_m;
+    opt.Smax_n = opt.enfSmax_n;
+end
 
 %check to make sure coarse mesh will work
 opt.fmin = false;
@@ -63,6 +66,7 @@ for i = 1:opt.m
 end
 X = output.cost;
 X(output.surv == 0) = inf;
+X(:,1) = inf; %don't allow initial minima on the boundary
 [I(1),I(2)] = find(X == min(X(:)),1,'first');
 opt.init = output.cost(I(1),I(2));
 opt.R_init = opt.R(I(1));

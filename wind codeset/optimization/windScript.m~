@@ -4,8 +4,7 @@ clear all, close all, clc
 
 %% to do
 
-% 2 - make visSens() an area plot like the energy consumption/production
-% plots
+% 3 - get rid of radius
 
 
 %% run optimization
@@ -26,7 +25,10 @@ if opt.mult %multiple simulations for sensitivity analysis
         if isequal(opt.tuned_parameter,'load')
             node.draw = opt.tuning_array(i);
         end
-        [multStruct(i).output,multStruct(i).opt] =  ... 
+        if isequal(opt.tuned_parameter,'bgd')
+            opt.battgriddur = opt.tuning_array(i);
+        end
+        [multStruct(i).output,multStruct(i).opt] =  ...
             optWind(opt,data,atmo,batt,econ,node,turb,tTot);
         multStruct(i).data = data;
         multStruct(i).atmo = atmo;
@@ -38,14 +40,16 @@ if opt.mult %multiple simulations for sensitivity analysis
     disp([num2str(opt.s) ' simulations complete after ' ...
         num2str(round(toc(tTot)/60,2)) ' minutes. '])
 else %just one simulation
-    [optStruct(i).output,optStruct(i).opt] = ... 
+    [output,opt] = ...
         optWind(opt,data,atmo,batt,econ,node,turb,tTot);
-        optStruct(i).data = data;
-        optStruct(i).atmo = atmo;
-        optStruct(i).batt = batt;
-        optStruct(i).econ = econ;
-        optStruct(i).node = node;
-        optStruct(i).turb = turb;   
+    optStruct.output = output;
+    optStruct.opt = opt;
+    optStruct.data = data;
+    optStruct.atmo = atmo;
+    optStruct.batt = batt;
+    optStruct.econ = econ;
+    optStruct.node = node;
+    optStruct.turb = turb;
 end
 
 clear i tTot
@@ -54,11 +58,7 @@ clear i tTot
 
 if opt.mult
     if isequal(opt.tuned_parameter,'utp')
-        name = ['multOpt_utp' num2str(opt.S)];
-        stru.(name) = multStruct;
-        save([name '.mat'],'-struct','stru','-v7.3');
-    elseif isequal(opt.tuned_parameter,'load')
-        name = ['multOpt_load' num2str(opt.S) '_bg' num2str(opt.battgriddur) ... 
+        name = ['multOpt_utp' num2str(opt.S) '_bg' num2str(opt.battgriddur) ...
             'mn' num2str(opt.m*opt.n)];
         if econ.turb_n * econ.batt_n > 1
             name = [name 'nonlin'];
@@ -67,15 +67,41 @@ if opt.mult
         end
         stru.(name) = multStruct;
         save([name '.mat'],'-struct','stru','-v7.3');
+    elseif isequal(opt.tuned_parameter,'load')
+        name = ['multOpt_load' num2str(opt.S) '_bg' num2str(opt.battgriddur) ...
+            'mn' num2str(opt.m) 'x' num2str(opt.n)];
+        if econ.turb_n * econ.batt_n > 1
+            name = [name 'nonlin'];
+        else
+            name = [name 'lin'];
+        end
+        stru.(name) = multStruct;
+        save([name '.mat'],'-struct','stru','-v7.3');
     end
-        visSensitivity(stru.(name))
-        load(name)
+    elseif isequal(opt.tuned_parameter,'bgd')
+        name = ['multOpt_bgd' num2str(opt.S) '_load' num2str(node.draw) ...
+            'utp' num2str('mn' num2str(opt.m) 'x' num2str(opt.n)];
+        if econ.turb_n * econ.batt_n > 1
+            name = [name 'nonlin'];
+        else
+            name = [name 'lin'];
+        end
+        stru.(name) = multStruct;
+        save([name '.mat'],'-struct','stru','-v7.3');
+    end
+    visSensitivity(stru.(name))
+    load(name)
 else
-    name = 'opt_';
+    name = ['opt_' 'mn' num2str(opt.m) 'x' num2str(opt.n)];
+    if econ.turb_n * econ.batt_n > 1
+        name = [name 'nonlin'];
+    else
+        name = [name 'lin'];
+    end
     stru.(name) = optStruct;
-    save([name '.mat'],'-struct','stru','-v7.3')
-    visWindOpt(stru.(name))
-    visWindSim(stru.(name))
+    save([name '.mat'],'-struct','stru','-v7.3')    
+    visWindOpt_v2(stru.(name))
+    %visWindSim(stru.(name))
     load(name)
 end
 

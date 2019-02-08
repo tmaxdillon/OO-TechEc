@@ -8,9 +8,8 @@ elseif isequal(multStruct(1).opt.tuned_parameter,'load')
     xlab = 'Load [W]';
     xt = multStruct(1).opt.tuning_array;
 elseif isequal(multStruct(1).opt.tuned_parameter,'bgd')
-    xlab = 'Input Mesh Size: Smax Axis Extent [days of battery storage]';
-    xt = min(multStruct(1).opt.tuning_array):3: ... 
-        max(multStruct(1).opt.tuning_array);
+    xlab = 'Smax Grid Axis Extent [days]';
+    xt = min(multstopt.tuning_array):3:max(opt.tuning_array);
 end
 
 cost = zeros(1,length(multStruct));

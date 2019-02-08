@@ -66,6 +66,10 @@ for i = 1:opt.m
 end
 X = output.cost;
 X(output.surv == 0) = inf;
+if opt.limitinitmin
+    X(:,1) = inf; %don't allow initial minima of Smax = 0
+    X(1,:) = inf; %don't allow initial minima of R = 0
+end
 [I(1),I(2)] = find(X == min(X(:)),1,'first');
 opt.init = output.cost(I(1),I(2));
 opt.R_init = opt.R(I(1));

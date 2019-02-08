@@ -9,8 +9,9 @@ if isequal(type,'turbine')
     %unpack into arrays
     for i = 1:length(turbineLib)
         x(i) = turbineLib(i).kW;
-        y(i) = turbineLib(i).cost;
+        y(i) = turbineLib(i).cost/turbineLib(i).kW;
     end
+    ylab = '[$1000/kW]';
 end
 if isequal(type,'battery')
     xf = 0:0.01:xmax; %kWh
@@ -21,8 +22,9 @@ if isequal(type,'battery')
     %unpack into arrays
     for i = 1:length(batteryLib)
         x(i) = batteryLib(i).kWh;
-        y(i) = batteryLib(i).cost;
+        y(i) = batteryLib(i).cost/batteryLib(i).kWh;
     end
+    ylab = '[$1000/kWh]';
 end
 
 yf = zeros(length(xf),length(n));
@@ -38,14 +40,15 @@ color = ['r','b'];
 
 figure
 for j=1:length(n)
-    h(j) = plot(xf,yf(:,j)/1000,color(j),'DisplayName',[num2str(j) ... 
+    h(j) = plot(xf,yf(:,j)./(xf*1000)',color(j),'DisplayName',[num2str(j) ... 
         ' order polynomial fit'],'LineWidth',1.4);
     %boundedline(x,y,delta,'alpha','transparency',.1)
     hold on
 end
 hold on
 scatter(x,y/1000,100,'.','k')
-ylabel('Cost in Thousands [$]')
+if type
+ylabel(ylab)
 xlabel(xlab)
 set(gca,'FontSize',14,'LineWidth',1.4)
 legend(h,'Location','Southeast')
