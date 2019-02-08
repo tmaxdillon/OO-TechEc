@@ -12,6 +12,7 @@ end
 cost = zeros(1,length(multStruct));
 Scost = zeros(1,length(multStruct));
 kWcost = zeros(1,length(multStruct));
+OpEx = zeros(1,length(multStruct));
 R = zeros(1,length(multStruct));
 Smax = zeros(1,length(multStruct));
 ratedP = zeros(1,length(multStruct));
@@ -21,6 +22,7 @@ for i = 1:length(multStruct)
     cost(i) = multStruct(i).output.min.cost;
     Scost(i) = multStruct(i).output.min.Scost;
     kWcost(i) = multStruct(i).output.min.kWcost;
+    OpEx(i) = multStruct(i).output.min.OpEx;
     R(i) = multStruct(i).output.min.R;
     Smax(i) = multStruct(i).output.min.Smax;
     ratedP(i) = multStruct(i).output.min.ratedP;
@@ -29,20 +31,22 @@ end
 %cost
 figure
 ax(1) = subplot(3,1,1);
-plot(multStruct(1).opt.tuning_array,(Scost(:)+kWcost(:))./cost(:).*100, ...
-    'LineWidth',1.3,'DisplayName','Storage + Turbine')
-hold on
-plot(multStruct(1).opt.tuning_array,Scost(:)./cost(:).*100, ...
-    'LineWidth',1.3,'DisplayName', ...
-    'Storage Cost')
-hold on
-plot(multStruct(1).opt.tuning_array,kWcost(:)./cost(:).*100, ...
-    'LineWidth',1.3,'DisplayName', ...
-    'Turbine Cost')
-ylabel('% of total cost')
-ylim([0 100])
+% plot(multStruct(1).opt.tuning_array,(Scost(:)+kWcost(:))./cost(:).*100, ...
+%     'LineWidth',1.3,'DisplayName','Storage + Turbine')
+% hold on
+% plot(multStruct(1).opt.tuning_array,Scost(:)./cost(:).*100, ...
+%     'LineWidth',1.3,'DisplayName', ...
+%     'Storage Cost')
+% hold on
+% plot(multStruct(1).opt.tuning_array,kWcost(:)./cost(:).*100, ...
+%     'LineWidth',1.3,'DisplayName', ...
+%     'Turbine Cost')
+area(multStruct(1).opt.tuning_array,[Scost;kWcost;OpEx]'./1000, ... 
+    'DisplayName',['S','T','O'])
+ylabel('cost in thousands')
+ylim([0 inf])
 xticks(xt)
-legend('show','Location','NorthEast')
+legend('Storage','Turbine','OpEx (no shipping)','Location','NorthWest')
 set(gca,'LineWidth',1.1,'Fontsize',14)
 if isequal(multStruct(1).opt.tuned_parameter,'utp')
     set(gca,'xdir','reverse')
@@ -68,7 +72,7 @@ plot(multStruct(1).opt.tuning_array,Smax,'k','LineWidth',1.6,'DisplayName', ...
 ylabel('[kWh]')
 ylim([0 inf])
 xticks(xt)
-xlabel('Percent Uptime')
+xlabel(xlab)
 legend('show','Location','NorthEast')
 set(gca,'LineWidth',1.1,'Fontsize',14)
 if isequal(multStruct(1).opt.tuned_parameter,'utp')

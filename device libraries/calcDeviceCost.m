@@ -1,4 +1,4 @@
-function [p,cost] = calcDeviceCost(type,n,xq)
+function [p,cost] = calcDeviceCost(type,xq,n)
 
 %code inspired by: http://maggotroot.blogspot.com/2013/11/constrained-linear-
 %least-squares-in.html

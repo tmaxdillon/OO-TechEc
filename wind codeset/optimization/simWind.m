@@ -1,6 +1,12 @@
 function [cost,surv,CapEx,OpEx,kWcost,Scost,CF,S,P,D,L] =  ...
     simWind(R,Smax,opt,data,atmo,batt,econ,node,turb,p)
 
+if opt.fmin && Smax < 0 || R < 0
+    surv = 0;
+    cost = inf;
+    return
+end
+
 wind = data.met.wind_spd; %extract wind speed
 dt = 24*(data.met.time(2) - data.met.time(1)); %time in hours
 dist = data.dist; %[m] dist to shore
@@ -61,7 +67,7 @@ if opt.constr.uptime && length(find(L==node.draw))/length(L) < node.uptime
 end
 
 if opt.fmin && surv == 0
-    cost = inf;
+    cost = opt.init + (opt.init - cost);
 end
 
 

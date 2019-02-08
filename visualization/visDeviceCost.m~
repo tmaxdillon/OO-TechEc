@@ -25,35 +25,28 @@ if isequal(type,'battery')
     end
 end
 
-yf = zeros(length(xf),length(n));
-p = zeros(max(n)+1,length(n));
-for j=1:length(n)
+for 1:length(n)
+    yf(:,n) = zeros(size(xf));
     for i = 1:length(xf)
-        [~,yf(i,j)] = calcDeviceCost(type,xf(i),n(j));
+        [~,yf(i)] = calcDeviceCost(type,xf(i),);
     end
-    p(1:n(j)+1,j) = calcDeviceCost(type,[],n(j)); %store polyvals
 end
 
-color = ['r','b'];
+p = calcDeviceCost(type); %store polyvals
 
 figure
-for j=1:length(n)
-    h(j) = plot(xf,yf(:,j)/1000,color(j),'DisplayName',[num2str(j) ... 
-        ' order polynomial fit'],'LineWidth',1.4);
-    %boundedline(x,y,delta,'alpha','transparency',.1)
-    hold on
-end
+plot(xf,yf/1000,'r')
+%boundedline(x,y,delta,'alpha','transparency',.1)
 hold on
 scatter(x,y/1000,100,'.','k')
 ylabel('Cost in Thousands [$]')
 xlabel(xlab)
 set(gca,'FontSize',14,'LineWidth',1.4)
-legend(h,'Location','Southeast')
 % set(gca,'xticklabel',num2str(get(gca,'xtick')','%.1f'))
 % set(gca,'yticklabel',num2str(get(gca,'ytick')','%d'))
 grid on
 
-set(gcf, 'Position', [100, 100, 800, 300])
+set(gcf, 'Position', [100, 100, 800, 400])
 
 
 end

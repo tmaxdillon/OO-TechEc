@@ -7,23 +7,19 @@ end
 clear location
 
 %economic parameters
-%econ.Tcost = 1047.4;       %[$/rated kW] Nature Power 400 W turbine
-%econ.Scost = 275;          %[$/kWh storage] lifeline GPL-L16T-2V (2.38 kWh)
-econ.ship = 80000;          %[$/day] of vessel charter UNOLS global class vessels (Dana)
-%econ.speed = 5;            %[m/s] vessel speed of Roberston
-econ.repairT = 2/24;        %[d] additional repair time
-%econ.fuel = 4;             %[$/gal] diesel fuel (in seattle)
-%econ.mileage = 23.4;       %[gal/hr] fuel consumption of Robertson
-econ.installed = 11953;     %[$/(kW*year)] installed costs(Orrell and Poehlman, 2017 + dwr)
-% ^^^^ one kW of wind costs $11k, installed costs == CapEx -- check this
-% out
-econ.maintenance = 37;      %[$/(kW*visit)] maintenance costs (Orrell and Poehlman, 2017 + dwr)
+%econ.ship = 80000;          %[$/day] of vessel charter UNOLS global class vessels (Dana)
+%econ.repairT = 2/24;        %[d] additional repair time
+econ.maintenance = 37;       %[$/(kW*visit)] maintenance costs (Orrell and Poehlman, 2017 + dwr)
 %econ.marinize = ??
+%econ.install = ??
+%econ.tower = ??
+econ.batt_n = 2;            %polynomial fit
+econ.turb_n = 2;            %polynomial fit
 
 %turbine parameters
 turb.uci = 3;               %[m/s] guess
 turb.ura = 11;              %[m/s] awea
-turb.uco = 40;              %[m/s] guess
+turb.uco = 30;              %[m/s] guess, high? maybe 25-30
 turb.eta = 0.35;            %[~] guess
 %turb.mtbf = 12;             %[months], mean time between failure (made up)
 
@@ -36,20 +32,26 @@ atmo.rho = 1;               %[kg/m^3] density
 %add surface roughness for vertical adjustment
 
 %load parameters
-node.draw = 150;            %[W] - secondary node
+node.draw = 400;            %[W] - secondary node
 node.lifetime = 5;          %[y]
 node.SI = 6;                %[months] service interval
-node.uptime = 1;            %[%] uptime
+node.uptime = .9;           %[%] uptime
 
 %optimization parameters
-opt.m = 8;
-opt.n = 8;
+opt.m = 100;
+opt.n = 100;
+opt.battgriddur = 30;       %[d]
 opt.show = false;
 opt.constr.thresh = false;
 opt.constr.uptime = true;
+opt.enforcegrid = true;
+opt.enfR_m = sqrt(2*2*1000/(atmo.rho*pi*turb.eta*turb.ura^3));
+opt.enfSmax_n = 7.5;
+opt.enfR_1 = 
+opt.enfSmax_1 = 6;
 
 %multiple optimization parameters
-opt.mult = true;
+opt.mult = false;
 %opt.tuning_array = [1 .99 .98 .97 .96 .95 .925 .9 .85 .8];
 %opt.tuned_parameter = 'utp';
 opt.tuning_array = [50:50:1000];

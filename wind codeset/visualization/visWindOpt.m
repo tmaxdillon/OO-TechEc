@@ -3,12 +3,18 @@ function [] = visWindOpt(optStruct)
 opt = optStruct.opt;
 output = optStruct.output;
 data = optStruct.data;
+atmo = optStruct.atmo;
+turb = optStruct.turb;
 
 %adjust to thousands
 output.cost = output.cost/1000;
+opt.init = opt.init/1000;
 output.min.cost = output.min.cost/1000;
 
-[Smaxgrid,Rgrid] = meshgrid(opt.Smax,opt.R);
+kW = (1/1000)*1/2*atmo.rho.*opt.R.^2.*pi.*turb.ura^3*turb.eta;
+kW_init = (1/1000)*1/2*atmo.rho.*opt.R_init.^2.*pi.*turb.ura^3*turb.eta;
+
+[Smaxgrid,kWgrid] = meshgrid(opt.Smax,kW);
 ms = 100;
 lw = 1.1;
 fs = 14;
@@ -20,32 +26,38 @@ textadj.y = .2;
 figure
 %COST
 a = 1; ax(a) = subplot(2,2,a);
-output.cost(output.surv == 0) = nan;
+% for i=1:size(output.cost,1)
+%     for j=1:size(output.cost,2)
+%         if output.surv(i,j) == 0
+%             output.cost = opt.init + (opt.init - output.cost);
+%         end
+%     end
+% end
 %surf(Smaxgrid,Rgrid,output.cost);
 scatter3(reshape(Smaxgrid,length(Smaxgrid)^2,1), ...
-    reshape(Rgrid,length(Rgrid)^2,1),reshape(output.cost,length(output.cost)^2,1), ... 
+    reshape(kWgrid,length(kWgrid)^2,1),reshape(output.cost,length(output.cost)^2,1), ... 
     100,reshape(output.cost,length(output.cost)^2,1))
 hold on
-minval = scatter3(output.min.Smax,output.min.R,output.min.cost,...
+minval = scatter3(output.min.Smax,output.min.ratedP,output.min.cost,...
     ms,'filled','MarkerEdgeColor','k', ...
     'MarkerFaceColor','m');
 hold on
-initval = scatter3(opt.Smax_init,opt.R_init,output.cost(opt.I_init(1),opt.I_init(2)), ...
+initval = scatter3(opt.Smax_init,kW_init,opt.init, ...
     ms,'filled','MarkerEdgeColor','k', ...
     'MarkerFaceColor','w');
 view(0,90)
 xlabel('Storage Capacity [kWh]')
-ylabel('Rotor Radius [m]')
+ylabel('Rated Power [kW]')
 xlim([min(opt.Smax) inf])
-ylim([min(opt.R) inf])
+ylim([min(kW) inf])
 c = colorbar;
 c.Label.String = '[$] in thousands';
-colormap(ax(a),brewermap([],'Purples'))
+colormap(ax(a),brewermap([],'RdGy'))
 hold on
 annotation('textbox',annodim1,'String',['$ ' num2str(round(output.min.cost,2))], ...
     'FitBoxToText','on','color','m','BackgroundColor','w')
 annotation('textbox',annodim2,'String',['$ ' ...
-    num2str(round(output.cost(opt.I_init(1),opt.I_init(2)),2))], ...
+    num2str(round(opt.init,2))], ...
     'FitBoxToText','on','color','k','BackgroundColor','w')
 legend([initval minval],'Grid Minima','Nelder-Mead Minima','location','NorthWest')
 title('Total Cost')
@@ -56,21 +68,21 @@ grid on
 a = 2; ax(a) = subplot(2,2,a);
 costratio = output.Scost./output.kWcost;
 costratio(output.surv == 0) = nan;
-surf(Smaxgrid,Rgrid,costratio);
+surf(Smaxgrid,kWgrid,costratio);
 hold on
-minval = scatter3(output.min.Smax,output.min.R,output.min.Scost/output.min.kWcost,...
+minval = scatter3(output.min.Smax,output.min.ratedP,output.min.Scost/output.min.kWcost,...
     ms,'filled','MarkerEdgeColor','k', ...
     'MarkerFaceColor','m');
 hold on
-scatter3(opt.Smax_init,opt.R_init,output.Scost(opt.I_init(1),opt.I_init(2))/ ... 
+scatter3(opt.Smax_init,kW_init,output.Scost(opt.I_init(1),opt.I_init(2))/ ... 
     output.kWcost(opt.I_init(1),opt.I_init(2)), ...
     ms,'filled','MarkerEdgeColor','k', ...
     'MarkerFaceColor','w');
 view(0,90)
 xlabel('Storage Capacity [kWh]')
-ylabel('Rotor Radius [m]')
+ylabel('Rated Power [kW]')
 xlim([min(opt.Smax) inf])
-ylim([min(opt.R) inf])
+ylim([min(kW) inf])
 c = colorbar;
 c.Label.String = '[~]';
 colormap(ax(a),brewermap([],'Purples'))
@@ -91,19 +103,19 @@ grid on
 a = 3; ax(a) = subplot(2,2,a);
 pavg = nanmean(output.P,3);
 pavg(output.surv == 0) = nan;
-surf(Smaxgrid,Rgrid,pavg/1000);
+surf(Smaxgrid,kWgrid,pavg/1000);
 hold on
-minval = scatter3(output.min.Smax,output.min.R,nanmean(output.min.P)/1000,...
+minval = scatter3(output.min.Smax,output.min.ratedP,nanmean(output.min.P)/1000,...
     ms,'filled','MarkerEdgeColor','k', ...
     'MarkerFaceColor','m');
 hold on
-scatter3(opt.Smax_init,opt.R_init, ... 
+scatter3(opt.Smax_init,kW_init, ... 
     nanmean(output.P(opt.I_init(1),opt.I_init(2))/1000), ...
     ms,'filled','MarkerEdgeColor','k', ...
     'MarkerFaceColor','w');
 view(0,90)
 xlabel('Storage Capacity [kWh]')
-ylabel('Rotor Radius [m]')
+ylabel('Rated Power [kW]')
 xlim([min(opt.Smax) inf])
 ylim([min(opt.R) inf])
 c = colorbar;
@@ -125,22 +137,22 @@ for i = 1:opt.m
 end
 dtotal(output.surv == 0) = nan;
 ytotal = ((data.met.time(end) - data.met.time(1))*24)/8760;
-surf(Smaxgrid,Rgrid,(dtotal/1000)/ytotal);
+surf(Smaxgrid,kWgrid,(dtotal/1000)/ytotal);
 hold on
-minval = scatter3(output.min.Smax,output.min.R, ... 
+minval = scatter3(output.min.Smax,output.min.ratedP, ... 
     trapz(data.met.time,output.min.D/1000)/ytotal, ...
     ms,'filled','MarkerEdgeColor','k', ...
     'MarkerFaceColor','m');
 hold on
-scatter3(opt.Smax_init,opt.R_init,trapz(data.met.time, ... 
+scatter3(opt.Smax_init,kW_init,trapz(data.met.time, ... 
     output.D(opt.I_init(1),opt.I_init(2),:)/1000)/ytotal, ... 
     ms,'filled','MarkerEdgeColor','k', ...
     'MarkerFaceColor','w');
 view(0,90)
 xlabel('Storage Capacity [kWh]')
-ylabel('Rotor Radius [m]')
+ylabel('Rated Power [kW]')
 xlim([min(opt.Smax) inf])
-ylim([min(opt.R) inf])
+ylim([min(kW) inf])
 c = colorbar;
 c.Label.String = '[kWh/year]';
 colormap(ax(a),brewermap([],'Purples'))
