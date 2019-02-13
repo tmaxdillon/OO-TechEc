@@ -9,12 +9,12 @@ clear location
 %economic parameters
 %econ.ship = 80000;          %[$/day] of vessel charter UNOLS global class vessels (Dana)
 %econ.repairT = 2/24;        %[d] additional repair time
-econ.maintenance = 37;       %[$/(kW*visit)] maintenance costs (Orrell and Poehlman, 2017 + dwr)
+econ.maintenance = 37;       %[$/(kW*visit)] maint costs (Orrell and Poehlman, 2017 + dwr)
 %econ.marinize = ??
 %econ.install = ??
 %econ.tower = ??
-econ.batt_n = 1;            %polynomial fit
-econ.turb_n = 1;            %polynomial fit
+econ.batt_n = 2;            %polynomial fit
+econ.turb_n = 2;            %polynomial fit
 
 %turbine parameters
 turb.uci = 3;               %[m/s] guess
@@ -35,21 +35,26 @@ atmo.rho = 1;               %[kg/m^3] density
 node.draw = 500;            %[W] - secondary node
 node.lifetime = 5;          %[y]
 node.SI = 6;                %[months] service interval
-node.uptime = .9;           %[%] uptime
+node.uptime = 1;           %[%] uptime
+node.constr.thresh = false;
+node.constr.uptime = true;
 
 %optimization parameters
 opt.m = 8;
 opt.n = 8;
 opt.battgriddur = 7;       %[d]
 opt.show = false;
-opt.constr.thresh = false;
-opt.constr.uptime = true;
 opt.enforcegrid = false;
-opt.limitinitmin = true;
-opt.enfR_m = sqrt(2*4*1000/(atmo.rho*pi*turb.eta*turb.ura^3));
+opt.initminset = 0;
+opt.initminlim = .9;
+opt.initminrand = false;
+opt.failurezoneslope = false;
+opt.enfKw_m = 4;
 opt.enfSmax_n = 15;
-opt.enfR_1 = sqrt(2*1*1000/(atmo.rho*pi*turb.eta*turb.ura^3));
+opt.enfkW_1 = 1;
 opt.enfSmax_1 = 3;
+opt.nelder.tolfun = 1;
+opt.nelder.tolx = 1;
 
 %multiple optimization parameters
 opt.mult = true;
@@ -57,5 +62,5 @@ opt.mult = true;
 %opt.tuned_parameter = 'utp';
 %opt.tuning_array = [50:50:1000];
 %opt.tuned_parameter = 'load';
-opt.tuning_array = linspace(7,30,10);
+opt.tuning_array = linspace(2,40,30);
 opt.tuned_parameter = 'bgd';

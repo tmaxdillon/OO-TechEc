@@ -4,8 +4,8 @@ clear all, close all, clc
 
 %% to do
 
-% 3 - get rid of radius
-
+% 4 - power law wind height
+% 4 - add new economics
 
 %% run optimization
 
@@ -84,6 +84,15 @@ if opt.mult
             name = [name 'nonlin'];
         else
             name = [name 'lin'];
+        end
+        if opt.initminlim
+            name = [name 'iml'];
+        end
+        if opt.initminharsh
+            name = [name 'imh'];
+        end
+        if opt.initmincentroid
+            name = [name 'imc'];
         end
         stru.(name) = multStruct;
         save([name '.mat'],'-struct','stru','-v7.3');

@@ -1,30 +1,17 @@
-function [] = visOptTime(multStruct_s,multStruct_ns)
+function [] = visOptTime(multStruct)
 
-for i = 1:length(multStruct_s)
-    time_ns(:,i) = [multStruct_ns(i).output.tInitOpt ;  ... 
-        multStruct_ns(i).output.tFminOpt];
-    time_s(:,i) = [multStruct_s(i).output.tInitOpt ; ...
-        multStruct_s(i).output.tFminOpt];
-    sqrtmn = sqrt(multStruct_ns(i).opt.tuning_array);
+for i = 1:length(multStruct)
+    time(:,i) = [multStruct(i).output.tInitOpt ; ...
+        multStruct(i).output.tFminOpt];
 end
 
 figure
-ax(1) = subplot(2,1,1);
-bar(sqrtmn,time_ns','stacked')
-legend('Initial Optimization Runtime','Nelder-Mead Runtime', ...
-    'location','north')
-xlabel('sqrt(m*n)')
-ylabel('[s]')
-grid on
-ax(2) = subplot(2,1,2);
-bar(sqrtmn,time_s','stacked');
+bar(multStruct(1).opt.tuning_array,time','stacked');
 legend('Initial Optimization Runtine','Nelder-Mead Runtime', ... 
     'location','north')
-xlabel('sqrt(m*n)')
+%xlabel('sqrt(m*n)')
 ylabel('[s]')
 grid on
-
-linkaxes(ax,'xy')
 
 end
 

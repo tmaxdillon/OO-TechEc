@@ -17,9 +17,8 @@ cost = zeros(1,length(multStruct));
 Scost = zeros(1,length(multStruct));
 kWcost = zeros(1,length(multStruct));
 OpEx = zeros(1,length(multStruct));
-R = zeros(1,length(multStruct));
 Smax = zeros(1,length(multStruct));
-ratedP = zeros(1,length(multStruct));
+kW = zeros(1,length(multStruct));
 
 %unpack multStruct
 for i = 1:length(multStruct)
@@ -27,9 +26,8 @@ for i = 1:length(multStruct)
     Scost(i) = multStruct(i).output.min.Scost;
     kWcost(i) = multStruct(i).output.min.kWcost;
     OpEx(i) = multStruct(i).output.min.OpEx;
-    R(i) = multStruct(i).output.min.R;
     Smax(i) = multStruct(i).output.min.Smax;
-    ratedP(i) = multStruct(i).output.min.ratedP;
+    kW(i) = multStruct(i).output.min.kW;
 end
 
 %cost
@@ -58,7 +56,7 @@ end
 grid on
 %radius
 ax(2) = subplot(3,1,2);
-plot(multStruct(1).opt.tuning_array,ratedP,'Color',[0,255,127]/256, ...
+plot(multStruct(1).opt.tuning_array,kW,'Color',[0,255,127]/256, ...
     'LineWidth',1.6,'DisplayName','Rated Power')
 ylabel('[kW]')
 ylim([0 inf])

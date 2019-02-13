@@ -1,7 +1,8 @@
 function [cost,surv,CapEx,OpEx,kWcost,Scost,CF,S,P,D,L] =  ...
-    simWind(R,Smax,opt,data,atmo,batt,econ,node,turb,p)
+    simWind(kW,Smax,opt,data,atmo,batt,econ,node,turb,p)
 
-if opt.fmin && Smax < 0 || R < 0
+%if fmin is suggesting a negative input, block it
+if opt.fmin && Smax < 0 || kW < 0
     surv = 0;
     cost = inf;
     return
@@ -12,7 +13,6 @@ dt = 24*(data.met.time(2) - data.met.time(1)); %time in hours
 dist = data.dist; %[m] dist to shore
 
 %compute cost
-kW = (1/1000)*1/2*atmo.rho*pi*R^2*turb.ura^3*turb.eta;
 trips = (node.lifetime*12)/(node.SI);
 %singletrip = 2*(econ.ship*(dist*econ.speed^(-1)*(1/86400) + ...
 %    econ.repairT) + econ.fuel*(dist*econ.speed^(-1)*(1/360)*econ.mileage));
@@ -37,9 +37,9 @@ for t = 1:length(wind)
     if wind(t) < turb.uci
         P(t) = 0; %[W]
     elseif turb.uci < wind(t) && wind(t) <= turb.ura
-        P(t) = 1/2*atmo.rho*pi*R^2*wind(t)^3*turb.eta; %[W]
+        P(t) = kW*1000*wind(t)^3/turb.ura^3; %[W]
     elseif turb.ura < wind(t) && wind(t) <= turb.uco
-        P(t) = 1/2*atmo.rho*pi*R^2*turb.ura^3*turb.eta; %[W]
+        P(t) = kW*1000; %[W]
     else
         P(t) = 0; %[W]
     end
@@ -53,21 +53,31 @@ for t = 1:length(wind)
             S(t+1) = 0; %no less than bottom
             L(t) = S(t)/dt; %adjust load to what was consumed
         end %no less than 0 kWh
-        if opt.constr.thresh
+        if node.constr.thresh
             surv = 0; %voilated lower constraint
         end
     end
 end
 
-CF = nanmean(P)/(1/2*atmo.rho*pi*R^2*turb.ura^3*turb.eta);
+CF = nanmean(P/1000)/kW; %capacity factor
 
 %check to see if we fell beneath uptime constraint
-if opt.constr.uptime && length(find(L==node.draw))/length(L) < node.uptime
+if node.constr.uptime && length(find(L==node.draw))/length(L) < node.uptime
     surv = 0;
 end
 
-if opt.fmin && surv == 0
-    cost = opt.init + (opt.init - cost);
+if surv == 0
+    if opt.initminset > 0
+        cost = opt.initminset + (opt.initminset - cost);
+        %cost = inf;
+    elseif opt.fmin
+        if opt.failurezoneslope
+            cost = 2*opt.init + 3*opt.init*(1 - (1/opt.kW_m)*kW - ...
+                (1/opt.Smax_n)*Smax);
+        else
+            cost = inf;
+        end
+    end
 end
 
 
