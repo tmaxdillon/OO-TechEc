@@ -1,19 +1,4 @@
-function [output,opt] = optWind(opt,data,atmo,batt,econ,uc,turb,tTot)
-
-%print status to command window
-if opt.mult
-    disp(['Optimization ' num2str(opt.s) ' out of ' num2str(opt.S) ...
-        ' beginning after ' num2str(round(toc(tTot),2)) ' seconds. ' ...
-        opt.tuned_parameter ' tuned to ' ...
-        num2str(opt.tuning_array(opt.s)) '.'])
-else
-    disp('Optimization beginning')
-end
-tOpt = tic;
-
-%curve-fit devices, find polyvals
-p.t = calcDeviceCost('turbine',[],econ.turb_n);
-[p.b,~,p.kWhmax] = calcDeviceCost('battery',[],econ.batt_n);
+function [output,opt] = optWind(opt,data,atmo,batt,econ,uc,turb,p)
 
 %set R and Smax mesh
 opt.kW_1 = 0;
@@ -104,18 +89,6 @@ output.min.Smax = opt_ind(2);
     output.min.CF,output.min.S,output.min.P,output.min.D,output.min.L] ...
     = simWind(output.min.kW,output.min.Smax,opt,data,atmo,batt,econ,uc,turb,p);
 output.tFminOpt = toc(tFminOpt); %end timer
-
-%print status to command window
-if opt.mult
-    disp(['Optimization ' num2str(opt.s) ' out of ' num2str(opt.S) ...
-        ' complete after ' num2str(round(toc(tOpt),2)) ' seconds.'])
-else
-    disp(['Optimization complete after ' ... 
-        num2str(round(toc(tTot),2)) ' seconds.'])
-end
-output.min %print nelder mead min values
-opt.kW_init; %print initial kW value
-opt.Smax_init; %print inial Smax value
 
 end
 

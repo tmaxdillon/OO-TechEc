@@ -23,9 +23,9 @@ econ.foundsub = 1653;           %[$/kW]
 %turbine parameters
 turb.uci = 3;               %[m/s] guess
 turb.ura = 11;              %[m/s] awea
-turb.uco = 30;              %[m/s] guess, high? maybe 25-30
+turb.uco = 30;              %[m/s] guess
 turb.eta = 0.35;            %[~] guess
-turb.mtbf = 12*5-5;             %[months], mean time between failure (made up)
+turb.mtbf = 36;             %[months], mean time between failure 
 
 %battery parameters
 batt.lb = 0.2;              %floor = percentage of Smax
@@ -49,7 +49,7 @@ uc(1).ship.mileage = 2700;    %gallons/day
 %long term instrumentation
 uc(2).draw = 500;             %[W] - secondary node
 uc(2).lifetime = 5;           %[y]
-uc(2).SI = 12*5;              %[months] service interval
+uc(2).SI = inf;               %[months] service interval
 uc(2).uptime = 1;             %[%] uptime
 uc(2).ship.cost = 80000;      %[$/day] for vessel
 uc(2).ship.speed = 11;        %[kts]
@@ -57,7 +57,7 @@ uc(2).ship.mileage = 2200;    %gallons/day
 %infrastructure
 uc(3).draw = 8000;            %[W] - secondary node
 uc(3).lifetime = 25;          %[y]
-uc(3).SI = 25*12;             %[months] service interval
+uc(3).SI = inf;               %[months] service interval
 uc(3).uptime = 99;            %[%] uptime
 uc(3).ship.cost = [];         %[$/day] for vessel
 uc(3).ship.speed = [];        %[kts]
@@ -67,6 +67,8 @@ uc(3).ship.mileage = [];      %gallons/day
 opt.m = 8;
 opt.n = 8;
 opt.battgriddur = 7;       %[d]
+opt.many = true;
+opt.bgd_array = [6,9];
 opt.show = false;
 opt.enforcegrid = false;
 opt.initminset = 0;
@@ -84,10 +86,13 @@ opt.nelder.tolx = 1;
 opt.mult = true;
 %opt.tuning_array = [1 .99 .98 .97 .96 .95 .925 .9 .85 .8];
 %opt.tuned_parameter = 'utp';
-%opt.tuning_array = [50:50:1000];
-%opt.tuned_parameter = 'load';
+opt.tuning_array = [50:50:1000];
+opt.tuned_parameter = 'load';
 %opt.tuning_array = linspace(2,40,8);
 %opt.tuned_parameter = 'bgd';
-%opt.tuning_array = [4 8 16 32 100];
+%opt.tuning_array = [4:2:20];
 %opt.tuned_parameter = 'mxn';
-opt.tuning_array = [0 0.
+%opt.tuning_array = [0.01,0.2,.5];
+%opt.tuned_parameter = 'zo';
+%opt.tuning_array = [2 4 6 8 10 12 14 18 22 30 40];
+%opt.tuned_parameter = 'mtbf';

@@ -4,12 +4,12 @@ clear all; close all; clc
 
 %% to do
 
-% 2 - build option for redundant/multiple optimizations
+% 1 - put height-adjusted wind speed into data structure
 
 %% run optimization
 
 tTot = tic;
-windInputs %load inputs
+optInputs %load inputs
 if opt.mult %multiple simulations for sensitivity analysis
     opt.S = length(opt.tuning_array);
     %initialize outputs
@@ -38,7 +38,7 @@ if opt.mult %multiple simulations for sensitivity analysis
             turb.mtbf = opt.tuning_array(i);
         end
         [multStruct(i).output,multStruct(i).opt] =  ...
-            optWind(opt,data,atmo,batt,econ,uc(c),turb,tTot);
+            optRun(opt,data,atmo,batt,econ,uc(c),turb,tTot);
         multStruct(i).data = data;
         multStruct(i).atmo = atmo;
         multStruct(i).batt = batt;
@@ -50,7 +50,7 @@ if opt.mult %multiple simulations for sensitivity analysis
         num2str(round(toc(tTot)/60,2)) ' minutes. '])
 else %just one simulation
     [output,opt] = ...
-        optWind(opt,data,atmo,batt,econ,uc(c),turb,tTot);
+        optRun(opt,data,atmo,batt,econ,uc(c),turb,tTot);
     optStruct.output = output;
     optStruct.opt = opt;
     optStruct.data = data;

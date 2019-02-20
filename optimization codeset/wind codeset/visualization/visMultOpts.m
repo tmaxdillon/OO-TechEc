@@ -6,12 +6,12 @@ data = multStruct(1).data;
 atmo = multStruct(1).atmo;
 batt = multStruct(1).batt;
 econ = multStruct(1).econ;
-node = multStruct(1).node;
+uc = multStruct(1).uc;
 turb = multStruct(1).turb;
 
 %curve-fit devices, find polyvals
 p.t = calcDeviceCost('turbine',[],econ.turb_n);
-p.b = calcDeviceCost('battery',[],econ.batt_n);
+[p.b,~,p.kWhmax] = calcDeviceCost('battery',[],econ.batt_n);
 
 %preallocate
 min_s = zeros(1,length(multStruct));
@@ -38,7 +38,7 @@ if ~isfield(multStruct(1),'savedsurf')
     for i=1:100
         for j=1:100
             [surface.cost(i,j),surface.surv(i,j)] ...
-                = simWind(kW(i),Smax(j),opt,data,atmo,batt,econ,node,turb,p);
+                = simWind(kW(i),Smax(j),opt,data,atmo,batt,econ,uc,turb,p);
         end
     end
 else 
@@ -50,7 +50,7 @@ end
 ms = 100;
 lw = 1.1;
 fs = 14;
-z_adj = 1.5;
+z_adj = 20;
 
 %remove failure configurations
 alive = surface.cost;

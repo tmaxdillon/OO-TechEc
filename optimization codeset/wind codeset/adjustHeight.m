@@ -6,8 +6,12 @@ function [U_1] = adjustHeight(U_0,h_0,h_1,type,constant)
 if isequal(type,'power')
     U_1 = U_0*(h_1/h_0)^(constant);
 elseif isequal(type,'log') 
-    U_1 = U_0*(log(h_1/constant)/log(h_0/constant));
+    U_1 = U_0*(log(h_1/(constant/1000))/log(h_0/(constant./1000)));
 end
 
 end
 
+
+%%
+
+for i = 1:length(data.met.wind
