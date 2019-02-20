@@ -17,9 +17,7 @@ elseif isequal(multStruct(1).opt.tuned_parameter,'mxn')
 elseif isequal(multStruct(1).opt.tuned_parameter,'zo')
     xlab = 'Surface Roughness';
     xt = multStruct(1).opt.tuning_array;
-elseif isequal(multStruct(1).opt.tuned_parameter,'mtbf')
-    xlab = 'Mean Time Between Failure';
-    xt = multStruct(1).opt.tuning_array;
+elseif isequal(mu
 end
 
 cost = zeros(1,length(multStruct));

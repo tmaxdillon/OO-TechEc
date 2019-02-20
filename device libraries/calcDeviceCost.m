@@ -1,4 +1,4 @@
-function [p,cost] = calcDeviceCost(type,xq,n)
+function [p,cost,xmax] = calcDeviceCost(type,xq,n)
 
 %code inspired by: http://maggotroot.blogspot.com/2013/11/constrained-linear-
 %least-squares-in.html
@@ -24,10 +24,15 @@ if isequal(type,'battery')
         x(i) = batteryLib(i).kWh;
         y(i) = batteryLib(i).cost;
     end
+    xmax = max(x);
+    if xq > xmax & n > 1
+        linmult = xq/xmax;
+        xq = xmax;
+    end
 end
 
 %clear out missing cost values
-x = x(~isnan(y)); %must do x firest
+x = x(~isnan(y)); %must do x first
 y = y(~isnan(y));
 
 V = [];
@@ -41,6 +46,10 @@ p = lsqnonneg(C,d);
 
 if exist('xq','var')
     cost = polyval(p,xq);
+end
+
+if exist('linmult','var')
+    cost = cost*linmult;
 end
 
 end

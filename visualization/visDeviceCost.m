@@ -9,9 +9,11 @@ if isequal(type,'turbine')
     %unpack into arrays
     for i = 1:length(turbineLib)
         x(i) = turbineLib(i).kW;
-        y(i) = turbineLib(i).cost/turbineLib(i).kW;
+        %y(i) = turbineLib(i).cost/turbineLib(i).kW;
+        y(i) = turbineLib(i).cost;
     end
-    ylab = '[$1000/kW]';
+    %ylab = '[$1000/kW]';
+    ylab = '[$1000]';
 end
 if isequal(type,'battery')
     xf = 0:0.01:xmax; %kWh
@@ -22,9 +24,11 @@ if isequal(type,'battery')
     %unpack into arrays
     for i = 1:length(batteryLib)
         x(i) = batteryLib(i).kWh;
-        y(i) = batteryLib(i).cost/batteryLib(i).kWh;
+        %y(i) = batteryLib(i).cost/batteryLib(i).kWh;
+        y(i) = batteryLib(i).cost;
     end
-    ylab = '[$1000/kWh]';
+    %ylab = '[$1000/kWh]';
+    ylab = '[$1000]';
 end
 
 yf = zeros(length(xf),length(n));
@@ -40,14 +44,15 @@ color = ['r','b'];
 
 figure
 for j=1:length(n)
-    h(j) = plot(xf,yf(:,j)./(xf*1000)',color(j),'DisplayName',[num2str(j) ... 
-        ' order polynomial fit'],'LineWidth',1.4);
+    %     h(j) = plot(xf,yf(:,j)./(xf*1000)',color(j),'DisplayName',[num2str(n(j)) ...
+    %         ' order polynomial fit'],'LineWidth',1.4); % $1000/x by x
     %boundedline(x,y,delta,'alpha','transparency',.1)
+    h(j) = plot(xf,yf(:,j)/1000,color(j),'DisplayName',[num2str(n(j)) ...
+        ' order polynomial fit'],'LineWidth',1.4); % $1000/x by x
     hold on
 end
 hold on
 scatter(x,y/1000,100,'.','k')
-if type
 ylabel(ylab)
 xlabel(xlab)
 set(gca,'FontSize',14,'LineWidth',1.4)

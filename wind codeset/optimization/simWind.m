@@ -1,5 +1,6 @@
-function [cost,surv,CapEx,OpEx,kWcost,Scost,CF,S,P,D,L] =  ...
-    simWind(kW,Smax,opt,data,atmo,batt,econ,node,turb,p)
+function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,FScost,maint,shipping, ... 
+    triptime,fuelconsump,trips,singletrip,CF,S,P,D,L] =  ...
+    simWind(kW,Smax,opt,data,atmo,batt,econ,uc,turb,p)
 
 %if fmin is suggesting a negative input, block it
 if opt.fmin && Smax < 0 || kW < 0
@@ -9,18 +10,32 @@ if opt.fmin && Smax < 0 || kW < 0
 end
 
 wind = data.met.wind_spd; %extract wind speed
+for i = 1:length(wind)
+    wind(i) = adjustHeight(wind(i),data.met.wind_ht,atmo.h,'log',atmo.zo);
+end
+    
 dt = 24*(data.met.time(2) - data.met.time(1)); %time in hours
 dist = data.dist; %[m] dist to shore
 
 %compute cost
-trips = (node.lifetime*12)/(node.SI);
-%singletrip = 2*(econ.ship*(dist*econ.speed^(-1)*(1/86400) + ...
-%    econ.repairT) + econ.fuel*(dist*econ.speed^(-1)*(1/360)*econ.mileage));
-%OpEx = turb.mtbf*(1/12)*singletrip*node.lifetime;
-OpEx = econ.maintenance*kW*trips;
-kWcost = polyval(p.t,kW);
-Scost = polyval(p.b,Smax);
-CapEx = kWcost + Scost;
+trips = ceil((uc.lifetime)*(12/turb.mtbf - 12/uc.SI)); %number of trips for power alone
+if trips < 0, trips = 0; end
+triptime = dist*kts2mps(econ.vessel.speed)^(-1)*(1/86400);
+fuelconsump = econ.vessel.mileage*dist*econ.vessel.speed^(-1)*(1/86400);
+singletrip = 2*(econ.vessel.cost*triptime + econ.vessel.fuel*fuelconsump);
+maint = econ.maintenance*kW*12/turb.mtbf*uc.lifetime;
+shipping = singletrip*trips;
+OpEx = maint + shipping;
+kWcost = polyval(p.t,kW)*econ.marinization; %cost of turbine
+Icost = (econ.installed - kWcost/(kW*econ.marinization))*kW; %const of installation
+FScost = econ.foundsub*kW; %cost of substructure and foundation
+if Icost < 0, Icost = 0; end
+if Smax < p.kWhmax
+    Scost = polyval(p.b,Smax);
+else
+    Scost = polyval(p.b,p.kWhmax)*(Smax/p.kWhmax);
+end
+CapEx = kWcost + Scost + Icost + FScost;
 cost = CapEx + OpEx;
 
 %initialize
@@ -28,7 +43,7 @@ S = zeros(1,length(wind));
 S(1) = Smax*1000;
 P = zeros(1,length(wind));
 D = zeros(1,length(wind));
-L = ones(1,length(wind))*node.draw;
+L = ones(1,length(wind))*uc.draw;
 surv = 1;
 
 %run simulation
@@ -44,7 +59,7 @@ for t = 1:length(wind)
         P(t) = 0; %[W]
     end
     %find next storage state
-    S(t+1) = dt*(P(t) - node.draw) + S(t); %[Wh]
+    S(t+1) = dt*(P(t) - uc.draw) + S(t); %[Wh]
     if S(t+1) > Smax*1000 %dump power if over limit
         D(t) = S(t+1) - Smax*1000; %[Wh]
         S(t+1) = Smax*1000; %[Wh]
@@ -53,16 +68,13 @@ for t = 1:length(wind)
             S(t+1) = 0; %no less than bottom
             L(t) = S(t)/dt; %adjust load to what was consumed
         end %no less than 0 kWh
-        if node.constr.thresh
-            surv = 0; %voilated lower constraint
-        end
     end
 end
 
 CF = nanmean(P/1000)/kW; %capacity factor
 
 %check to see if we fell beneath uptime constraint
-if node.constr.uptime && length(find(L==node.draw))/length(L) < node.uptime
+if length(find(L==uc.draw))/length(L) < uc.uptime
     surv = 0;
 end
 

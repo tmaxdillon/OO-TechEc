@@ -1,4 +1,4 @@
-function [output,opt] = optWind(opt,data,atmo,batt,econ,node,turb,tTot)
+function [output,opt] = optWind(opt,data,atmo,batt,econ,uc,turb,tTot)
 
 %print status to command window
 if opt.mult
@@ -13,13 +13,13 @@ tOpt = tic;
 
 %curve-fit devices, find polyvals
 p.t = calcDeviceCost('turbine',[],econ.turb_n);
-p.b = calcDeviceCost('battery',[],econ.batt_n);
+[p.b,~,p.kWhmax] = calcDeviceCost('battery',[],econ.batt_n);
 
 %set R and Smax mesh
 opt.kW_1 = 0;
-opt.kW_m = node.draw/1000*(turb.ura^3/turb.uci^3); %survive at cut in
+opt.kW_m = uc.draw/1000*(turb.ura^3/turb.uci^3); %survive at cut in
 opt.Smax_1 = 0;
-opt.Smax_n = node.draw*24*opt.battgriddur/1000; %one month without power
+opt.Smax_n = uc.draw*24*opt.battgriddur/1000; %one month without power
 
 %enforce the grid
 if opt.enforcegrid
@@ -31,7 +31,7 @@ end
 
 %check to make sure coarse mesh will work
 opt.fmin = false;
-[~,check_s] = simWind(opt.kW_m,opt.Smax_n,opt,data,atmo,batt,econ,node,turb,p);
+[~,check_s] = simWind(opt.kW_m,opt.Smax_n,opt,data,atmo,batt,econ,uc,turb,p);
 if ~check_s
     opt.kW_m = 2*opt.kW_m;
     opt.Smax_n = 2*opt.Smax_n;
@@ -58,11 +58,8 @@ end
 tInitOpt = tic;
 for i = 1:opt.m
     for j = 1:opt.n
-        [output.cost(i,j),output.surv(i,j),output.CapEx(i,j), ...
-            output.OpEx(i,j),output.kWcost(i,j), ...
-            output.Scost(i,j),output.CF(i,j),output.S(i,j,:), ...
-            output.P(i,j,:),output.D(i,j,:),output.L(i,j,:)] ...
-            = simWind(opt.kW(i),opt.Smax(j),opt,data,atmo,batt,econ,node,turb,p);
+        [output.cost(i,j),output.surv(i,j)] = ...
+            simWind(opt.kW(i),opt.Smax(j),opt,data,atmo,batt,econ,uc,turb,p);
     end
 end
 X = output.cost;
@@ -84,11 +81,12 @@ output.tInitOpt = toc(tInitOpt);
 tFminOpt = tic; %start timer
 opt.fmin = true; %let simWind know that fminsearch is on
 %objective function
-fun = @(x)simWind(x(1),x(2),opt,data,atmo,batt,econ,node,turb,p);
+fun = @(x)simWind(x(1),x(2),opt,data,atmo,batt,econ,uc,turb,p);
 %set options (show convergence and objective space or not)
 if opt.show
     options = optimset('MaxFunEvals',10000,'Algorithm','sqp','MaxIter',10000, ...
-        'TolFun',opt.nelder.tolfun,'TolX',opt.nelder.tolx,'PlotFcns',@optimplotfval);
+        'TolFun',opt.nelder.tolfun,'TolX',opt.nelder.tolx, ... 
+        'PlotFcns',@optimplotfval);
 else
     options = optimset('MaxFunEvals',10000,'Algorithm','sqp','MaxIter',10000, ...
         'TolFun',opt.nelder.tolfun,'TolX',opt.nelder.tolx);
@@ -100,9 +98,11 @@ end
 output.min.kW = opt_ind(1);
 output.min.Smax = opt_ind(2);
 [output.min.cost,output.min.surv,output.min.CapEx,output.min.OpEx,...
-    output.min.kWcost,output.min.Scost,output.min.CF,output.min.S, ...
-    output.min.P,output.min.D,output.min.L] ...
-    = simWind(output.min.kW,output.min.Smax,opt,data,atmo,batt,econ,node,turb,p);
+    output.min.kWcost,output.min.Scost,output.min.Icost,output.min.FScost, ...
+    output.min.maint,output.min.shipping,output.min.triptime, ... 
+    output.min.fuelconsump,output.min.trips,output.min.singletrip, ... 
+    output.min.CF,output.min.S,output.min.P,output.min.D,output.min.L] ...
+    = simWind(output.min.kW,output.min.Smax,opt,data,atmo,batt,econ,uc,turb,p);
 output.tFminOpt = toc(tFminOpt); %end timer
 
 %print status to command window
@@ -110,7 +110,8 @@ if opt.mult
     disp(['Optimization ' num2str(opt.s) ' out of ' num2str(opt.S) ...
         ' complete after ' num2str(round(toc(tOpt),2)) ' seconds.'])
 else
-    disp(['Optimization complete after ' num2str(round(toc(tTot),2)) ' seconds.'])
+    disp(['Optimization complete after ' ... 
+        num2str(round(toc(tTot),2)) ' seconds.'])
 end
 output.min %print nelder mead min values
 opt.kW_init; %print initial kW value
