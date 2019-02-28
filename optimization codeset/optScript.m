@@ -4,7 +4,15 @@ clear all; close all; clc
 
 %% to do
 
-% 1 - put height-adjusted wind speed into data structure
+% 2 - transmission costs for battery/wind/solar systems + support
+% infrastructure
+% 1 - increase fidelity of solar cost model (foundation, marinization,
+% maintenance, installation, mtbf, repair, panel cost)
+% 1 - switch solar to kW instead of A
+% 2 - include floating structure costs for battery bank and panels
+% 3 - build hybrid model
+% 3 - make battery model more realistic
+% 3 - more realisitic deployment ships
 
 %% run optimization
 
@@ -36,21 +44,24 @@ if opt.mult %multiple simulations for sensitivity analysis
         end
         if isequal(opt.tuned_parameter,'mtbf')
             turb.mtbf = opt.tuning_array(i);
+            inso.mtbf = opt.tuning_array(i);
         end
         [multStruct(i).output,multStruct(i).opt] =  ...
-            optRun(opt,data,atmo,batt,econ,uc(c),turb,tTot);
+            optRun(pm,opt,data,atmo,batt,econ,uc(c),inso,turb,tTot);
         multStruct(i).data = data;
         multStruct(i).atmo = atmo;
         multStruct(i).batt = batt;
         multStruct(i).econ = econ;
         multStruct(i).uc = uc(c);
         multStruct(i).turb = turb;
+        multStruct(i).pm = pm;
+        multStruct(i).c = c;
     end
     disp([num2str(opt.s) ' simulations complete after ' ...
         num2str(round(toc(tTot)/60,2)) ' minutes. '])
 else %just one simulation
     [output,opt] = ...
-        optRun(opt,data,atmo,batt,econ,uc(c),turb,tTot);
+        optRun(pm,opt,data,atmo,batt,econ,uc(c),inso,turb,tTot);
     optStruct.output = output;
     optStruct.opt = opt;
     optStruct.data = data;
@@ -63,7 +74,7 @@ end
 
 clear i tTot
 
-%% save and visualize optimization outputs
+%% save and visualize
 
 if opt.mult
     if isequal(opt.tuned_parameter,'utp')

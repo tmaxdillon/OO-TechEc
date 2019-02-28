@@ -1,5 +1,6 @@
-function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,FScost,maint,shipping, ... 
-    triptime,fuelconsump,trips,singletrip,CF,S,P,D,L] =  ...
+function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,FScost,maint, ... 
+    vesselcost,fuelcost,repair, ...
+    triptime,trips,CF,S,P,D,L] =  ...
     simWind(kW,Smax,opt,data,atmo,batt,econ,uc,turb,p)
 
 %if fmin is suggesting a negative input, block it
@@ -10,32 +11,38 @@ if opt.fmin && Smax < 0 || kW < 0
 end
 
 wind = data.met.wind_spd; %extract wind speed
-for i = 1:length(wind)
-    wind(i) = adjustHeight(wind(i),data.met.wind_ht,atmo.h,'log',atmo.zo);
+if atmo.adj_h
+    for i = 1:length(wind)
+        wind(i) = adjustHeight(wind(i),data.met.wind_ht,atmo.h,'log',atmo.zo);
+    end
 end
-    
+
 dt = 24*(data.met.time(2) - data.met.time(1)); %time in hours
 dist = data.dist; %[m] dist to shore
 
 %compute cost
-trips = ceil((uc.lifetime)*(12/turb.mtbf - 12/uc.SI)); %number of trips for power alone
-if trips < 0, trips = 0; end
-triptime = dist*kts2mps(econ.vessel.speed)^(-1)*(1/86400);
-fuelconsump = econ.vessel.mileage*dist*econ.vessel.speed^(-1)*(1/86400);
-singletrip = 2*(econ.vessel.cost*triptime + econ.vessel.fuel*fuelconsump);
-maint = econ.maintenance*kW*12/turb.mtbf*uc.lifetime;
-shipping = singletrip*trips;
-OpEx = maint + shipping;
-kWcost = polyval(p.t,kW)*econ.marinization; %cost of turbine
-Icost = (econ.installed - kWcost/(kW*econ.marinization))*kW; %const of installation
-FScost = econ.foundsub*kW; %cost of substructure and foundation
+kWcost = polyval(p.t,kW)*econ.wind.marinization; %cost of turbine
+Icost = (econ.wind.installed - kWcost/ ... 
+    (kW*econ.wind.marinization))*kW; %cost of installation
 if Icost < 0, Icost = 0; end
+%compute foundation costs using scale factor
+FScost = applyScaleFactor(econ.wind.foundsub.cost,5640,kW, ... 
+    econ.wind.foundsub.sf)*kW;
 if Smax < p.kWhmax
     Scost = polyval(p.b,Smax);
 else
     Scost = polyval(p.b,p.kWhmax)*(Smax/p.kWhmax);
 end
-CapEx = kWcost + Scost + Icost + FScost;
+trips = ceil((uc.lifetime)*(12/turb.mtbf - 12/uc.SI)); %number of trips for power alone
+if trips < 0, trips = 0; end
+triptime = dist*kts2mps(econ.wind.vessel.speed)^(-1)*(1/86400);
+fuelcost = 2*trips*econ.wind.vessel.fuel*econ.wind.vessel.mileage*dist* ... 
+    econ.wind.vessel.speed^(-1)*(1/86400);
+vesselcost = 2*trips*econ.wind.vessel.cost*triptime;
+maint = econ.wind.maintenance*kW*12/turb.mtbf*uc.lifetime;
+repair = kWcost*kW*12/turb.mtbf*uc.lifetime;
+CapEx = Scost + FScost + Icost + kWcost;
+OpEx = repair + maint + vesselcost + fuelcost;
 cost = CapEx + OpEx;
 
 %initialize
