@@ -12,8 +12,8 @@ end
 tOpt = tic;
 
 %curve-fit devices, find polyvals
-p.t = calcDeviceCost('turbine',[],econ.wind_n);
-[p.b,~,p.kWhmax] = calcDeviceCost('battery',[],econ.batt_n);
+opt.p.t = calcDeviceCost('turbine',[],econ.wind_n);
+[opt.p.b,~,opt.p.kWhmax] = calcDeviceCost('battery',[],econ.batt_n);
 
 if pm == 1
     if opt.many
@@ -24,7 +24,7 @@ if pm == 1
             opt.c = i;
             opt.battgriddur = opt.bgd_array(i);
             [compare(i).output,compare(i).opt] = ...
-                optWind(opt,data,atmo,batt,econ,uc,turb,p);
+                optWind(opt,data,atmo,batt,econ,uc,turb);
             costcompare(i) = compare(i).output.min.cost;
         end
         [~,min_ind] = min(costcompare(:));
@@ -32,7 +32,7 @@ if pm == 1
         opt = compare(min_ind).opt;
         opt.battgriddur = opt.bgd_array(min_ind);
     else
-        [output,opt] = optWind(opt,data,atmo,batt,econ,uc,turb,p);
+        [output,opt] = optWind(opt,data,atmo,batt,econ,uc,turb);
     end
 elseif pm == 2
     if opt.many
@@ -43,7 +43,7 @@ elseif pm == 2
             opt.c = i;
             opt.battgriddur = opt.bgd_array(i);
             [compare(i).output,compare(i).opt] = ...
-                optInso(opt,data,batt,econ,uc,inso,p);
+                optInso(opt,data,atmo,batt,econ,uc,inso);
             costcompare(i) = compare(i).output.min.cost;
         end
         [~,min_ind] = min(costcompare(:));
@@ -51,7 +51,7 @@ elseif pm == 2
         opt = compare(min_ind).opt;
         opt.battgriddur = opt.bgd_array(min_ind);
     else
-        [output,opt] = optInso(opt,data,batt,econ,uc,inso,p);
+        [output,opt] = optInso(opt,data,atmo,batt,econ,uc,inso);
     end
 end
 

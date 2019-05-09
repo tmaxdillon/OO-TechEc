@@ -1,4 +1,4 @@
-function [output,opt] = optWind(opt,data,atmo,batt,econ,uc,turb,p)
+function [output,opt] = optWind(opt,data,atmo,batt,econ,uc,turb)
 
 %set kW and Smax mesh
 opt.kW_1 = 0;
@@ -16,7 +16,7 @@ end
 
 %check to make sure coarse mesh will work
 opt.fmin = false;
-[~,check_s] = simWind(opt.kW_m,opt.Smax_n,opt,data,atmo,batt,econ,uc,turb,p);
+[~,check_s] = simWind(opt.kW_m,opt.Smax_n,opt,data,atmo,batt,econ,uc,turb);
 if ~check_s
     opt.kW_m = 2*opt.kW_m;
     opt.Smax_n = 2*opt.Smax_n;
@@ -44,7 +44,7 @@ tInitOpt = tic;
 for i = 1:opt.m
     for j = 1:opt.n
         [output.cost(i,j),output.surv(i,j)] = ...
-            simWind(opt.kW(i),opt.Smax(j),opt,data,atmo,batt,econ,uc,turb,p);
+            simWind(opt.kW(i),opt.Smax(j),opt,data,atmo,batt,econ,uc,turb);
     end
 end
 X = output.cost;
@@ -66,7 +66,7 @@ output.tInitOpt = toc(tInitOpt);
 tFminOpt = tic; %start timer
 opt.fmin = true; %let simWind know that fminsearch is on
 %objective function
-fun = @(x)simWind(x(1),x(2),opt,data,atmo,batt,econ,uc,turb,p);
+fun = @(x)simWind(x(1),x(2),opt,data,atmo,batt,econ,uc,turb);
 %set options (show convergence and objective space or not)
 if opt.show
     options = optimset('MaxFunEvals',10000,'Algorithm','sqp','MaxIter',10000, ...
@@ -84,10 +84,13 @@ output.min.kW = opt_ind(1);
 output.min.Smax = opt_ind(2);
 [output.min.cost,output.min.surv,output.min.CapEx,output.min.OpEx,...
     output.min.kWcost,output.min.Scost,output.min.Icost,output.min.FScost, ...
-    output.min.maint,output.min.vesselcost,output.min.fuelcost,output.min.repair, ... 
-    output.min.triptime,output.min.trips, ... 
+    output.min.maint,output.min.vesselcost,output.min.fuelcost, ... 
+    output.min.turbrepair,output.min.battreplace,output.min.battencl, ... 
+    output.min.wiring,output.min.battvol,output.min.triptime,output.min.trips, ... 
     output.min.CF,output.min.S,output.min.P,output.min.D,output.min.L] ...
-    = simWind(output.min.kW,output.min.Smax,opt,data,atmo,batt,econ,uc,turb,p);
+    = simWind(output.min.kW,output.min.Smax,opt,data,atmo,batt,econ,uc,turb);
+output.min.rotor_h = turb.clearance + ... 
+    sqrt(2*output.min.kW/(atmo.rho*pi*turb.ura^3)); %store rotor height
 output.tFminOpt = toc(tFminOpt); %end timer
 
 end

@@ -4,15 +4,22 @@ clear all; close all; clc
 
 %% to do
 
-% 2 - transmission costs for battery/wind/solar systems + support
-% infrastructure
-% 1 - increase fidelity of solar cost model (foundation, marinization,
-% maintenance, installation, mtbf, repair, panel cost)
-% 1 - switch solar to kW instead of A
-% 2 - include floating structure costs for battery bank and panels
-% 3 - build hybrid model
-% 3 - make battery model more realistic
-% 3 - more realisitic deployment ships
+%wind
+% 2 - reserve storage to accommodate for failure
+
+%solar
+% 3 - is rated irradiance of PV accurate? (McKenzie)
+% 2 - add rainfall cleaning
+% 3 - marinzation
+% 3 - floating structure costs (Senu Model)
+
+%battery
+% 2 - make battery optimization module
+% 1 - research chemistry for stand alone batteries
+
+%other
+% 1 - resolve availabiltiy window runtime issue
+% 3 - more realistic deployment/maintenance ships
 
 %% run optimization
 
@@ -33,6 +40,7 @@ if opt.mult %multiple simulations for sensitivity analysis
             uc(c).draw = opt.tuning_array(i);
         end
         if isequal(opt.tuned_parameter,'bgd')
+            
             opt.battgriddur = opt.tuning_array(i);
         end
         if isequal(opt.tuned_parameter,'mxn')
@@ -44,7 +52,20 @@ if opt.mult %multiple simulations for sensitivity analysis
         end
         if isequal(opt.tuned_parameter,'mtbf')
             turb.mtbf = opt.tuning_array(i);
-            inso.mtbf = opt.tuning_array(i);
+        end
+        if isequal(opt.tuned_parameter,'psr')
+            atmo.soil = opt.tuning_array(i);
+        end
+        if isequal(opt.tuned_parameter,'pvci')
+            inso.pvci = opt.tuning_array(i);
+            inso.seasonalclean = false;
+        end 
+        if isequal(opt.tuned_parameter,'scm')
+            inso.cleanmonth = opt.tuning_array(i);
+            inso.seasonalclean = true;
+        end
+        if isequal(opt.tuned_parameter,'utf')
+            turb.uf = opt.tuning_array(i);
         end
         [multStruct(i).output,multStruct(i).opt] =  ...
             optRun(pm,opt,data,atmo,batt,econ,uc(c),inso,turb,tTot);
@@ -73,6 +94,7 @@ else %just one simulation
 end
 
 clear i tTot
+uc = uc(c); %for debugging
 
 %% save and visualize
 

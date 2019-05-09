@@ -1,59 +1,66 @@
-function [] = visInsoSens(multStruct,xlab,xt)
+function [] = visInsoSens(multStruct,xlab,xt,xscale,ylab,yscale)
 
 cost = zeros(1,length(multStruct));
-Scost = zeros(1,length(multStruct));
 Mcost = zeros(1,length(multStruct));
-maint = zeros(1,length(multStruct));
-FScost = zeros(1,length(multStruct));
-Icost = zeros(1,length(multStruct));
+Scost = zeros(1,length(multStruct));
 Ecost = zeros(1,length(multStruct));
+Icost = zeros(1,length(multStruct));
+FScost = zeros(1,length(multStruct));
+maint = zeros(1,length(multStruct));
+vesselcost = zeros(1,length(multStruct));
+fuelcost = zeros(1,length(multStruct));
+PVreplace = zeros(1,length(multStruct));
+battreplace = zeros(1,length(multStruct));
+battencl = zeros(1,length(multStruct));
+wiring = zeros(1,length(multStruct));
 Smax = zeros(1,length(multStruct));
 kW = zeros(1,length(multStruct));
-trips = zeros(1,length(multStruct));
-repair = zeros(1,length(multStruct));
-fuelcost = zeros(1,length(multStruct));
-vesselcost = zeros(1,length(multStruct));
 
 %unpack multStruct
 for i = 1:length(multStruct)
     cost(i) = multStruct(i).output.min.cost;
-    Scost(i) = multStruct(i).output.min.Scost;
     Mcost(i) = multStruct(i).output.min.Mcost;
-    maint(i) = multStruct(i).output.min.maint;
-    FScost(i) = multStruct(i).output.min.FScost;
-    Icost(i) = multStruct(i).output.min.Icost;
+    Scost(i) = multStruct(i).output.min.Scost;
     Ecost(i) = multStruct(i).output.min.Ecost;
+    Icost(i) = multStruct(i).output.min.Icost;
+    FScost(i) = multStruct(i).output.min.FScost;
+    maint(i) = multStruct(i).output.min.maint;
+    vesselcost(i) = multStruct(i).output.min.vesselcost;
+    fuelcost(i) = multStruct(i).output.min.fuelcost;
+    PVreplace(i) = multStruct(i).output.min.PVreplace;
+    battreplace(i) = multStruct(i).output.min.battreplace;
+    battencl(i) = multStruct(i).output.min.battencl;
+    wiring(i) = multStruct(i).output.min.wiring;
     Smax(i) = multStruct(i).output.min.Smax;
     kW(i) = multStruct(i).output.min.kW;
-    trips(i) = multStruct(i).output.min.trips;
-    repair(i) = multStruct(i).output.min.repair;
-    fuelcost(i) = multStruct(i).output.min.fuelcost;
-    vesselcost(i) = multStruct(i).output.min.vesselcost;
 end
 
 %cost
 figure
 ax(1) = subplot(5,1,1:3);
-a = area(multStruct(1).opt.tuning_array,[Scost;Mcost;FScost;Icost;Ecost; ... 
-    maint;fuelcost;vesselcost;repair]'./1000);
+if exist('yscale','var'), yscale = (1/1000)*yscale; else, yscale = 1/1000; end
+if exist('xscale','var'), xscale = xscale; else, xscale = 1; end
+a = area(multStruct(1).opt.tuning_array.*xscale, ... 
+    [Mcost;Scost;Icost;FScost;Ecost;battencl;wiring; ... 
+    maint;PVreplace;battreplace;fuelcost;vesselcost]'.*yscale);
 %colormap differentiating OpEx from CapEx
-CapCol = colormap(brewermap(5,'reds'));
-OpCol = colormap(brewermap(4,'purples'));
-a(1).FaceColor = CapCol(1,:);
-a(2).FaceColor = CapCol(2,:);
-a(3).FaceColor = CapCol(3,:);
-a(4).FaceColor = CapCol(4,:);
-a(5).FaceColor = CapCol(5,:);
-a(6).FaceColor = OpCol(1,:);
-a(7).FaceColor = OpCol(2,:);
-a(8).FaceColor = OpCol(3,:);
-a(9).FaceColor = OpCol(4,:);
-ylabel('cost in thousands')
-ylim([0 1.25*max(cost)/1000])
+CapN = 7;
+OpN = 5;
+CapCol = colormap(brewermap(CapN,'reds'));
+OpCol = colormap(brewermap(OpN,'purples'));
+for i = 1:CapN
+    a(i).FaceColor = CapCol(i,:);
+end
+for i = 1:OpN
+    a(CapN+i).FaceColor = OpCol(i,:);
+end
+if exist('ylab','var'), ylabel(ylab), else, ylabel('cost in thousands'), end
+ylim([0 1.25*max(cost).*yscale])
 xticks(xt)
 legend('CapEx: Storage','CapEx: Module','CapEx: Platform', ... 
-    'CapEx: Installation','CapEx: Electrical','OpEx: Maintenance', ... 
-    'OpEx: Fuel', ... 
+    'CapEx: Installation','CapEx: Electrical','CapEx: Battery Enclosure', ... 
+    'CapEx: Wiring','OpEx: Maintenance','OpEx: PV Replacememnt', ... 
+    'OpEx: Battery Replacements','OpEx: Fuel', ... 
     'OpEx: Vessel','OpEx: Repair','Location','NorthEast')
 set(gca,'LineWidth',1.1,'Fontsize',14)
 if isequal(multStruct(1).opt.tuned_parameter,'utp')
