@@ -58,7 +58,7 @@ turb.clearance = 4;         %[m] surface to bottom of swept area clearance
 turb.uf = 10;                %unexpected failures
 %solar parameters
 inso.rated = 1;             %[kW/m^2] from Brian
-inso.eff = 0.30;            %[~] big guess for now, but based on RER
+inso.eff = 0.18;            %[~] from Devin (may trail off when off of MPP)
 inso.deg = 0.005;           %[%/year]
 inso.pvci = 24;             %[months] cleaning interval
 inso.autoclean = 0;         %toggle automated cleaning
