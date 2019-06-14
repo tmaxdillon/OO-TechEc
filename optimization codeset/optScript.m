@@ -6,9 +6,11 @@ clear all; close all; clc
 
 %wind
 % 2 - reserve storage to accommodate for failure
+% 1 - remove fuel cost
 
 %solar
 % 3 - is rated irradiance of PV accurate? (McKenzie)
+% 1 - remove fuel cost
 % 2 - add rainfall cleaning
 % 3 - marinzation
 % 3 - floating structure costs (Senu Model)

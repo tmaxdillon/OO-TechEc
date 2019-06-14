@@ -1,12 +1,12 @@
 %load data
-location = 'argBasin';
+location = 'souOcean';
 if ~exist('data','var')
     data = load(location,location);
     data = data.(location);
 end
 clear location
 
-pm = 2; %power module
+pm = 1; %power module
 c = 2;  %use case
 
 %ECONOMIC
@@ -55,7 +55,7 @@ turb.uco = 30;              %[m/s] guess
 turb.eta = 0.35;            %[~] guess
 turb.mtbf = 12*3;           %[months], mean time between failure
 turb.clearance = 4;         %[m] surface to bottom of swept area clearance
-turb.uf = 10;                %unexpected failures
+turb.uf = 1;                %unexpected failures
 %solar parameters
 inso.rated = 1;             %[kW/m^2] from Brian
 inso.eff = 0.18;            %[~] from Devin (may trail off when off of MPP)
@@ -112,7 +112,7 @@ uc(3).ship.speed = [];          %[kts]
 uc(3).ship.mileage = [];        %gallons/day
 
 %multiple optimizations
-opt.mult = 0;
+opt.mult = 1;
 opt.tuning_array = [1 .99 .97 .95 .925 .9 .85 .8];
 opt.tuned_parameter = 'utp';
 %opt.tuning_array = [50:50:1000];
@@ -140,7 +140,7 @@ opt.m = 8;
 opt.n = 8;
 opt.l = 4;
 opt.battgriddur = 7; %[d]
-opt.many = true;
+opt.many = true; %seed many initial points into nelder
 opt.bgd_array = [5,9,10,14,22]; %[d]
 opt.show = false;
 opt.enforcegrid = false;
@@ -154,4 +154,4 @@ opt.enfkW_1 = 1;
 opt.enfSmax_1 = 3;
 opt.nelder.tolfun = 10;
 opt.nelder.tolx = 1;
-opt.utw = 0;
+opt.utw = 0; %uptime window?
