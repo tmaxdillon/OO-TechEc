@@ -2,6 +2,9 @@
 %from OOI website: https://ooinet.oceanobservatories.org/
 
 %NOTE: variable names are manually adjusted post-creation of data structure
+% - the argBasin dataset was the first dataset downloaded. Therefore, this
+% code is irregular in comparison to other saveTHREDDS.m files that are
+% more systematic. This dataset was often wrangled from the command window.
 
 clearvars -except argBasin, close all, clc
 %% WAVE: set up filenames

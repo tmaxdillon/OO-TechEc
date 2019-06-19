@@ -1,4 +1,4 @@
-%created by Trent Dillon on Monday Thursday June 13 2019 to load THREDDS data
+%created by Trent Dillon on Thursday June 13 2019 to load THREDDS data
 %from OOI website: https://ooinet.oceanobservatories.org/
 
 %NOTE: variable names are manually adjusted post-creation of data structure
@@ -56,10 +56,10 @@ souOcean.met.wind_spd_orig = souOcean.met.met_wind10m;
 
 clear Y M D H MI S v i met_filenames vars temp opendap
 
-%% additional structure features
+%% MET: additional structure adjustments
 
 %title and port
-souOcean.title = 'South Ocean';
+souOcean.title = 'Southern Ocean';
 %souOcean.port =
 %souOcean.portlat =
 %souOcean.portlon =
@@ -81,8 +81,7 @@ souOcean.met.shortwave_irradiance = ...
 %wind
 souOcean.met.wind_spd = ...
     fillmissing(souOcean.met.wind_spd_orig(souOcean.met.tstart: ...
-    souOcean.met.tend), ...
-    'linear');
+    souOcean.met.tend),'linear');
 
 %adjust height
 souOcean.met.wind_ht = 4;
@@ -97,10 +96,63 @@ end
 
 clear i
 
+%% WAVE: set up filenames
 
+opendap = 'https://opendap.oceanobservatories.org';
+threddspath = '/thredds/dodsC/ooi/tmaxd@uw.edu/20190617T183946298Z-GS01SUMO-SBD12-05-WAVSSA000-telemetered-wavss_a_dcl_statistics/';
+deppath(1,:) = 'deployment0001_GS01SUMO-SBD12-05-WAVSSA000-telemetered-wavss_a_dcl_statistics_20150721T012303.052000-20151222T172305.930000.nc';
+deppath(2,:) = 'deployment0002_GS01SUMO-SBD12-05-WAVSSA000-telemetered-wavss_a_dcl_statistics_20151214T210737.792000-20161205T080740.155000.nc';
+deppath(3,:) = 'deployment0003_GS01SUMO-SBD12-05-WAVSSA000-telemetered-wavss_a_dcl_statistics_20161125T020749.472000-20181209T162316.234000.nc';
+deppath(4,:) = 'deployment0004_GS01SUMO-SBD12-05-WAVSSA000-telemetered-wavss_a_dcl_statistics_20181204T172301.964000-20190617T142309.500000.nc';
 
+wave_filenames_so = cell(1,4);
+for i = 1:length(wave_filenames_so)
+    wave_filenames_so{i} = [threddspath deppath(i,:)];
+end
 
+clear i deppath threddspath
 
+vars = {'time' 'deployment' 'significant_wave_height' 'peak_wave_period' 'lat' 'lon'};
+
+%% WAVE: read vars into data structure
+
+%base time
+Y = 1900;
+M = 1;
+D = 1;
+H = 0;
+MI = 0;
+S = 0;
+
+for v = 1:length(vars)
+    souOcean.wave.(vars{v}) = [];
+    for i = 1:length(wave_filenames_so)
+        temp = ncread([opendap wave_filenames_so{i}],vars{v});
+        souOcean.wave.(vars{v}) = [souOcean.wave.(vars{v}) ; temp];
+    end
+    %adjust time
+    if isequal(vars{v},'time')
+        souOcean.wave.(vars{v}) = datenum(Y,M,D,H,MI,S + souOcean.wave.(vars{v}));
+    end
+    %collapse lat/lon
+    if isequal(vars{v},'lat') || isequal(vars{v},'lon')
+        if any(souOcean.wave.(vars{v}) - souOcean.wave.(vars{v})(1))
+            souOcean.wave.(vars{v}) = souOcean.wave.(vars{v})(1);
+        end
+    end
+end
+
+souOcean.wave.peak_wave_period_orig = souOcean.wave.peak_wave_period;
+
+clear Y M D H MI S v i met_filenames vars temp opendap
+
+%% WAVE: additional structure adjustments
+
+%remove period outliers
+souOcean.wave.peak_wave_period_nans = souOcean.wave.peak_wave_period_orig;
+souOcean.wave.peak_wave_period_nans(souOcean.wave.peak_wave_period_orig > 20) = nan;
+souOcean.wave.peak_wave_period = fillmissing(souOcean.wave.peak_wave_period_nans, ...
+    'linear');
 
 
 

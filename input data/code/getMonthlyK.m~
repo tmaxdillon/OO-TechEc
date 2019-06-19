@@ -2,23 +2,19 @@ function [K_avg] = getMonthlyK(dataStruct,type)
 
 %%%%%%%%%%% SET VALUES %%%%%%%%%%%%%%
 
-pts = 1:length(dataStruct.met.time);
-
-time = dataStruct.met.time(pts);
-wind = dataStruct.met.wind_spd(pts);
-inso = dataStruct.met.shortwave_irradiance(pts);
-if ~isfield(dataStruct, 'wave')
-    hs = zeros(length(time),1);
-    tp = zeros(length(time),1);
-else
-    hs = dataStruct.wave.significant_wave_height(pts);
-    tp = dataStruct.wave.peak_wave_period(pts);
-end
+met_pts = 1:length(dataStruct.met.time);
+wave_pts = 1:length(dataStruct.wave.time);
+met_time = dataStruct.met.time(met_pts);
+wave_time = dataStruct.wave.time(wave_pts);
+wind = dataStruct.met.wind_spd(met_pts);
+inso = dataStruct.met.shortwave_irradiance(met_pts);
+hs = dataStruct.wave.significant_wave_height(wave_pts);
+tp = dataStruct.wave.peak_wave_period(wave_pts);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if isequal(type,'wave')
-    dvall = datevec(time);
+    dvall = datevec(m_time);
     dvymu = unique(dvall(:,1:2),'rows');
     K_avg = zeros(length(dvymu),2);
     K_avg(:,1) = datenum(num2str(dvymu(:,1:2)));
@@ -34,7 +30,7 @@ if isequal(type,'wave')
 end
 
 if isequal(type,'wind')
-    dvall = datevec(time);
+    dvall = datevec(met_time);
     dvymu = unique(dvall(:,1:2),'rows');
     K_avg = zeros(length(dvymu),2);
     K_avg(:,1) = datenum(num2str(dvymu(:,1:2)));
