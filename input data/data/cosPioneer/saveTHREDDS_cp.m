@@ -20,9 +20,9 @@ deppath(9,:) = 'deployment0009_CP01CNSM-SBD11-06-METBKA000-telemetered-metbk_hou
 deppath(10,:) = 'deployment0010_CP01CNSM-SBD11-06-METBKA000-telemetered-metbk_hourly_20181030T021812.609000-20190407T183057.336000.nc';
 deppath(11,:) = 'deployment0011_CP01CNSM-SBD11-06-METBKA000-telemetered-metbk_hourly_20190406T150543.898000-20190617T233024.400000.nc';
 
-met_filenames_cp = cell(1,4);
-for i = 1:length(met_filenames_cp)
-    met_filenames_cp{i} = [threddspath deppath(i,:)];
+met_filenames = cell(1,size(deppath,1));
+for i = 1:length(met_filenames)
+    met_filenames{i} = [threddspath deppath(i,:)];
 end
 
 clear i deppath threddspath
@@ -41,8 +41,8 @@ S = 0;
 
 for v = 1:length(vars)
     cosPioneer.met.(vars{v}) = [];
-    for i = 1:length(met_filenames_cp)
-        temp = ncread([opendap met_filenames_cp{i}],vars{v});
+    for i = 1:length(met_filenames)
+        temp = ncread([opendap met_filenames{i}],vars{v});
         cosPioneer.met.(vars{v}) = [cosPioneer.met.(vars{v}) ; temp];
     end
     %adjust time
@@ -112,9 +112,9 @@ deppath(9,:) = 'deployment0009_CP01CNSM-SBD12-05-WAVSSA000-telemetered-wavss_a_d
 deppath(10,:) = 'deployment0010_CP01CNSM-SBD12-05-WAVSSA000-telemetered-wavss_a_dcl_statistics_20181030T022303.668000-20190407T172304.630000.nc';
 deppath(11,:) = 'deployment0011_CP01CNSM-SBD12-05-WAVSSA000-telemetered-wavss_a_dcl_statistics_20190406T152302.434000-20190617T232253.382000.nc';
 
-wave_filenames_cp = cell(1,4);
-for i = 1:length(wave_filenames_cp)
-    wave_filenames_cp{i} = [threddspath deppath(i,:)];
+wave_filenames = cell(1,size(deppath,1));
+for i = 1:length(wave_filenames)
+    wave_filenames{i} = [threddspath deppath(i,:)];
 end
 
 clear i deppath threddspath
@@ -133,8 +133,8 @@ S = 0;
 
 for v = 1:length(vars)
     cosPioneer.wave.(vars{v}) = [];
-    for i = 1:length(wave_filenames_cp)
-        temp = ncread([opendap wave_filenames_cp{i}],vars{v});
+    for i = 1:length(wave_filenames)
+        temp = ncread([opendap wave_filenames{i}],vars{v});
         cosPioneer.wave.(vars{v}) = [cosPioneer.wave.(vars{v}) ; temp];
     end
     %adjust time
@@ -154,7 +154,7 @@ cosPioneer.wave.peak_wave_period_orig = cosPioneer.wave.peak_wave_period;
 cosPioneer.wave.significant_wave_height_orig = cosPioneer.wave.significant_wave_height;
 cosPioneer.title = 'Coastal Pioneer';
 
-clear Y M D H MI S v i wave_filenames_cp vars temp opendap
+clear Y M D H MI S v i wave_filenames vars temp opendap
 
 %% WAVE: additional structure adjustments
 

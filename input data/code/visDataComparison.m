@@ -1,5 +1,10 @@
 function [] = visDataComparison(allData)
 
+%MUST CHANGE THE AVERAGE POWER DENSITY SO THAT IT IS AVERAGE ANNUAL K (AS
+%OPPOSED TO AVERAGE OVER WHOLE TIME SERIES, WHICH IS OFTEN LARGER THAN A
+%SINGLE YEAR) - or - DO NOT DO THIS BECAUSE YOU RUN THE SIMULATION ON THE
+%WHOLE TIME SERIES ???
+
 fn = fieldnames(allData);
 l = numel(fn);
 
@@ -126,7 +131,7 @@ set(gca,'FontSize',fs)
 xlabel('Distance to Coast [km]','Fontsize',10)
 grid on
 %LATITUDE
-subplot(5,1,2)
+subplot(5,1,5)
 b = barh(labels,lats);
 b(1).FaceColor = 'flat';
 for i = 1:l
@@ -137,7 +142,7 @@ set(gca,'FontSize',fs)
 xlabel('Latitude, Absolute [deg]','Fontsize',10)
 grid on
 %WAVE
-subplot(5,1,3)
+subplot(5,1,4)
 b = barh(labels,Kmean_wave(:,1));
 hold on
 e = errorbar(Kmean_wave(:,1),labels,Kmean_wave(:,2),Kmean_wave(:,3),'.', ...
@@ -153,7 +158,7 @@ set(gca,'FontSize',fs)
 xlabel('Wave Power Density [kW/m]','Fontsize',10)
 grid on
 %WIND
-subplot(5,1,4)
+subplot(5,1,2)
 b = barh(labels,Kmean_wind(:,1));
 hold on
 e = errorbar(Kmean_wind(:,1),labels,Kmean_wind(:,2),Kmean_wind(:,3),'.', ...
@@ -169,7 +174,7 @@ set(gca,'FontSize',fs)
 xlabel('Wind Power Density [kW/m]','Fontsize',10)
 grid on
 %SOLAR
-subplot(5,1,5)
+subplot(5,1,3)
 b = barh(labels,Kmean_inso(:,1));
 hold on
 e = errorbar(Kmean_inso(:,1),labels,Kmean_inso(:,2),Kmean_inso(:,3),'.', ...

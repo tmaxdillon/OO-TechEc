@@ -6,7 +6,6 @@ Scost = zeros(1,length(multStruct));
 Ecost = zeros(1,length(multStruct));
 Icost = zeros(1,length(multStruct));
 FScost = zeros(1,length(multStruct));
-maint = zeros(1,length(multStruct));
 vesselcost = zeros(1,length(multStruct));
 fuelcost = zeros(1,length(multStruct));
 PVreplace = zeros(1,length(multStruct));
@@ -24,7 +23,6 @@ for i = 1:length(multStruct)
     Ecost(i) = multStruct(i).output.min.Ecost;
     Icost(i) = multStruct(i).output.min.Icost;
     FScost(i) = multStruct(i).output.min.FScost;
-    maint(i) = multStruct(i).output.min.maint;
     vesselcost(i) = multStruct(i).output.min.vesselcost;
     fuelcost(i) = multStruct(i).output.min.fuelcost;
     PVreplace(i) = multStruct(i).output.min.PVreplace;
@@ -41,10 +39,10 @@ ax(1) = subplot(5,1,1:3);
 if exist('yscale','var'), yscale = (1/1000)*yscale; else, yscale = 1/1000; end
 if exist('xscale','var'), xscale = xscale; else, xscale = 1; end
 a = area(multStruct(1).opt.tuning_array.*xscale, ... 
-    [Mcost;Scost;Icost;FScost;Ecost;battencl;wiring; ... 
+    [Mcost;Scost;Icost;FScost;Ecost;battencl; ... 
     maint;PVreplace;battreplace;fuelcost;vesselcost]'.*yscale);
 %colormap differentiating OpEx from CapEx
-CapN = 7;
+CapN = 6;
 OpN = 5;
 CapCol = colormap(brewermap(CapN,'reds'));
 OpCol = colormap(brewermap(OpN,'purples'));
@@ -59,7 +57,7 @@ ylim([0 1.25*max(cost).*yscale])
 xticks(xt)
 legend('CapEx: Storage','CapEx: Module','CapEx: Platform', ... 
     'CapEx: Installation','CapEx: Electrical','CapEx: Battery Enclosure', ... 
-    'CapEx: Wiring','OpEx: Maintenance','OpEx: PV Replacememnt', ... 
+    'OpEx: Maintenance','OpEx: PV Replacememnt', ... 
     'OpEx: Battery Replacements','OpEx: Fuel', ... 
     'OpEx: Vessel','OpEx: Repair','Location','NorthEast')
 set(gca,'LineWidth',1.1,'Fontsize',14)

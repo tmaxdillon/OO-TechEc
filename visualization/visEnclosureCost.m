@@ -8,7 +8,7 @@ x = 0:1:xmax;
 y = zeros(size(x));
 for i=1:length(x)
     y(i) = applyScaleFactor(econ.batt.encl.cost,econ.batt.encl.scale, ... 
-    x(i)*10^3/(batt.ed*batt.V/1.638e-5),.9995)*batt.ed^-1*batt.V^-1*1.638e-5;
+    x(i)*10^3/(batt.ed*batt.V/1.638e-5),econ.batt.encl.sf)*batt.ed^-1*batt.V^-1*1.638e-5;
 end
 
 ind = find(x == econ.batt.encl.scale);

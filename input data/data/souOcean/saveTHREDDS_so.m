@@ -13,9 +13,9 @@ deppath(2,:) = 'deployment0002_GS01SUMO-SBD11-06-METBKA000-telemetered-metbk_hou
 deppath(3,:) = 'deployment0003_GS01SUMO-SBD11-06-METBKA000-telemetered-metbk_hourly_20161125T014201.966000-20181209T163012.563000.nc';
 deppath(4,:) = 'deployment0004_GS01SUMO-SBD11-06-METBKA000-telemetered-metbk_hourly_20181204T174137.654000-20190613T173011.323000.nc';
 
-met_filenames_so = cell(1,4);
-for i = 1:length(met_filenames_so)
-    met_filenames_so{i} = [threddspath deppath(i,:)];
+met_filenames = cell(1,size(deppath,1));
+for i = 1:length(met_filenames)
+    met_filenames{i} = [threddspath deppath(i,:)];
 end
 
 clear i deppath threddspath
@@ -34,8 +34,8 @@ S = 0;
 
 for v = 1:length(vars)
     souOcean.met.(vars{v}) = [];
-    for i = 1:length(met_filenames_so)
-        temp = ncread([opendap met_filenames_so{i}],vars{v});
+    for i = 1:length(met_filenames)
+        temp = ncread([opendap met_filenames{i}],vars{v});
         souOcean.met.(vars{v}) = [souOcean.met.(vars{v}) ; temp];
     end
     %adjust time
@@ -105,9 +105,9 @@ deppath(2,:) = 'deployment0002_GS01SUMO-SBD12-05-WAVSSA000-telemetered-wavss_a_d
 deppath(3,:) = 'deployment0003_GS01SUMO-SBD12-05-WAVSSA000-telemetered-wavss_a_dcl_statistics_20161125T020749.472000-20181209T162316.234000.nc';
 deppath(4,:) = 'deployment0004_GS01SUMO-SBD12-05-WAVSSA000-telemetered-wavss_a_dcl_statistics_20181204T172301.964000-20190617T142309.500000.nc';
 
-wave_filenames_so = cell(1,4);
-for i = 1:length(wave_filenames_so)
-    wave_filenames_so{i} = [threddspath deppath(i,:)];
+wave_filenames = cell(1,size(deppath,1));
+for i = 1:length(wave_filenames)
+    wave_filenames{i} = [threddspath deppath(i,:)];
 end
 
 clear i deppath threddspath
@@ -126,8 +126,8 @@ S = 0;
 
 for v = 1:length(vars)
     souOcean.wave.(vars{v}) = [];
-    for i = 1:length(wave_filenames_so)
-        temp = ncread([opendap wave_filenames_so{i}],vars{v});
+    for i = 1:length(wave_filenames)
+        temp = ncread([opendap wave_filenames{i}],vars{v});
         souOcean.wave.(vars{v}) = [souOcean.wave.(vars{v}) ; temp];
     end
     %adjust time

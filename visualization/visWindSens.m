@@ -7,11 +7,10 @@ Icost = zeros(1,length(multStruct));
 FScost = zeros(1,length(multStruct));
 maint = zeros(1,length(multStruct));
 vesselcost = zeros(1,length(multStruct));
-fuelcost = zeros(1,length(multStruct));
 turbrepair = zeros(1,length(multStruct));
 battreplace = zeros(1,length(multStruct));
 battencl = zeros(1,length(multStruct));
-wiring = zeros(1,length(multStruct));
+platform = zeros(1,length(multStruct));
 Smax = zeros(1,length(multStruct));
 kW = zeros(1,length(multStruct));
 
@@ -24,11 +23,10 @@ for i = 1:length(multStruct)
     FScost(i) = multStruct(i).output.min.FScost;
     maint(i) = multStruct(i).output.min.maint;
     vesselcost(i) = multStruct(i).output.min.vesselcost;
-    fuelcost(i) = multStruct(i).output.min.fuelcost;
     turbrepair(i) = multStruct(i).output.min.turbrepair;
     battreplace(i) = multStruct(i).output.min.battreplace;
     battencl(i) = multStruct(i).output.min.battencl;
-    wiring(i) = multStruct(i).output.min.wiring;
+    platform(i) = multStruct(i).output.min.platform;
     Smax(i) = multStruct(i).output.min.Smax;
     kW(i) = multStruct(i).output.min.kW;
 end
@@ -39,11 +37,11 @@ ax(1) = subplot(5,1,1:3);
 if exist('yscale','var'), yscale = (1/1000)*yscale; else, yscale = 1/1000; end
 if exist('xscale','var'), xscale = xscale; else, xscale = 1; end
 a = area(multStruct(1).opt.tuning_array.*xscale, ... 
-    [kWcost;Scost;Icost;FScost;battencl;wiring; ... 
-    maint;turbrepair;battreplace;fuelcost;vesselcost]'.*yscale);
+    [kWcost;Scost;Icost;FScost;battencl;platform; ... 
+    maint;turbrepair;battreplace;vesselcost]'.*yscale);
 %colormap differentiating OpEx from CapEx
 CapN = 6;
-OpN = 5;
+OpN = 4;
 CapCol = colormap(brewermap(CapN,'reds'));
 OpCol = colormap(brewermap(OpN,'purples'));
 for i = 1:CapN
@@ -55,10 +53,10 @@ end
 if exist('ylab','var'), ylabel(ylab), else, ylabel('cost in thousands'), end
 ylim([0 1.25*max(cost)*yscale])
 xticks(xt)
-legend('CapEx: Storage','CapEx: Turbine','CapEx: Platform', ... 
-    'CapEx: Installation','CapEx: Battery Enclosure','CapEx: Wiring', ...
+legend('CapEx: Storage','CapEx: Turbine','CapEx: Installation', ... 
+    'CapEx: Foundation/Substructure','CapEx: Battery Enclosure','CapEx: Platform', ...
     'OpEx: Maintenance','OpEx: Turbine Repair','OpEx: Battery Replacement', ... 
-    'OpEx: Fuel','OpEx: Vessel','Location','NorthEast')
+    'OpEx: Vessel','Location','NorthEast')
 set(gca,'LineWidth',1.1,'Fontsize',14)
 if isequal(multStruct(1).opt.tuned_parameter,'utp')
     set(gca,'xdir','reverse')

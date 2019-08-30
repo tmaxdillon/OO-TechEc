@@ -8,19 +8,28 @@ opt.Smax_n = uc.draw*24*opt.nm.battgriddur/1000; %bgd days without power
 
 %check to make sure coarse mesh will work
 opt.fmin = false;
-check_s = 0;
-while ~check_s
-    [~,check_s] = simWind(opt.kW_m,opt.Smax_n,opt,data, ... 
-        atmo,batt,econ,uc,turb);
+[~,check_s] = simWind(opt.kW_m,opt.Smax_n,opt,data,atmo,batt,econ,uc,turb);
+if ~check_s
     opt.kW_m = 2*opt.kW_m;
     opt.Smax_n = 2*opt.Smax_n;
 end
 
 %initialize inputs/outputs
-opt.kW = linspace(opt.kW_1,opt.kW_m,opt.nm.m);              %[kW] 
-opt.Smax = linspace(opt.Smax_1,opt.Smax_n,opt.nm.n);        %[kWh] 
+opt.kW = linspace(opt.kW_1,opt.kW_m,opt.nm.m);                %[m] rated power
+opt.Smax = linspace(opt.Smax_1,opt.Smax_n,opt.nm.n);       %[kWh] maximum storage capacity
 output.cost = zeros(opt.nm.m,opt.nm.n);
 output.surv = zeros(opt.nm.m,opt.nm.n);
+if opt.nm.show
+    output.CapEx = zeros(opt.nm.m,opt.nm.n);
+    output.OpEx = zeros(opt.nm.m,opt.nm.n);
+    output.kWcost = zeros(opt.nm.m,opt.nm.n);
+    output.Scost = zeros(opt.nm.m,opt.nm.n);
+    output.CF = zeros(opt.nm.m,opt.nm.n);
+    output.S = zeros(opt.nm.m,opt.nm.n,length(data.met.time)+1);
+    output.P = zeros(opt.nm.m,opt.nm.n,length(data.met.time));
+    output.D = zeros(opt.nm.m,opt.nm.n,length(data.met.time));
+    output.L = zeros(opt.nm.m,opt.nm.n,length(data.met.time));
+end
 
 %initial/coarse optimization
 tInitOpt = tic;
@@ -32,9 +41,8 @@ for i = 1:opt.nm.m
 end
 X = output.cost;
 X(output.surv == 0) = inf;
-%no initial minima near origin
-X(:,1:floor(opt.nm.n*opt.nm.initminlim)) = inf;
-X(1:floor(opt.nm.m*opt.nm.initminlim),:) = inf;
+X(:,1:floor(opt.nm.n*opt.nm.initminlim)) = inf; %don't allow initial minima near Smax = 0
+X(1:floor(opt.nm.m*opt.nm.initminlim),:) = inf; %don't allow initial minima near R = 0
 [I(1),I(2)] = find(X == min(X(:)),1,'first');
 opt.init = output.cost(I(1),I(2));
 opt.kW_init = opt.kW(I(1));

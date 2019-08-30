@@ -2,7 +2,6 @@ function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,FScost,maint, ...
     vesselcost,turbrepair,battreplace,battencl,platform, ...
     battvol,triptime,trips,CF,S,P,D,L] =  ...
     simWind(kW,Smax,opt,data,atmo,batt,econ,uc,turb)
-
 %if fmin is suggesting a negative input, block it
 if opt.fmin && Smax < 0 || kW < 0
     surv = 0;
@@ -11,13 +10,15 @@ if opt.fmin && Smax < 0 || kW < 0
 end
 
 %extract data
-wind = data.met.wind_spd; %[m/s]
-if atmo.dyn_h %use log law to adjust height dynamically basec on size
+if atmo.dyn_h %[use log law to adjust height dynamically]
+    wind = data.met.wind_spd; %[m/s]
     for i = 1:length(wind)
         wind(i) = adjustHeight(wind(i),data.met.wind_ht, ...
             turb.clearance + sqrt(1000*2*kW/(atmo.rho*pi*turb.ura^3)), ...
-            'log',atmo.zo);
+        'log',atmo.zo);
     end
+else %not dynamically adjusting height
+    wind = data.met.wind_spd; %[m/s]
 end
 dt = 24*(data.met.time(2) - data.met.time(1)); %time in hours
 dist = data.dist; %[m] dist to shore
@@ -85,7 +86,7 @@ if trips < 0, trips = 0; end
 trips = trips + uc.turb.iv;
 triptime = dist*kts2mps(econ.wind.vessel.speed)^(-1)*(1/86400); %[d]
 vesselcost = 2*trips*econ.wind.vessel.cost*triptime;
-maint = econ.wind.maintenance*kW*trips*uc.lifetime;
+maint = econ.wind.maintenance*kW*12/turb.mtbf*uc.lifetime;
 turbrepair = kWcost*(2 + 1/2*(12/batt.lc*uc.lifetime-1+uc.turb.iv-1));
 battreplace = Scost*(12/batt.lc*uc.lifetime-1);
 if battreplace < 0, battreplace = 0; end

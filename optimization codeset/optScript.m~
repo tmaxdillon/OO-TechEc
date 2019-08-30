@@ -11,7 +11,6 @@
 
 %opt v2
 % 3 - switch to linear interpolation instead of curve fit
-% 3 - think about making this ^ agnostic to power type
 % 4 - adapt to search along multiple discontinuities
 % 5 - automate search ratio values
 
@@ -67,8 +66,7 @@ if opt.sens && ~opt.alldim %multiple simulations for sensitivity analysis
             atmo.zo = opt.tuning_array(i);
         end
         [multStruct(i).output,multStruct(i).opt] =  ...
-            optRun(loc,pm,c,opt,data,atmo,batt,econ,uc(c),inso,turb,wave, ...
-            tTot);
+            optRun(loc,pm,c,opt,data,atmo,batt,econ,uc(c),inso,turb,tTot);
         multStruct(i).data = data;
         multStruct(i).atmo = atmo;
         multStruct(i).batt = batt;
@@ -90,14 +88,14 @@ elseif opt.alldim %run all dimensions
     allDimStruct(length(opt.locations),length(opt.powermodules), ...
         length(opt.usecases)) = struct();
     for loc = 1:length(opt.locations)
+        %data
         data = load(string(opt.locations(loc)), ...
             string(opt.locations(loc)));
         data = data.(string(opt.locations(loc)));
         for pm = 1:length(opt.powermodules)
             for c = 1:length(opt.usecases)
                 [allDimStruct(loc,pm,c).output,allDimStruct(loc,pm,c).opt] = ...
-                    optRun(loc,pm,c,opt,data,atmo,batt,econ,uc(c),inso,turb, ... 
-                    wave,tTot);
+                    optRun(loc,pm,c,opt,data,atmo,batt,econ,uc(c),inso,turb,tTot);
                 allDimStruct(loc,pm,c).data = data;
                 allDimStruct(loc,pm,c).atmo = atmo;
                 allDimStruct(loc,pm,c).batt = batt;
@@ -116,8 +114,7 @@ elseif opt.alldim %run all dimensions
     end
 else %just one simulation
     [output,opt] = ...
-        optRun(loc,pm,c,opt,data,atmo,batt,econ,uc(c),inso,turb,wave, ...
-        tTot);
+        optRun(loc,pm,c,opt,data,atmo,batt,econ,uc(c),inso,turb,tTot);
     optStruct.output = output;
     optStruct.opt = opt;
     optStruct.data = data;

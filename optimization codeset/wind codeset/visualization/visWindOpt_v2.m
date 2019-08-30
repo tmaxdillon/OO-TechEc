@@ -15,13 +15,13 @@ output.min.cost = output.min.cost/1000;
 ms = 100;
 lw = 1.1;
 fs = 14;
-z_adj = 1.5;
+z_adj = 35;
 
 %remove failure configurations
 alive = output.cost;
 alive(output.surv == 0) = nan;
 
-if opt.failurezoneslope
+if opt.nm.failurezoneslope
     %remove survival configurations
     dead = 2*opt.init+3*opt.init.*(1-(1/opt.kW_m).*kWgrid- ...
         (1/opt.Smax_n).*Smaxgrid);
@@ -39,7 +39,7 @@ if opt.failurezoneslope
 end
 
 figure
-if opt.failurezoneslope
+if opt.nm.failurezoneslope
     sdead = surf(Smaxgrid,kWgrid,dead2, ...
         deadcolor);
     sdead.EdgeColor = 'none';
@@ -53,7 +53,7 @@ s.EdgeColor = 'none';
 hold on
 [~,con] = contour3(Smaxgrid,kWgrid,output.cost,'LineColor','w');
 hold on
-minval = scatter3(output.min.Smax,output.min.kW,output.min.cost+z_adj,...
+minval = scatter3(output.min.Smax,output.min.kW,output.min.cost+z_adj*3,...
     ms,'filled','MarkerEdgeColor','k', ...
     'MarkerFaceColor','m');
 hold on

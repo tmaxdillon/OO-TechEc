@@ -23,7 +23,7 @@ plot(datetime(data.met.time,'ConvertFrom','datenum'), ...
     'DisplayName','Power Produced','LineWidth',2)
 legend('show')
 ylabel('[kW]')
-set(gca,'XTickLabel',[]);
+%set(gca,'XTickLabel',[]);
 set(gca,'FontSize',16)
 set(gca,'LineWidth',2)
 grid on

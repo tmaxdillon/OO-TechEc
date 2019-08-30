@@ -1,6 +1,6 @@
 %DIMENSIONS
 loc = 'argBasin';
-pm = 3; %power module
+pm = 2; %power module
 c = 3;  %use case
 opt.locations = {'argBasin';'souOcean';'cosPioneer';'cosEndurance'};
 opt.powermodules = {'wind';'inso'};
@@ -61,8 +61,9 @@ batt.lc = 18;               %[months] life cycle under deep cycling
 batt.sdr = 2;               %[%/month] self discharge rate
 batt.dyn_lc = true;         %toggle dynamic life cycle
 %wave energy parameters
-wec.w = 15;
-wec.eta_ct = 0.6;
+wec.cw = 
+wec.w = 
+wec.eta_ct
 
 %atmospheric parameters
 atmo.rho = 1.225;           %[kg/m^3] density

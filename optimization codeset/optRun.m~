@@ -72,9 +72,8 @@ elseif pm == 2
     end
 elseif pm == 3
     %determine average wave conditions
-    wec.Tpc = median(data.wave.peak_wave_period);
-    wec.Hsc = median(data.wave.significant_wave_height);
-    wec.r = powerFromWEC(wec.Tpc,
+    wec.Tpc = mean(data.wave.peak_wave_period);
+    wec.Hsc = mean(data.wave.significant_wave_height)
     if opt.nm.many
            if opt.nm.many
         opt.C = length(opt.nm.bgd_array);
