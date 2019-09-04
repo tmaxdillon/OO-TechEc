@@ -1,48 +1,41 @@
-function [output,opt] = optWind(opt,data,atmo,batt,econ,uc,turb)
+function [output,opt] = optWave(opt,data,atmo,batt,econ,uc,wave)
 
 %set kW and Smax mesh
 opt.kW_1 = 0.1;
-opt.kW_m = uc.draw/1000*(turb.ura^3/turb.uci^3); %survive at cut in
+opt.kW_m = findMaxWecPower(wave.kW_gf*wave.Hsc,wave.kW_gf*wave.Tpc, ...
+    uc.draw,wave); %survive at kW_gf portion of median wave conditions
 opt.Smax_1 = 1;
 opt.Smax_n = uc.draw*24*opt.nm.battgriddur/1000; %bgd days without power
 
 %check to make sure coarse mesh will work
 opt.fmin = false;
-[~,check_s] = simWind(opt.kW_m,opt.Smax_n,opt,data,atmo,batt,econ,uc,turb);
-if ~check_s
+check_s = 0;
+while ~check_s
+    [~,check_s] = simWave(opt.kW_m,opt.Smax_n,opt,data, ... 
+        atmo,batt,econ,uc,wave);
     opt.kW_m = 2*opt.kW_m;
     opt.Smax_n = 2*opt.Smax_n;
 end
 
 %initialize inputs/outputs
-opt.kW = linspace(opt.kW_1,opt.kW_m,opt.nm.m);                %[m] rated power
-opt.Smax = linspace(opt.Smax_1,opt.Smax_n,opt.nm.n);       %[kWh] maximum storage capacity
+opt.kW = linspace(opt.kW_1,opt.kW_m,opt.nm.m);              %[kW] 
+opt.Smax = linspace(opt.Smax_1,opt.Smax_n,opt.nm.n);        %[kWh] 
 output.cost = zeros(opt.nm.m,opt.nm.n);
 output.surv = zeros(opt.nm.m,opt.nm.n);
-if opt.nm.show
-    output.CapEx = zeros(opt.nm.m,opt.nm.n);
-    output.OpEx = zeros(opt.nm.m,opt.nm.n);
-    output.kWcost = zeros(opt.nm.m,opt.nm.n);
-    output.Scost = zeros(opt.nm.m,opt.nm.n);
-    output.CF = zeros(opt.nm.m,opt.nm.n);
-    output.S = zeros(opt.nm.m,opt.nm.n,length(data.met.time)+1);
-    output.P = zeros(opt.nm.m,opt.nm.n,length(data.met.time));
-    output.D = zeros(opt.nm.m,opt.nm.n,length(data.met.time));
-    output.L = zeros(opt.nm.m,opt.nm.n,length(data.met.time));
-end
 
 %initial/coarse optimization
 tInitOpt = tic;
 for i = 1:opt.nm.m
     for j = 1:opt.nm.n
         [output.cost(i,j),output.surv(i,j)] = ...
-            simWind(opt.kW(i),opt.Smax(j),opt,data,atmo,batt,econ,uc,turb);
+            simWave(opt.kW(i),opt.Smax(j),opt,data,atmo,batt,econ,uc,wave);
     end
 end
 X = output.cost;
 X(output.surv == 0) = inf;
-X(:,1:floor(opt.nm.n*opt.nm.initminlim)) = inf; %don't allow initial minima near Smax = 0
-X(1:floor(opt.nm.m*opt.nm.initminlim),:) = inf; %don't allow initial minima near R = 0
+%no initial minima near origin
+X(:,1:floor(opt.nm.n*opt.nm.initminlim)) = inf;
+X(1:floor(opt.nm.m*opt.nm.initminlim),:) = inf;
 [I(1),I(2)] = find(X == min(X(:)),1,'first');
 opt.init = output.cost(I(1),I(2));
 opt.kW_init = opt.kW(I(1));
@@ -54,7 +47,7 @@ output.tInitOpt = toc(tInitOpt);
 tFminOpt = tic; %start timer
 opt.fmin = true; %let simWind know that fminsearch is on
 %objective function
-fun = @(x)simWind(x(1),x(2),opt,data,atmo,batt,econ,uc,turb);
+fun = @(x)simWave(x(1),x(2),opt,data,atmo,batt,econ,uc,wave);
 %set options (show convergence and objective space or not)
 if opt.nm.show
     options = optimset('MaxFunEvals',10000,'Algorithm','sqp','MaxIter',10000, ...
@@ -73,13 +66,12 @@ output.min.Smax = opt_ind(2);
 [output.min.cost,output.min.surv,output.min.CapEx,output.min.OpEx,...
     output.min.kWcost,output.min.Scost,output.min.Icost,output.min.FScost, ...
     output.min.maint,output.min.vesselcost, ... 
-    output.min.turbrepair,output.min.battreplace,output.min.battencl, ...
+    output.min.wecrepair,output.min.battreplace,output.min.battencl, ...
     output.min.platform, ...
     output.min.battvol,output.min.triptime,output.min.trips, ... 
     output.min.CF,output.min.S,output.min.P,output.min.D,output.min.L] ...
-    = simWind(output.min.kW,output.min.Smax,opt,data,atmo,batt,econ,uc,turb);
-output.min.rotor_h = turb.clearance + ... 
-    sqrt(1000*2*output.min.kW/(atmo.rho*pi*turb.ura^3)); %store rotor height
+    = simWave(output.min.kW,output.min.Smax,opt,data,atmo,batt,econ,uc,wave);
+[~,output.min.cw] = powerFromWEC(; %capture width
 output.tFminOpt = toc(tFminOpt); %end timer
 
 end

@@ -1,9 +1,9 @@
 %DIMENSIONS
-loc = 'argBasin';
+loc = 'cosPioneer';
 pm = 3; %power module
-c = 3;  %use case
+c = 1;  %use case
 opt.locations = {'argBasin';'souOcean';'cosPioneer';'cosEndurance'};
-opt.powermodules = {'wind';'inso'};
+opt.powermodules = {'wind';'inso';'wave'};
 opt.usecases = {'short term';'long term';'infrastructure'};
 
 %ECONOMIC
@@ -39,6 +39,9 @@ econ.inso.electrical = 210;         %[$/kW]
 econ.batt.encl.sf = .9997;                          %scaling factor
 econ.batt.encl.scale = 10*.3278*.1713*.2355;        %[m^3], WAMP
 econ.batt.encl.cost = 5000/econ.batt.encl.scale;    %[$/m^3]
+%wave costs
+econ.wave.scen = 1;                 %scenario indicator
+econ.wave.scenarios = 3;            %number of scenarios
 
 %DEVICE
 %wind parameters
@@ -61,8 +64,9 @@ batt.lc = 18;               %[months] life cycle under deep cycling
 batt.sdr = 2;               %[%/month] self discharge rate
 batt.dyn_lc = true;         %toggle dynamic life cycle
 %wave energy parameters
-wec.w = 15;
-wec.eta_ct = 0.6;
+wave.w = 15;                %width of gaussian power matrix
+wave.eta_ct = 0.6;          %[~] wec efficiency
+wave.kW_gf = 0.5;           %resource % reduction for coarse grid
 
 %atmospheric parameters
 atmo.rho = 1.225;           %[kg/m^3] density
@@ -95,8 +99,9 @@ uc(3).uptime_window = 30;       %[d]
 uc(3).turb.iv = 5;              %turbine interventions
 
 %multiple optimizations
-opt.alldim = 1;
+opt.alldim = 0;
 opt.sens = 0;
+opt.wavescen = 1;
 %opt.tuning_array = [1 .99 .97 .95 .925 .9 .85 .8];
 %opt.tuned_parameter = 'utp';
 opt.tuning_array = [50:50:600];

@@ -1,7 +1,8 @@
 function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,FScost,maint, ...
     vesselcost,turbrepair,battreplace,battencl,platform, ...
     battvol,triptime,trips,CF,S,P,D,L] =  ...
-    simWind(kW,Smax,opt,data,atmo,batt,econ,uc,turb)
+    simWave(kW,Smax,opt,data,atmo,batt,econ,uc,wave)
+
 %if fmin is suggesting a negative input, block it
 if opt.fmin && Smax < 0 || kW < 0
     surv = 0;
@@ -10,39 +11,24 @@ if opt.fmin && Smax < 0 || kW < 0
 end
 
 %extract data
-if atmo.dyn_h %[use log law to adjust height dynamically]
-    wind = data.met.wind_spd; %[m/s]
-    for i = 1:length(wind)
-        wind(i) = adjustHeight(wind(i),data.met.wind_ht, ...
-            turb.clearance + sqrt(1000*2*kW/(atmo.rho*pi*turb.ura^3)), ...
-        'log',atmo.zo);
-    end
-else %not dynamically adjusting height
-    wind = data.met.wind_spd; %[m/s]
-end
-dt = 24*(data.met.time(2) - data.met.time(1)); %time in hours
+Hs = data.wave.significant_wave_height; %[m]
+Tp = data.wave.peak_wave_period; %[s]
+dt = 24*(data.wave.time(2) - data.wave.time(1)); %time in hours
 dist = data.dist; %[m] dist to shore
+T = min(length(Hs),length(Tp)); %totatl time steps
 
 %initialize
-S = zeros(1,length(wind));
+S = zeros(1,T);
 S(1) = Smax*1000;
-P = zeros(1,length(wind));
-D = zeros(1,length(wind));
-L = ones(1,length(wind))*uc.draw;
+P = zeros(1,T);
+D = zeros(1,T);
+L = ones(1,T)*uc.draw;
 surv = 1;
 
 %run simulation
-for t = 1:length(wind)
-    %find power from turbine
-    if wind(t) < turb.uci
-        P(t) = 0; %[W]
-    elseif turb.uci < wind(t) && wind(t) <= turb.ura
-        P(t) = kW*1000*wind(t)^3/turb.ura^3; %[W]
-    elseif turb.ura < wind(t) && wind(t) <= turb.uco
-        P(t) = kW*1000; %[W]
-    else
-        P(t) = 0; %[W]
-    end
+for t = 1:T
+    %find power from wec
+    P(t) = powerFromWEC(Hs(t),Tp(t),kW,wave)*1000; %[W]
     %find next storage state
     sd = S(t)*(batt.sdr/100)*(1/(30*24))*dt; %[Wh] self discharge
     S(t+1) = dt*(P(t) - uc.draw) + S(t) - sd; %[Wh]
@@ -62,13 +48,26 @@ if batt.dyn_lc
     batt.lc = batt.lc*opt.phi; %effective battery size
 end
 
+switch econ.wave
+    case 1 % 2xwind cost, wind reliability
+        costmult = 2;
+        interventions = uc.turb.iv;
+    case 2 % wind cost, wind reliability
+        costmult = 1;
+        interventions = uc.turb.iv;
+    case 3 % wind cost, solar reliability
+        costmult = 1;
+        interventions = 0;
+end
+       
 %economic modeling
-kWcost = polyval(opt.p_dev.t,kW)*econ.wind.marinization; %turbine
-Icost = (econ.wind.installed - kWcost/ ...
+kWcost = costmult*polyval(opt.p_dev.t,kW)* ...
+    econ.wind.marinization; %wec
+Icost = (costmult*econ.wind.installed - kWcost/ ...
     (kW*econ.wind.marinization))*kW*econ.wind.mim; %installation
 if Icost < 0, Icost = 0; end
 %compute foundation costs using scale factor
-FScost = applyScaleFactor(econ.wind.foundsub.cost,5640,kW, ...
+FScost = costmult*applyScaleFactor(econ.wind.foundsub.cost,5640,kW, ...
     econ.wind.foundsub.sf)*kW;
 if Smax < opt.p_dev.kWhmax %less than linear region
     Scost = polyval(opt.p_dev.b,Smax);
@@ -83,10 +82,10 @@ platform = (1/2204.62)*Smax*1000/(batt.V*batt.wf)* ...
     econ.platform.wf*econ.platform.steel;
 trips = ceil((uc.lifetime)*(12/batt.lc - 12/uc.SI)); %number of trips
 if trips < 0, trips = 0; end
-trips = trips + uc.turb.iv;
+trips = trips + interventions;
 triptime = dist*kts2mps(econ.wind.vessel.speed)^(-1)*(1/86400); %[d]
 vesselcost = 2*trips*econ.wind.vessel.cost*triptime;
-maint = econ.wind.maintenance*kW*12/turb.mtbf*uc.lifetime;
+maint = econ.wind.maintenance*kW*trips*uc.lifetime;
 turbrepair = kWcost*(2 + 1/2*(12/batt.lc*uc.lifetime-1+uc.turb.iv-1));
 battreplace = Scost*(12/batt.lc*uc.lifetime-1);
 if battreplace < 0, battreplace = 0; end

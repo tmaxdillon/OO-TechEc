@@ -85,6 +85,33 @@ if opt.sens && ~opt.alldim %multiple simulations for sensitivity analysis
     end
     disp([num2str(opt.s) ' simulations complete after ' ...
         num2str(round(toc(tTot)/60,2)) ' minutes. '])
+elseif opt.wavescen %wave scenarios
+    clear data multStruct waveScenStruct
+    pm = 3;
+    waveScenStruct(length(opt.locations),length(opt.powermodules), ...
+        length(opt.usecases)) = struct();
+    for loc = 1:length(opt.locations)
+        data = load(string(opt.locations(loc)), ...
+            string(opt.locations(loc)));
+        data = data.(string(opt.locations(loc)));
+        for scen = 1:econ.wave.scenarios
+            econ.wave.scen = scen;
+            for c = 1:length(opt.usecases)
+                [waveScenStruct(loc,scen,c).output,waveScenStruct(loc,scen,c).opt] = ...
+                    optRun(loc,pm,c,opt,data,atmo,batt,econ,uc(c),inso,turb, ... 
+                    wave,tTot);
+                waveScenStruct(loc,scen,c).data = data;
+                waveScenStruct(loc,scen,c).atmo = atmo;
+                waveScenStruct(loc,scen,c).batt = batt;
+                waveScenStruct(loc,scen,c).econ = econ;
+                waveScenStruct(loc,scen,c).uc = uc(c);
+                waveScenStruct(loc,scen,c).pm = pm;
+                waveScenStruct(loc,scen,c).c = c;
+                waveScenStruct(loc,scen,c).loc = loc;
+                waveScenStruct(loc,scen,c).wave = wave;
+            end
+        end
+    end
 elseif opt.alldim %run all dimensions
     clear data multStruct allDimStruct
     allDimStruct(length(opt.locations),length(opt.powermodules), ...

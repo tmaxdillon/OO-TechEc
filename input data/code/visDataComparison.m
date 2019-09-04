@@ -45,8 +45,9 @@ end
 ylabel({'Wave','[kW/m]'},'FontSize',14)
 ylim([0 inf])
 xl = xlim;
+xtickangle(45)
 %xticks(xt)
-set(gca,'XTickLabel',[]);
+%set(gca,'XTickLabel',[]);
 set(gca,'FontSize',fs)
 title({'Renewable Power Density (Monthly Avg)',''}, ...
     'FontSize',18)

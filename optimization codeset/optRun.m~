@@ -12,6 +12,11 @@ elseif opt.alldim
         char(opt.powermodules(pm)) ' for ' char(opt.usecases(c)) ...
         ' application beginning after ' num2str(round(toc(tTot),2)) ...
         ' seconds.'])
+elseif opt.wavescen
+    disp(['Optimization at ' char(opt.locations(loc)) ' using scenario' ...
+        char(opt.powermodules(pm)) ' for ' char(opt.usecases(c)) ...
+        ' application beginning after ' num2str(round(toc(tTot),2)) ...
+        ' seconds.'])
 else
     disp(['Optimization (' char(loc) ', ' num2str(pm) ...
         ', ' num2str(c) ') beginning'])
@@ -71,11 +76,11 @@ elseif pm == 2
         [output,opt] = optInso(opt,data,atmo,batt,econ,uc,inso);
     end
 elseif pm == 3
-    %determine average wave conditions
-    wec.Tpc = mean(data.wave.peak_wave_period);
-    wec.Hsc = mean(data.wave.significant_wave_height)
+    %determine median wave conditions
+    wave.Tpc = median(data.wave.peak_wave_period);
+    wave.Hsc = median(data.wave.significant_wave_height);
+    %wave.r = powerFromWEC(wec.Tpc,
     if opt.nm.many
-           if opt.nm.many
         opt.C = length(opt.nm.bgd_array);
         compare(opt.C) = struct();
         costcompare = zeros(1,opt.C);
@@ -83,7 +88,7 @@ elseif pm == 3
             opt.c = i;
             opt.nm.battgriddur = opt.nm.bgd_array(i);
             [compare(i).output,compare(i).opt] = ...
-                optWave(opt,data,atmo,batt,econ,uc,inso);
+                optWave(opt,data,atmo,batt,econ,uc,wave);
             costcompare(i) = compare(i).output.min.cost;
         end
         [~,min_ind] = min(costcompare(:));
@@ -91,8 +96,7 @@ elseif pm == 3
         opt = compare(min_ind).opt;
         opt.nm.battgriddur = opt.nm.bgd_array(min_ind);
     else
-        [output,opt] = optWave(opt,data,atmo,batt,econ,uc,inso);
-           end
+        [output,opt] = optWave(opt,data,atmo,batt,econ,uc,wave);
     end
 end
 

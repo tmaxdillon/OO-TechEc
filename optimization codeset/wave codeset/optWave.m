@@ -2,9 +2,8 @@ function [output,opt] = optWave(opt,data,atmo,batt,econ,uc,wave)
 
 %set kW and Smax mesh
 opt.kW_1 = 0.1;
-cw = findCaptureWidth(0.2*wec.Hsc,0.2*wec.Tpc,uc.draw);
-opt.kW_m = powerFromWEC(wec.Hsc,wec.Tpc,
-opt.kW_m = uc.draw/1000*(turb.ura^3/turb.uci^3); %survive at 1/5 mean resource
+opt.kW_m = findMaxWecPower(wave.kW_gf*wave.Hsc,wave.kW_gf*wave.Tpc, ...
+    uc.draw,wave); %survive at kW_gf portion of median wave conditions
 opt.Smax_1 = 1;
 opt.Smax_n = uc.draw*24*opt.nm.battgriddur/1000; %bgd days without power
 
@@ -12,8 +11,8 @@ opt.Smax_n = uc.draw*24*opt.nm.battgriddur/1000; %bgd days without power
 opt.fmin = false;
 check_s = 0;
 while ~check_s
-    [~,check_s] = simWind(opt.kW_m,opt.Smax_n,opt,data, ... 
-        atmo,batt,econ,uc,turb);
+    [~,check_s] = simWave(opt.kW_m,opt.Smax_n,opt,data, ... 
+        atmo,batt,econ,uc,wave);
     opt.kW_m = 2*opt.kW_m;
     opt.Smax_n = 2*opt.Smax_n;
 end
@@ -29,7 +28,7 @@ tInitOpt = tic;
 for i = 1:opt.nm.m
     for j = 1:opt.nm.n
         [output.cost(i,j),output.surv(i,j)] = ...
-            simWind(opt.kW(i),opt.Smax(j),opt,data,atmo,batt,econ,uc,turb);
+            simWave(opt.kW(i),opt.Smax(j),opt,data,atmo,batt,econ,uc,wave);
     end
 end
 X = output.cost;
@@ -48,7 +47,7 @@ output.tInitOpt = toc(tInitOpt);
 tFminOpt = tic; %start timer
 opt.fmin = true; %let simWind know that fminsearch is on
 %objective function
-fun = @(x)simWind(x(1),x(2),opt,data,atmo,batt,econ,uc,turb);
+fun = @(x)simWave(x(1),x(2),opt,data,atmo,batt,econ,uc,wave);
 %set options (show convergence and objective space or not)
 if opt.nm.show
     options = optimset('MaxFunEvals',10000,'Algorithm','sqp','MaxIter',10000, ...
@@ -67,13 +66,12 @@ output.min.Smax = opt_ind(2);
 [output.min.cost,output.min.surv,output.min.CapEx,output.min.OpEx,...
     output.min.kWcost,output.min.Scost,output.min.Icost,output.min.FScost, ...
     output.min.maint,output.min.vesselcost, ... 
-    output.min.turbrepair,output.min.battreplace,output.min.battencl, ...
+    output.min.wecrepair,output.min.battreplace,output.min.battencl, ...
     output.min.platform, ...
     output.min.battvol,output.min.triptime,output.min.trips, ... 
     output.min.CF,output.min.S,output.min.P,output.min.D,output.min.L] ...
-    = simWind(output.min.kW,output.min.Smax,opt,data,atmo,batt,econ,uc,turb);
-output.min.rotor_h = turb.clearance + ... 
-    sqrt(1000*2*output.min.kW/(atmo.rho*pi*turb.ura^3)); %store rotor height
+    = simWave(output.min.kW,output.min.Smax,opt,data,atmo,batt,econ,uc,wave);
+[~,output.min.cw] = powerFromWEC(0,0,output.min.kW,wave); %capture width
 output.tFminOpt = toc(tFminOpt); %end timer
 
 end

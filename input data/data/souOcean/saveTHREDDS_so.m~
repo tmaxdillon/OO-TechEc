@@ -143,30 +143,31 @@ for v = 1:length(vars)
 end
 
 souOcean.wave.peak_wave_period_orig = souOcean.wave.peak_wave_period;
-souOcean.wave.significant_wave_height_orig = ...
-    souOcean.wave.significant_wave_height;
-souOcean.wave.time_orig = souOcean.wave.time;
 
 clear Y M D H MI S v i met_filenames vars temp opendap
 
 %% WAVE: additional structure adjustments
 
-%abridge due to large gap
-[~,souOcean.wave.tend] = min(abs(souOcean.wave.time_orig - ...
-    datenum('12-Nov-2018 00:00:00')));
-%time
-souOcean.wave.time = ...
-    souOcean.wave.time_orig(1:souOcean.wave.tend);
-%height
-souOcean.wave.significant_wave_height = ...
-    souOcean.wave.significant_wave_height_orig(1:souOcean.wave.tend);
 %remove period outliers
 souOcean.wave.peak_wave_period_nans = souOcean.wave.peak_wave_period_orig;
 souOcean.wave.peak_wave_period_nans(souOcean.wave.peak_wave_period_orig > 20) = nan;
-souOcean.wave.peak_wave_period = fillmissing( ... 
-    souOcean.wave.peak_wave_period_nans(1:souOcean.wave.tend),'linear');
+souOcean.wave.peak_wave_period = fillmissing(souOcean.wave.peak_wave_period_nans, ...
+    'linear');
 
-
+%abridge due to large gap
+[~,souOcean.wave.tend] = min(abs(souOcean.wave.time - ...
+    datenum('12-Nov-2018 00:00:00')));
+%time
+souOcean.wave.time = ...
+    souOcean.wave.time(1:souOcean.met.tend);
+%height
+souOcean.wave.significant_wave_height = ...
+    souOcean.met.shortwave_irradiance_orig(souOcean.met.tstart: ...
+    souOcean.met.tend);
+%wind
+souOcean.met.wind_spd = ...
+    fillmissing(souOcean.met.wind_spd_orig(souOcean.met.tstart: ...
+    souOcean.met.tend),'linear');
 
 
 
