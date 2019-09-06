@@ -1,20 +1,24 @@
-function [power,cw] = powerFromWEC(Hs,Tp,kWmax,wave)
+function [power,width] = powerFromWEC(Hs,Tp,rated,wave,opt,width)
 
 rho = 1020;
 g = 9.81;
 
-%use power at centroid to find capture width
-gausseff_c = 1;
-wavepower_c = (1/(16*4*pi))*rho*g^2*wave.Hsc^2*wave.Tpc; %[W]
-cw = 1000*kWmax/(wave.eta_ct*gausseff_c*wavepower_c); %[m]
+%compute power
+hs_eff = exp(-1.*((Hs-opt.wave.Hsm).^2)./wave.w); %Hs efficiency
+tp_eff = skewedGaussian(Tp,opt.wave.c(1),opt.wave.c(2))/ ... 
+    skewedGaussian(opt.wave.Tpm,opt.wave.c(1),opt.wave.c(2)); %Tp efficiency
+wavepower = (1/(16*4*pi))*rho*g^2*Hs^2*Tp/1000; %[kW]
+power = wave.eta_ct*width*hs_eff*tp_eff*wavepower - ...
+    rated*wave.house; %[kW]
+%cut out
+if wavepower*width > wave.cutout*rated
+    power = 0;
+end
 
-%use capture width to find power at input conditions
-gausseff = exp(-1*((Tp-wave.Tpc)^2+(Hs-wave.Hsc)^2)/wave.w);
-wavepower = (1/(16*4*pi))*rho*g^2*Hs^2*Tp; %[W]
-power = wave.eta_ct*cw*gausseff*wavepower/1000; %[kW]
+%scale to rated power and revmove negative power
+power(power<0) = 0;
+power(power>rated) = rated; %[kW]
 
-%scale to rated power
-power(power>kWmax) = kWmax; %[kW]
 
 end
 

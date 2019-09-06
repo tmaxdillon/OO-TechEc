@@ -1,5 +1,5 @@
 function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,FScost,maint, ...
-    vesselcost,turbrepair,battreplace,battencl,platform, ...
+    vesselcost,wecrepair,battreplace,battencl,platform, ...
     battvol,triptime,trips,CF,S,P,D,L] =  ...
     simWave(kW,Smax,opt,data,atmo,batt,econ,uc,wave)
 
@@ -48,18 +48,23 @@ if batt.dyn_lc
     batt.lc = batt.lc*opt.phi; %effective battery size
 end
 
-switch econ.wave
-    case 1 % 2xwind cost, wind reliability
-        costmult = 2;
-        interventions = uc.turb.iv;
-    case 2 % wind cost, wind reliability
-        costmult = 1;
-        interventions = uc.turb.iv;
-    case 3 % wind cost, solar reliability
-        costmult = 1;
-        interventions = 0;
+if isfield(econ.wave,'costmult') %sensitivity analysis
+    costmult = econ.wave.costmult;
+    interventions = uc.turb.iv;
+else %scenario analysis
+    switch econ.wave.scen
+        case 1 % 2xwind cost, wind reliability
+            costmult = 2;
+            interventions = uc.turb.iv;
+        case 2 % wind cost, wind reliability
+            costmult = 1;
+            interventions = uc.turb.iv;
+        case 3 % wind cost, solar reliability
+            costmult = 1;
+            interventions = 0;
+    end
 end
-       
+
 %economic modeling
 kWcost = costmult*polyval(opt.p_dev.t,kW)* ...
     econ.wind.marinization; %wec
@@ -85,13 +90,19 @@ if trips < 0, trips = 0; end
 trips = trips + interventions;
 triptime = dist*kts2mps(econ.wind.vessel.speed)^(-1)*(1/86400); %[d]
 vesselcost = 2*trips*econ.wind.vessel.cost*triptime;
-maint = econ.wind.maintenance*kW*trips*uc.lifetime;
-turbrepair = kWcost*(2 + 1/2*(12/batt.lc*uc.lifetime-1+uc.turb.iv-1));
+if isfield(uc.ship,'t_add') %add cost due to instrumentation vessel usage
+    addedcost = (uc.ship.t_add/24)*uc.ship.cost* ... 
+        (uc.lifetime)*(12/batt.SI);
+    vesselcost = vesselcost + addedcost;
+end
+maint = costmult*econ.wind.maintenance*kW*trips*uc.lifetime;
+wecrepair = kWcost*(2 + 1/2*(12/batt.lc*uc.lifetime-1+interventions-1));
+if interventions == 0, wecrepair = 0; end
 battreplace = Scost*(12/batt.lc*uc.lifetime-1);
 if battreplace < 0, battreplace = 0; end
-if turbrepair < 0, turbrepair = 0; end
+if wecrepair < 0, wecrepair = 0; end
 CapEx = platform + battencl + Scost + FScost + Icost + kWcost;
-OpEx = battreplace + turbrepair + maint + vesselcost;
+OpEx = battreplace + wecrepair + maint + vesselcost;
 cost = CapEx + OpEx;
 if opt.fmin && opt.fmindebug
     kW

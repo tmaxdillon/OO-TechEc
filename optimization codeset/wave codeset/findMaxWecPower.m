@@ -4,15 +4,24 @@ rho = 1020;
 g = 9.81;
 power = load;
 
-%use power requirement to find capture width
-gausseff = exp(-1*((Tp-wave.Tpc)^2+(Hs-wave.Hsc)^2)/wave.w); 
-wavepower = (1/(16*4*pi))*rho*g^2*Hs^2*Tp; %[W]
-cw = power/(wave.eta_ct*gausseff*wavepower); %[m]
+%find width through resonance onditions
+wavepower = (1/(16*4*pi))*rho*g^2*(Hs)^2*(Tp); %[W], power of given conditions
+hs_eff = exp(-1.*((Hs-opt.wave.Hsm).^2)./wave.w); %Hs eff (given conditions)
+tp_eff = skewedGaussian(Tp,c(1),c(2))/ ...
+    skewedGaussian(wave.tp_res*opt.wave.Tpm,c(1),c(2)); %Tp eff (given conditions)
+width = power/(wave.eta_ct*hs_eff*tp_eff*wavepower - ...
+    1000*rated*wave.house); %[m]
 
-%use capture width to find power at peak
-gausseff_c = 1;
-wavepower_c = (1/(16*4*pi))*rho*g^2*wave.Hsc^2*wave.Tpc; %[W]
-kWmax = cw*wave.eta_ct*gausseff_c*wavepower_c/1000; %[kW]
+%this gets tricky because we do not know rated power for house load (above)
+
+%use capture width to find rated power
+hs_eff_r = exp(-1.*((wave.hs_res*opt.wave.Hsm-opt.wave.Hsm).^2) ...
+    ./wave.w); %Hs eff (resonance)
+tp_eff_r = skewedGaussian(wave.tp_res*opt.wave.Tpm,c(1),c(2))/ ...
+    skewedGaussian(wave.tp_res*opt.wave.Tpm,c(1),c(2)); %Tp eff (resonance)
+wavepower_r = (1/(16*4*pi))*rho*g^2*(wave.hs_res*opt.wave.Hsm)^2 ...
+    *(wave.tp_res*opt.wave.Tpm); %[W], wave power at resonance
+kWhmax = wave.eta_ct*width*efficiency*wavepower - rated*wave.house; %[kW]
 
 end
 

@@ -40,6 +40,15 @@ elseif isequal(multStruct(1).opt.tuned_parameter,'scm')
 elseif isequal(multStruct(1).opt.tuned_parameter,'utf')
     xlab = 'Number of Unexpected Failures';
     xt = multStruct(1).opt.tuning_array;
+elseif isequal(multStruct(1).opt.tuned_parameter,'wcm')
+    xlab = 'Wave Cost Multiplier (relative to wind $/kW)';
+    xt = multStruct(1).opt.tuning_array;
+elseif isequal(multStruct(1).opt.tuned_parameter,'wrp')
+    xlab = 'Tp, Hs Percentile for Power Matrix Centroid';
+    xt = multStruct(1).opt.tuning_array;
+elseif isequal(multStruct(1).opt.tuned_parameter,'wcp')
+    xlab = 'Tp, Hs Percentile for Power Matrix Cut Out';
+    xt = fliplr(multStruct(1).opt.tuning_array);
 end
 
 if ~exist('xscale','var')
@@ -56,16 +65,17 @@ if multStruct(1).pm == 1
     else 
         visWindSens(multStruct,xlab,xt)
     end
-end
-if multStruct(1).pm == 2
-    if ~exist('ylab','var')
-        ylab = 'cost in thousands';
-    end
-    if ~exist('yscale','var')
-        yscale = 1;
-    end
+elseif multStruct(1).pm == 2
+    if ~exist('ylab','var'), ylab = 'cost in thousands'; end
+    if ~exist('yscale','var'), yscale = 1; end
     visInsoSens(multStruct,xlab,xt,xscale,ylab,yscale)
+elseif multStruct(1).pm == 3
+    if ~exist('ylab','var'), ylab = 'cost in thousands'; end
+    if ~exist('yscale','var'), yscale = 1; end
+    visWaveSens(multStruct,xlab,xt,xscale,ylab,yscale)
 end
 
 end
+
+
 

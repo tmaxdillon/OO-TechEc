@@ -77,9 +77,15 @@ elseif pm == 2
     end
 elseif pm == 3
     %determine median wave conditions
-    wave.Tpc = median(data.wave.peak_wave_period);
-    wave.Hsc = median(data.wave.significant_wave_height);
-    %wave.r = powerFromWEC(wec.Tpc,
+    opt.wave.Tpm = median(data.wave.peak_wave_period);
+    opt.wave.Hsm = median(data.wave.significant_wave_height);
+    %find skewed gaussian fit
+    c0 = [0.5 60];
+    Tpm = opt.wave.Tpm;
+    fun = @(c)findSkewedSS(linspace(0,2*Tpm,wave.tp_N),c,wave,Tpm);
+    options = optimset('MaxFunEvals',10000,'MaxIter',10000, ...
+        'TolFun',.0001,'TolX',.0001);
+    opt.wave.c = fminsearch(fun,c0,options);
     if opt.nm.many
         opt.C = length(opt.nm.bgd_array);
         compare(opt.C) = struct();

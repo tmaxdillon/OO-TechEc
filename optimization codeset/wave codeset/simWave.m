@@ -1,6 +1,6 @@
 function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,FScost,maint, ...
     vesselcost,wecrepair,battreplace,battencl,platform, ...
-    battvol,triptime,trips,CF,S,P,D,L] =  ...
+    battvol,triptime,trips,width,CF,S,P,D,L] =  ...
     simWave(kW,Smax,opt,data,atmo,batt,econ,uc,wave)
 
 %if fmin is suggesting a negative input, block it
@@ -17,6 +17,21 @@ dt = 24*(data.wave.time(2) - data.wave.time(1)); %time in hours
 dist = data.dist; %[m] dist to shore
 T = min(length(Hs),length(Tp)); %totatl time steps
 
+%find width through resonance conditions
+rho = 1020;
+g = 9.81;
+wavepower_r = (1/(16*4*pi))*rho*g^2*(wave.hs_rated*opt.wave.Hsm)^2 ...
+    *(wave.tp_res*opt.wave.Tpm); %[W], wave power at resonance
+hs_eff_r = exp(-1.*((wave.hs_rated*opt.wave.Hsm- ... 
+    wave.hs_res*opt.wave.Hsm).^2) ...
+    ./wave.w); %Hs eff (resonance)
+tp_eff_r = skewedGaussian(wave.tp_res*opt.wave.Tpm, ... 
+    opt.wave.c(1),opt.wave.c(2))/ ...
+    skewedGaussian(wave.tp_res*opt.wave.Tpm, ... 
+    opt.wave.c(1),opt.wave.c(2)); %Tp eff (resonance)
+width = 1000*kW/(wave.eta_ct*hs_eff_r*tp_eff_r*wavepower_r - ...
+    1000*kW*wave.house); %[m]
+
 %initialize
 S = zeros(1,T);
 S(1) = Smax*1000;
@@ -28,7 +43,7 @@ surv = 1;
 %run simulation
 for t = 1:T
     %find power from wec
-    P(t) = powerFromWEC(Hs(t),Tp(t),kW,wave)*1000; %[W]
+    P(t) = powerFromWEC(Hs(t),Tp(t),kW,wave,opt,width)*1000; %[W]
     %find next storage state
     sd = S(t)*(batt.sdr/100)*(1/(30*24))*dt; %[Wh] self discharge
     S(t+1) = dt*(P(t) - uc.draw) + S(t) - sd; %[Wh]
@@ -45,21 +60,26 @@ CF = nanmean(P)/(kW*1000); %capacity factor
 
 if batt.dyn_lc
     opt.phi = Smax/(Smax - (min(S)/1000)); %extra depth
-    batt.lc = batt.lc*opt.phi; %effective battery size
+    batt.lc = batt.lc_nom*opt.phi; %effective battery size
 end
 
-switch econ.wave.scen
-    case 1 % 2xwind cost, wind reliability
-        costmult = 2;
-        interventions = uc.turb.iv;
-    case 2 % wind cost, wind reliability
-        costmult = 1;
-        interventions = uc.turb.iv;
-    case 3 % wind cost, solar reliability
-        costmult = 1;
-        interventions = 0;
+if isfield(econ.wave,'costmult') %sensitivity analysis
+    costmult = econ.wave.costmult;
+    interventions = uc.turb.iv;
+else %scenario analysis
+    switch econ.wave.scen
+        case 1 % conservative
+            costmult = 5;
+            interventions = uc.turb.iv;
+        case 2 % optimistic cost
+            costmult = 2;
+            interventions = uc.turb.iv;
+        case 3 % optimistic reliability
+            costmult = 5;
+            interventions = 0;
+    end
 end
-       
+
 %economic modeling
 kWcost = costmult*polyval(opt.p_dev.t,kW)* ...
     econ.wind.marinization; %wec
@@ -69,6 +89,7 @@ if Icost < 0, Icost = 0; end
 %compute foundation costs using scale factor
 FScost = costmult*applyScaleFactor(econ.wind.foundsub.cost,5640,kW, ...
     econ.wind.foundsub.sf)*kW;
+if kW > 8000, FScost = 10500*costmult; end %can't be negative
 if Smax < opt.p_dev.kWhmax %less than linear region
     Scost = polyval(opt.p_dev.b,Smax);
 else %in linear region
@@ -85,6 +106,11 @@ if trips < 0, trips = 0; end
 trips = trips + interventions;
 triptime = dist*kts2mps(econ.wind.vessel.speed)^(-1)*(1/86400); %[d]
 vesselcost = 2*trips*econ.wind.vessel.cost*triptime;
+if isfield(uc.ship,'t_add') %add cost due to instrumentation vessel usage
+    addedcost = (uc.ship.t_add/24)*uc.ship.cost* ... 
+        (uc.lifetime)*(12/uc.SI);
+    vesselcost = vesselcost + addedcost;
+end
 maint = costmult*econ.wind.maintenance*kW*trips*uc.lifetime;
 wecrepair = kWcost*(2 + 1/2*(12/batt.lc*uc.lifetime-1+interventions-1));
 if interventions == 0, wecrepair = 0; end
@@ -97,7 +123,7 @@ cost = CapEx + OpEx;
 if opt.fmin && opt.fmindebug
     kW
     cost
-    pause
+    %pause
 end
 
 if sum(L == uc.draw)/(length(L)) < uc.uptime 

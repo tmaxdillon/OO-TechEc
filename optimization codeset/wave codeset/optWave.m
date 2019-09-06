@@ -2,8 +2,7 @@ function [output,opt] = optWave(opt,data,atmo,batt,econ,uc,wave)
 
 %set kW and Smax mesh
 opt.kW_1 = 0.1;
-opt.kW_m = findMaxWecPower(wave.kW_gf*wave.Hsc,wave.kW_gf*wave.Tpc, ...
-    uc.draw,wave); %survive at kW_gf portion of median wave conditions
+opt.kW_m = uc.draw/10; %divide load (kW) by ten
 opt.Smax_1 = 1;
 opt.Smax_n = uc.draw*24*opt.nm.battgriddur/1000; %bgd days without power
 
@@ -25,6 +24,7 @@ output.surv = zeros(opt.nm.m,opt.nm.n);
 
 %initial/coarse optimization
 tInitOpt = tic;
+disp('Populating coarse grid...')
 for i = 1:opt.nm.m
     for j = 1:opt.nm.n
         [output.cost(i,j),output.surv(i,j)] = ...
@@ -57,6 +57,7 @@ else
     options = optimset('MaxFunEvals',10000,'Algorithm','sqp','MaxIter',10000, ...
         'TolFun',opt.nm.tolfun,'TolX',opt.nm.tolx);
 end
+disp('Beginning Nelder Mead')
 %fminsearch
 [opt_ind] = ...
     fminsearch(fun,[opt.kW_init opt.Smax_init],options);
@@ -67,11 +68,10 @@ output.min.Smax = opt_ind(2);
     output.min.kWcost,output.min.Scost,output.min.Icost,output.min.FScost, ...
     output.min.maint,output.min.vesselcost, ... 
     output.min.wecrepair,output.min.battreplace,output.min.battencl, ...
-    output.min.platform, ...
-    output.min.battvol,output.min.triptime,output.min.trips, ... 
+    output.min.platform,output.min.battvol,output.min.triptime, ... 
+    output.min.trips,output.min.width, ...
     output.min.CF,output.min.S,output.min.P,output.min.D,output.min.L] ...
     = simWave(output.min.kW,output.min.Smax,opt,data,atmo,batt,econ,uc,wave);
-[~,output.min.cw] = powerFromWEC(0,0,output.min.kW,wave); %capture width
 output.tFminOpt = toc(tFminOpt); %end timer
 
 end

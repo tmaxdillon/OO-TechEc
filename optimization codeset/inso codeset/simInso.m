@@ -1,6 +1,6 @@
 function [cost,surv,CapEx,OpEx,Mcost,Scost,Ecost,Icost,maint, ...
     vesselcost,PVreplace,battreplace,battencl,platform, ...
-    battvol,triptime,trips,CF,S,P,D,L,eff_t] = ...
+    battvol,triptime,trips,CF,S,P,D,L,eff_t,pvci,battlc] = ...
     simInso(kW,Smax,opt,data,atmo,batt,econ,uc,inso)
 
 %if fmin is suggesting a negative input, block it
@@ -33,53 +33,86 @@ L = ones(1,length(swso))*uc.draw; %[W] load
 eff_t = zeros(1,length(swso)); %[~] efficiency
 surv = 1; % satisfies use case requirements
 
+%set panel degradation
+eff = (1-(inso.deg/8760)*(1:1:length(swso)));
+%rain = repmat(linspace(0.5,0,24*30),[1,ceil(length(swso)/(24*30))]);
+
 % set the cleaning interval based on the use case service interval
-% need better way of doing this?
 if uc.SI > 6
-    %if service interval is long-term, assume the panels will be cleaned
-    %once every thirty months
-    inso.pvci = 30;
+    %if service interval is long-term, guess the panels will be cleaned
+    %once every thirty months, run shooting scheme
+    inso.pvci = 30; %initial guess
+    over = true; %over/under indicator
+    dm = 10; %change in pvci
+    tol = 2; %tolerance
 else
     %if service interval is short-term, assume the panels will be cleaned
     %every six months
     inso.pvci = 6;
 end
 
-%set panel degradation
-eff = (1-(inso.deg/8760)*(1:1:length(swso)));
-%rain = repmat(linspace(0.5,0,24*30),[1,ceil(length(swso)/(24*30))]);
-
-%run simulation
-for t = 1:length(swso)
-    %find efficiency
-    soil_eff = (1-atmo.soil/8760*rem(t,inso.pvci*(365/12)*24));
-    %soil_eff = (1-soil_eff)*rain(t) + soil_eff; %rainfall clean
-    eff_t(t) = eff(t)*soil_eff*inso.eff;
-    %find power from panel
-    if swso(t) > inso.rated*1000 %rated irradiance
-        P(t) = eff_t(t)/inso.eff*kW*1000; %[W]
-    else %sub rated irradiance
-        P(t) = eff_t(t)/inso.eff*kW*1000*(swso(t)/(inso.rated*1000)); %[W]
+cont = 1;
+while cont
+    %run simulation
+    for t = 1:length(swso)
+        %find efficiency
+        soil_eff = (1-atmo.soil/8760*rem(t,inso.pvci*(365/12)*24));
+        %soil_eff = (1-soil_eff)*rain(t) + soil_eff; %rainfall clean
+        eff_t(t) = eff(t)*soil_eff*inso.eff;
+        %find power from panel
+        if swso(t) > inso.rated*1000 %rated irradiance
+            P(t) = eff_t(t)/inso.eff*kW*1000; %[W]
+        else %sub rated irradiance
+            P(t) = eff_t(t)/inso.eff*kW*1000*(swso(t)/(inso.rated*1000)); %[W]
+        end
+        %find next storage state
+        sd = S(t)*(batt.sdr/100)*(1/(30*24))*dt; %[Wh] self discharge
+        S(t+1) = dt*(P(t) - uc.draw) + S(t) - sd; %[Wh]
+        if S(t+1) > Smax*1000 %dump power if over limit
+            D(t) = S(t+1) - Smax*1000; %[Wh]
+            S(t+1) = Smax*1000; %[Wh]
+        elseif S(t+1) <= 0 %bottomed out
+            S(t+1) = 0; %no less than bottom
+            L(t) = S(t)/dt; %adjust load to what was consumed
+        end
     end
-    %find next storage state
-    sd = S(t)*(batt.sdr/100)*(1/(30*24))*dt; %[Wh] self discharge
-    S(t+1) = dt*(P(t) - uc.draw) + S(t) - sd; %[Wh]
-    if S(t+1) > Smax*1000 %dump power if over limit
-        D(t) = S(t+1) - Smax*1000; %[Wh]
-        S(t+1) = Smax*1000; %[Wh]
-    elseif S(t+1) <= 0 %bottomed out
-        S(t+1) = 0; %no less than bottom
-        L(t) = S(t)/dt; %adjust load to what was consumed
+    
+    %compute life cycle of battery
+    if batt.dyn_lc
+        minbatt = min(S)/1000; %minimum battery storage
+        %make sure minimum battery storage is not full capacity
+        if minbatt == Smax, minbatt = .99*Smax; end
+        opt.phi = Smax/(Smax - minbatt); %extra depth
+        batt.lc = batt.lc_nom*opt.phi; %life cycle
+    end
+    
+    if inso.shootdebug
+        disp(['pvci = ' num2str(inso.pvci)])
+        disp(['battlc = ' num2str(batt.lc)])
+        pause
+    end
+    
+    if uc.SI == 6 || abs(batt.lc - inso.pvci) < tol
+        cont = 0;
+    elseif batt.lc < inso.pvci %cleaning interval longer than battery life
+        inso.pvci = inso.pvci - dm;
+        if ~over
+            dm = dm/2;
+            over = true;
+        end
+    elseif batt.lc > inso.pvci %cleaning interval shorter than battery life
+        inso.pvci = inso.pvci + dm;
+        if over
+            dm = dm/2;
+            over = false;
+        end
     end
 end
+
+pvci = inso.pvci;
+battlc = batt.lc;
 
 CF = nanmean(P)/(kW*1000); %capacity factor [W_avg/W_rated]
-
-%compute life cycle of battery
-if batt.dyn_lc
-    opt.phi = Smax/(Smax - (min(S)/1000)); %extra depth
-    batt.lc = batt.lc*opt.phi; %effective battery size
-end
 
 %economic modeling
 Mcost = econ.inso.module*kW*econ.inso.marinization; %module
@@ -101,6 +134,11 @@ trips = ceil((uc.lifetime)*(12/batt.lc - 12/uc.SI)); %number of trips
 if trips < 0, trips = 0; end
 triptime = dist*kts2mps(econ.inso.vessel.speed)^(-1)*(1/86400); %[d]
 vesselcost = 2*trips*econ.inso.vessel.cost*triptime;
+if isfield(uc.ship,'t_add') %add cost due to instrumentation vessel usage
+    addedcost = (uc.ship.t_add/24)*uc.ship.cost* ...
+        (uc.lifetime)*(12/uc.SI);
+    vesselcost = vesselcost + addedcost;
+end
 maint = econ.inso.maintenance*kW*uc.lifetime;
 battreplace = Scost*(12/batt.lc*uc.lifetime-1);
 if battreplace < 0, battreplace = 0; end
@@ -115,7 +153,7 @@ if opt.fmin && opt.fmindebug
 end
 
 %evaluate if system requirements were met
-if sum(L == uc.draw)/(length(L)) < uc.uptime 
+if sum(L == uc.draw)/(length(L)) < uc.uptime
     surv = 0;
     if opt.fmin
         cost = inf;

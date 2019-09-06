@@ -16,12 +16,8 @@
 % 5 - automate search ratio values
 
 %wind
-% 2 - vessel ops time for STI
 
 %solar
-% 2 - vessel ops time for STI
-% 2 - re think PV replacement for infrastructure
-% 2 - talk to brian regarding soiling and cleaning
 
 %battery
 % 3 - add max depth of discharge (currently 100%)
@@ -31,7 +27,7 @@
 % 5 - research chemistry for single use batteries
 
 %wave
-% 2 - basic wave model
+% 4 - need to re consider cut out
 
 %cable
 % 2 - basic cable model
@@ -57,6 +53,15 @@ if opt.sens && ~opt.alldim %multiple simulations for sensitivity analysis
     for i = 1:opt.S
         opt.s = i;
         %update tuned parameter
+        if isequal(opt.tuned_parameter,'wcp')
+            wave.cutout_prctile = opt.tuning_array(i);
+        end
+        if isequal(opt.tuned_parameter,'wrp')
+            wave.rated_prctile = opt.tuning_array(i);
+        end
+        if isequal(opt.tuned_parameter,'wcm')
+            econ.wave.costmult = opt.tuning_array(i);
+        end
         if isequal(opt.tuned_parameter,'utp')
             uc(c).uptime = opt.tuning_array(i);
         end
@@ -65,7 +70,7 @@ if opt.sens && ~opt.alldim %multiple simulations for sensitivity analysis
         end
         if isequal(opt.tuned_parameter,'zo')
             atmo.zo = opt.tuning_array(i);
-        end
+        end        
         [multStruct(i).output,multStruct(i).opt] =  ...
             optRun(loc,pm,c,opt,data,atmo,batt,econ,uc(c),inso,turb,wave, ...
             tTot);
@@ -81,6 +86,8 @@ if opt.sens && ~opt.alldim %multiple simulations for sensitivity analysis
             multStruct(i).turb = turb;
         elseif pm == 2
             multStruct(i).inso = inso;
+        elseif pm == 3
+            multStruct(i).wave = wave;
         end
     end
     disp([num2str(opt.s) ' simulations complete after ' ...
