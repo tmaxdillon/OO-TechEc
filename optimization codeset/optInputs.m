@@ -68,15 +68,15 @@ batt.lc_nom = 18;           %[months] nominal life cycle under deep cycling
 batt.sdr = 2;               %[%/month] self discharge rate
 batt.dyn_lc = true;         %toggle dynamic life cycle
 %wave energy parameters
-wave.w = 60;                %width of gaussian power matrix
+wave.w = 60;                %width of gaussian power matrix in Hs direction
 wave.eta_ct = 0.6;          %[~] wec efficiency
 wave.kW_gf = 0.5;           %resource % reduction for coarse grid
 wave.tp_N = 1000;           %discretization for Tp skewed gaussian fit
 wave.tp_res = 0.3;          %multiplier on median tp for resonance
 wave.hs_res = 1;            %multiplier on median hs for resonance
 wave.hs_rated = 2;          %multiplier on median hs for rated power
-wave.med_prob = 0.1;        %median probability in skewed gaussian
-wave.cutout = 15;          %wavepower X times ratedpower initiates cutout
+wave.med_prob = 0.1;        %median probability for fitting skewed gaussian
+wave.cutout = 15;           %wavepower X times ratedpower initiates cutout
 wave.house = 0.10;          %percent of rated power as house load
 
 %atmospheric parameters

@@ -17,20 +17,20 @@ dt = 24*(data.wave.time(2) - data.wave.time(1)); %time in hours
 dist = data.dist; %[m] dist to shore
 T = min(length(Hs),length(Tp)); %totatl time steps
 
-%find width through resonance conditions
+%find width through resonance and rated power conditions
 rho = 1020;
 g = 9.81;
 wavepower_r = (1/(16*4*pi))*rho*g^2*(wave.hs_rated*opt.wave.Hsm)^2 ...
-    *(wave.tp_res*opt.wave.Tpm); %[W], wave power at resonance
+    *(wave.tp_res*opt.wave.Tpm); %[W], wave power at resonance/rated
 hs_eff_r = exp(-1.*((wave.hs_rated*opt.wave.Hsm- ... 
     wave.hs_res*opt.wave.Hsm).^2) ...
-    ./wave.w); %Hs eff (resonance)
+    ./wave.w); %Hs eff (rated power)
 tp_eff_r = skewedGaussian(wave.tp_res*opt.wave.Tpm, ... 
     opt.wave.c(1),opt.wave.c(2))/ ...
     skewedGaussian(wave.tp_res*opt.wave.Tpm, ... 
     opt.wave.c(1),opt.wave.c(2)); %Tp eff (resonance)
 width = 1000*kW/(wave.eta_ct*hs_eff_r*tp_eff_r*wavepower_r - ...
-    1000*kW*wave.house); %[m]
+    1000*kW*wave.house); %[m, physical width of wec
 
 %initialize
 S = zeros(1,T);
