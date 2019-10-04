@@ -15,12 +15,12 @@ Hs = data.wave.significant_wave_height; %[m]
 Tp = data.wave.peak_wave_period; %[s]
 dt = 24*(data.wave.time(2) - data.wave.time(1)); %time in hours
 dist = data.dist; %[m] dist to shore
-T = min(length(Hs),length(Tp)); %totatl time steps
+T = min(length(Hs),length(Tp)); %total time steps
 
-%find width through resonance and rated power conditions, computed up front
-%in optRun() from median conditions: hs_eff_r, tp_eff_r, wavepower_r
-width = 1000*kW/(wave.eta_ct*opt.wave.hs_eff_r* ... 
-    opt.wave.tp_eff_r*opt.wave.wavepower_r - ...
+%find width through rated power conditions, computed up front
+%in optRun(), from median conditions: hs_eff_r, tp_eff_r, wavepower_r
+width = 1000*kW/(wave.eta_ct*opt.wave.hs_eff_ra* ... 
+    opt.wave.tp_eff_ra*opt.wave.wavepower_ra - ...
     1000*kW*wave.house); %[m] physical width of wec
 
 %initialize
@@ -51,7 +51,8 @@ CF = nanmean(P)/(kW*1000); %capacity factor
 
 if batt.dyn_lc
     opt.phi = Smax/(Smax - (min(S)/1000)); %extra depth
-    batt.lc = batt.lc_nom*opt.phi; %effective battery size
+    batt.lc = batt.lc_nom*opt.phi^(batt.beta); %new lifetime
+    batt.lc(batt.lc > batt.lc_max) = batt.lc_max; %no larger than max 
 end
 
 if isfield(econ.wave,'costmult') %sensitivity analysis
@@ -59,15 +60,23 @@ if isfield(econ.wave,'costmult') %sensitivity analysis
     interventions = uc.turb.iv;
 else %scenario analysis
     switch econ.wave.scen
-        case 1 % conservative
+%         case 1 % conservative
+%             costmult = 5;
+%             interventions = uc.turb.iv;
+%         case 2 % optimistic cost
+%             costmult = 2;
+%             interventions = uc.turb.iv;
+%         case 3 % optimistic reliability
+%             costmult = 5;
+%             interventions = 0;
+%             uc.turb_planned_rep = 0;
+        case 1 %conservative
             costmult = 5;
             interventions = uc.turb.iv;
-        case 2 % optimistic cost
-            costmult = 2;
-            interventions = uc.turb.iv;
-        case 3 % optimistic reliability
-            costmult = 5;
+        case 2
+            costmult = 3;
             interventions = 0;
+            uc.turb_planned_rep = 0;
     end
 end
 
@@ -103,6 +112,8 @@ if isfield(uc.ship,'t_add') %add cost due to instrumentation vessel usage
     vesselcost = vesselcost + addedcost;
 end
 maint = costmult*econ.wind.maintenance*kW*trips*uc.lifetime;
+%add planned turbine replacements (should not require vessel)
+interventions = interventions + uc.turb_planned_rep;
 wecrepair = kWcost*(2 + 1/2*(12/batt.lc*uc.lifetime-1+interventions-1));
 if interventions == 0, wecrepair = 0; end
 battreplace = Scost*(12/batt.lc*uc.lifetime-1);

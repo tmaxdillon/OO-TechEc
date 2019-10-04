@@ -21,30 +21,30 @@ z_adj = 35;
 alive = output.cost;
 alive(output.surv == 0) = nan;
 
-if opt.nm.failurezoneslope
-    %remove survival configurations
-    dead = 2*opt.init+3*opt.init.*(1-(1/opt.kW_m).*kWgrid- ...
-        (1/opt.Smax_n).*Smaxgrid);
-    dead2=dead;
-    dead2(output.surv == 1) = nan;
-    for i=size(dead,1):-1:2
-        for j=size(dead,2):-1:2
-            if isnan(dead2(i,j)) && ~isnan(dead2(i-1,j)) && ~isnan(dead2(i,j-1))
-                dead2(i,j) = dead(i,j);
-            end
-        end
-    end
-    deadcolor = repmat([64,224,208]/265,[length(Smaxgrid),1,length(kWgrid)]);
-    deadcolor = permute(deadcolor,[1,3,2]);
-end
+% if opt.nm.failurezoneslope
+%     %remove survival configurations
+%     dead = 2*opt.init+3*opt.init.*(1-(1/opt.kW_m).*kWgrid- ...
+%         (1/opt.Smax_n).*Smaxgrid);
+%     dead2=dead;
+%     dead2(output.surv == 1) = nan;
+%     for i=size(dead,1):-1:2
+%         for j=size(dead,2):-1:2
+%             if isnan(dead2(i,j)) && ~isnan(dead2(i-1,j)) && ~isnan(dead2(i,j-1))
+%                 dead2(i,j) = dead(i,j);
+%             end
+%         end
+%     end
+%     deadcolor = repmat([64,224,208]/265,[length(Smaxgrid),1,length(kWgrid)]);
+%     deadcolor = permute(deadcolor,[1,3,2]);
+% end
 
 figure
-if opt.nm.failurezoneslope
-    sdead = surf(Smaxgrid,kWgrid,dead2, ...
-        deadcolor);
-    sdead.EdgeColor = 'none';
-    hold on
-end
+% if opt.nm.failurezoneslope
+%     sdead = surf(Smaxgrid,kWgrid,dead2, ...
+%         deadcolor);
+%     sdead.EdgeColor = 'none';
+%     hold on
+% end
 s = surf(Smaxgrid,kWgrid,output.cost,zeros(length(Smaxgrid),length(kWgrid),3));
 s.EdgeColor = 'none';
 hold on

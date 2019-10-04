@@ -83,7 +83,8 @@ while cont
         %make sure minimum battery storage is not full capacity
         if minbatt == Smax, minbatt = .99*Smax; end
         opt.phi = Smax/(Smax - minbatt); %extra depth
-        batt.lc = batt.lc_nom*opt.phi; %life cycle
+        batt.lc = batt.lc_nom*opt.phi^(batt.beta); %new lifetime
+        batt.lc(batt.lc > batt.lc_max) = batt.lc_max; %no larger than max
     end
     
     if inso.shootdebug

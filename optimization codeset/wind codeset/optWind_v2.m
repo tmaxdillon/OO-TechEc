@@ -1,7 +1,7 @@
 function [output,opt] = optWind_v2(opt,data,atmo,batt,econ,uc,turb)
 
 %created on Tuesday August 13th by Trent Dillon
-%code identifies optimization "cliff" amnd minimizes along cliff
+%code identifies optimization "cliffs" and minimizes along cliffs
 
 %settings and preallocation
 opt.cliff.m = zeros(1,size(opt.cliff.srv_wind,2)); %weight of each line
@@ -13,8 +13,9 @@ for l = 1:size(opt.cliff.srv_wind,2)
     dm = opt.cliff.dmult; %reset dm
     m = opt.cliff.mult; %reset m
     for s = 1:opt.cliff.stot-1
-        [~,check_s] = simWind(opt.cliff.srv_wind(1,l)*m, ... 
-            opt.cliff.srv_wind(2,l).*m,opt,data,atmo,batt,econ,uc,turb);
+%         [~,check_s] = simWind(opt.cliff.srv_wind(1,l)*m, ... 
+%             opt.cliff.srv_wind(2,l).*m,opt,data,atmo,batt,econ,uc,turb);
+        phi = windPhi(kW,Smax,data,atmo,batt,uc,turb)
         if check_s %over, needs lower multiplier
             m = m-dm;
             if ~over

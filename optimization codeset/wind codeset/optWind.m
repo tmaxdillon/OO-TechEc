@@ -2,9 +2,9 @@ function [output,opt] = optWind(opt,data,atmo,batt,econ,uc,turb)
 
 %set kW and Smax mesh
 opt.kW_1 = 0.1;
-opt.kW_m = uc.draw/1000*(turb.ura^3/turb.uci^3); %survive at cut in
+opt.kW_m = uc.draw/1000*(turb.ura^3/turb.uci^3)*(1/4); %survive at cut in
 opt.Smax_1 = 1;
-opt.Smax_n = uc.draw*24*opt.nm.battgriddur/1000; %bgd days without power
+opt.Smax_n = uc.draw*24*opt.nm.battgriddur/1000*(1/3); %bgd days without power
 
 %check to make sure coarse mesh will work
 opt.fmin = false;

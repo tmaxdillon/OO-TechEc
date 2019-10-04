@@ -115,14 +115,14 @@ for c = 1:size(waveScenStruct,3)
             for lay = 1:cols
                 h(i,lay,c).CData = col(lay,:);
             end
-            if c == 1
+            if c == 2
                 legend(h(1,:,c),leg,'Location','northeast')
             end
         else
             for lay = 1:dcols
                 h(i,lay,c).CData = dcol(lay,:);
             end
-            if c == 1 && i == 3
+            if c == 2 && i == 3
                 legend(h(i,:,c),leg,'Location','best')
             end
         end

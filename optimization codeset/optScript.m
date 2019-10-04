@@ -3,8 +3,6 @@
 % to do
 
 %key
-% 1 - before labor day
-% 2 - after labor day
 % 3 - after all center (first priority)
 % 4 - after all center (second priority)
 % 5 - after all center (third priority)
@@ -21,19 +19,20 @@
 
 %battery
 % 3 - add max depth of discharge (currently 100%)
-% 2 - vessel ops time for STI
-% 2 - sensitivity to life cycle analysis
+% 3 - sensitivity to life cycle analysis
 % 5 - make battery optimization module
 % 5 - research chemistry for single use batteries
 
 %wave
-% 4 - need to re consider cut out
+% 4 - need to re consider cut out (look into ben ideas)
+% 4 - add region for breaking waves
+% 4 - speed up
 
 %cable
-% 2 - basic cable model
+% 3 - basic cable model
 
 %other
-% 1 - clean, shorten code
+% 5 - consider adding cost of environmental compliance
 % 5 - research tugboat cost
 % 2.5 - integrate all OOI sensor timeserieses
 % 5 - add parabolic distance to port
@@ -104,7 +103,8 @@ elseif opt.wavescen %wave scenarios
         for scen = 1:econ.wave.scenarios
             econ.wave.scen = scen;
             for c = 1:length(opt.usecases)
-                [waveScenStruct(loc,scen,c).output,waveScenStruct(loc,scen,c).opt] = ...
+                [waveScenStruct(loc,scen,c).output, ... 
+                    waveScenStruct(loc,scen,c).opt] = ...
                     optRun(loc,pm,c,opt,data,atmo,batt,econ,uc(c),inso,turb, ... 
                     wave,tTot);
                 waveScenStruct(loc,scen,c).data = data;
@@ -159,7 +159,16 @@ else %just one simulation
     optStruct.batt = batt;
     optStruct.econ = econ;
     optStruct.uc = uc(c);
-    optStruct.turb = turb;
+    optStruct.pm = pm;
+    optStruct.c = c;
+    optStruct.loc = loc;
+    if pm == 1
+        optStruct.turb = turb;
+    elseif pm == 2
+        optStruct.inso = inso;
+    elseif pm == 3
+        optStruct.wave = wave;
+    end
 end
 
 clear i tTot

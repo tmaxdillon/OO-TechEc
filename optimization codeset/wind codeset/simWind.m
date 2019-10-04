@@ -58,7 +58,8 @@ CF = nanmean(P)/(kW*1000); %capacity factor
 
 if batt.dyn_lc
     opt.phi = Smax/(Smax - (min(S)/1000)); %extra depth
-    batt.lc = batt.lc_nom*opt.phi; %effective battery size
+    batt.lc = batt.lc_nom*opt.phi^(batt.beta); %new lifetime
+    batt.lc(batt.lc > batt.lc_max) = batt.lc_max; %no larger than max 
 end
 
 %economic modeling
@@ -91,6 +92,10 @@ if isfield(uc.ship,'t_add') %add cost due to instrumentation vessel usage
     vesselcost = vesselcost + addedcost;
 end
 maint = econ.wind.maintenance*kW*trips*uc.lifetime;
+%add planned turbine replacements (should not require vessel)
+if isfield(uc,'turb_planned_rep')
+    uc.turb.iv = uc.turb.iv + uc.turb_planned_rep;
+end
 turbrepair = kWcost*(2 + 1/2*(12/batt.lc*uc.lifetime-1+uc.turb.iv-1));
 battreplace = Scost*(12/batt.lc*uc.lifetime-1);
 if battreplace < 0, battreplace = 0; end

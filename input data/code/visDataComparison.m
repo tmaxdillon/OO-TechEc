@@ -125,7 +125,11 @@ subplot(5,1,1)
 b = barh(labels,dists./1000);
 b(1).FaceColor = 'flat';
 for i = 1:l
-    b(1).CData(i,:) = col(end+1-i,:);
+%     reds = colormap(brewermap(50,'reds'));
+%     array = linspace(0,max(dists),50);
+    %b(1).CData(i,:) = col(end+1-i,:);
+    %[~,ind] = min(abs(array - dists(i)));
+    b(1).CData(i,:) = [255 0 0]/256;
 end
 xlim([0 1.1*max(dists)/1000])
 set(gca,'FontSize',fs)

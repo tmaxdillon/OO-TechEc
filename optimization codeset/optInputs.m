@@ -1,12 +1,12 @@
 %DIMENSIONS
-loc = 'cosPioneer';
-pm = 3; %power module
-c = 1;  %use case
+loc = 'argBasin';
+pm = 1; %power module
+c = 3;  %use case
 opt.alldim = 0;
 opt.sens = 0;
-opt.wavescen = 1;
+opt.wavescen = 0;
 opt.locations = {'argBasin';'souOcean';'cosPioneer'};
-opt.powermodules = {'wind';'inso';'wave'};
+opt.powermodules = {'wind';'inso'};
 opt.usecases = {'short term';'long term';'infrastructure'};
 
 %ECONOMIC
@@ -44,7 +44,7 @@ econ.batt.encl.scale = 10*.3278*.1713*.2355;        %[m^3], WAMP
 econ.batt.encl.cost = 5000/econ.batt.encl.scale;    %[$/m^3]
 %wave costs
 econ.wave.scen = 1;                 %scenario indicator
-econ.wave.scenarios = 3;            %number of scenarios
+econ.wave.scenarios = 2;            %number of scenarios
 
 %DEVICE
 %wind parameters
@@ -65,6 +65,8 @@ batt.V = 12;                %[V] Voltage
 batt.ed = 0.1;              %[Ah/in^3] energy density
 batt.wf = 1.5;              %[Ah/lb] weight factor
 batt.lc_nom = 18;           %[months] nominal life cycle under deep cycling
+batt.beta = 6/10;           %decay exponential for life cycle
+batt.lc_max = 12*10;        %maximum months of operation
 batt.sdr = 2;               %[%/month] self discharge rate
 batt.dyn_lc = true;         %toggle dynamic life cycle
 %wave energy parameters
@@ -73,6 +75,7 @@ wave.eta_ct = 0.6;          %[~] wec efficiency
 wave.kW_gf = 0.5;           %resource % reduction for coarse grid
 wave.tp_N = 1000;           %discretization for Tp skewed gaussian fit
 wave.tp_res = 0.3;          %multiplier on median tp for resonance
+wave.tp_rated = 1;          %multiplier on median tp for rated power
 wave.hs_res = 1;            %multiplier on median hs for resonance
 wave.hs_rated = 2;          %multiplier on median hs for rated power
 wave.med_prob = 0.1;        %median probability for fitting skewed gaussian
@@ -96,18 +99,21 @@ uc(1).uptime = .99;             %[%] uptime
 uc(1).ship.cost = 40000;        %[$/day] for vessel
 uc(1).ship.t_add = 1;           %[h], added vessel time
 uc(1).turb.iv = 0;              %turbine interventions
+uc(1).turb_planned_rep = 1;     %planned turbine replacements
 %long term instrumentation
 uc(2).draw = 200;               %[W] - secondary node
 uc(2).lifetime = 5;             %[y]
 uc(2).SI = 12*uc(2).lifetime;   %[months] service interval
 uc(2).uptime = .99;              %[%] uptime
 uc(2).turb.iv = 2;              %turbine interventions
+uc(2).turb_planned_rep = 0;     %planned turbine replacements
 %infrastructure
 uc(3).draw = 8000;              %[W] - secondary node
 uc(3).lifetime = 25;            %[y]
 uc(3).SI = 12*uc(3).lifetime;   %[months] service interval
 uc(3).uptime = .99;             %[%] uptime
 uc(3).turb.iv = 5;              %turbine interventions
+uc(3).turb_planned_rep = 0;     %planned turbine replacements
 
 %sensitivity analaysis
 % opt.tuning_array = [100 95 90 85 80 75 70];
@@ -126,9 +132,9 @@ opt.tuned_parameter = 'wcm'; %wave cost multiplier
 % opt.tuned_parameter = 'utf';
 
 %optimization parameters
-opt.nm.m = 8; %input grid resolution for rated power
-opt.nm.n = 8; %input grid resolution for storage
-opt.nm.battgriddur = 7; %[d]
+opt.nm.m = 80; %input grid resolution for rated power
+opt.nm.n = 80; %input grid resolution for storage
+opt.nm.battgriddur = 20; %[d]
 opt.nm.many = false; %seed many initial points into nelder
 opt.nm.bgd_array = [5,9,10,14,22]; %[d]
 opt.nm.show = false; %show 
