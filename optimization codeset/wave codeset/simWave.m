@@ -19,9 +19,8 @@ T = min(length(Hs),length(Tp)); %total time steps
 
 %find width through rated power conditions, computed up front
 %in optRun(), from median conditions: hs_eff_r, tp_eff_r, wavepower_r
-width = 1000*kW/(wave.eta_ct*opt.wave.hs_eff_ra* ... 
-    opt.wave.tp_eff_ra*opt.wave.wavepower_ra - ...
-    1000*kW*wave.house); %[m] physical width of wec
+width = 1000*kW(1-wave.house)/(wave.eta_ct*opt.wave.hs_eff_ra* ... 
+    opt.wave.tp_eff_ra*opt.wave.wavepower_ra); %[m] physical width of wec
 
 %initialize
 S = zeros(1,T);

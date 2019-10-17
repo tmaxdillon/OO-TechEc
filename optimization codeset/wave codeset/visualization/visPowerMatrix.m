@@ -6,8 +6,8 @@ rho = 1020;
 g = 9.81;
 
 % set axes
-y = ymin:.01:4*Hsm; %wave height
-x = xmin:.01:1.3*Tpm; %peak period
+y = ymin:.1:4*Hsm; %wave height
+x = xmin:.1:1.3*Tpm; %peak period
 N = 1000; %discretization for finding skewed gaussian
 
 % preallocate
