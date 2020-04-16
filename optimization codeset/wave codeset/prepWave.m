@@ -25,7 +25,7 @@ Tp = data.wave.peak_wave_period; %[s]
 opt.wave.cwr_b_ts = interp1(opt.wave.Tp_ws, ...
     opt.wave.cwr_b_ws,Tp,'spline'); %timeseries of cwr/b
 opt.wave.wavepower_ts = (1/(16*4*pi))*atmo.rho_w*atmo.g^2* ...
-    Hs.^2.*Tp./1000; %[kW] %timeseries of wavepower
+    Hs.^2.*Tp./1000; %[kW/m] %timeseries of wavepower
 
 end
 

@@ -2,8 +2,8 @@
 opt.alllocuses = 0;
 opt.sens = 0;
 opt.tdsens = 0;
-opt.ninepanel = 1;
-pm = 1; %power module
+opt.ninepanel = 0;
+pm = 3; %power module
 bc = 1; %battery chemistry
 c = 1;  %use case
 loc = 'argBasin'; %location
