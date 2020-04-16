@@ -1,9 +1,9 @@
-function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,FScost,maint, ...
-    vesselcost,turbrepair,battreplace,battencl,platform, ...
-    battvol,triptime,trips,CF,S,P,D,L] =  ...
-    simWind(kW,Smax,opt,data,atmo,batt,econ,uc,turb)
+function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst,Pline, ...
+    Panchor,vesselcost,turbrepair,battreplace,battencl, ... 
+    t_add_batt,triptime,nvi,Fdmax,dp,CF,S,P,D,L] =  ...
+    simWind(kW,Smax,opt,data,atmo,batt,econ,uc,bc,turb)
 
-%if fmin is suggesting a negative input, block it
+%if fmin is suggesting a negative input (physically impossible), exit 
 if opt.fmin && Smax < 0 || kW < 0
     surv = 0;
     cost = inf;
@@ -12,96 +12,122 @@ end
 
 %extract data
 wind = data.met.wind_spd; %[m/s]
-if atmo.dyn_h %use log law to adjust height dynamically basec on size
+if atmo.dyn_h %use log law to adjust wind speed based on rotor height
     for i = 1:length(wind)
         wind(i) = adjustHeight(wind(i),data.met.wind_ht, ...
-            turb.clearance + sqrt(1000*2*kW/(atmo.rho*pi*turb.ura^3)), ...
-            'log',atmo.zo);
+            turb.clearance + ...
+            sqrt(1000*2*kW/(atmo.rho_a*pi*turb.ura^3)),'log',atmo.zo);
     end
 end
 dt = 24*(data.met.time(2) - data.met.time(1)); %time in hours
-dist = data.dist; %[m] dist to shore
+dist = data.dist; %[m] distance to shore
+depth = data.depth;   %[m] water depth
 
-%initialize
-S = zeros(1,length(wind));
-S(1) = Smax*1000;
-P = zeros(1,length(wind));
-D = zeros(1,length(wind));
-L = ones(1,length(wind))*uc.draw;
+%initialize diagnostic variables
+S = zeros(1,length(wind)); %battery level timeseries
+S(1) = Smax*1000; %assume battery begins fully charged
+P = zeros(1,length(wind)); %power produced timeseries
+D = zeros(1,length(wind)); %power dumped timeseries
+L = ones(1,length(wind))*uc.draw; %power put to sensing timeseries
 surv = 1;
 
 %run simulation
 for t = 1:length(wind)
     %find power from turbine
-    if wind(t) < turb.uci
+    if wind(t) < turb.uci %below cut out
         P(t) = 0; %[W]
-    elseif turb.uci < wind(t) && wind(t) <= turb.ura
+    elseif turb.uci < wind(t) && wind(t) <= turb.ura %below rated
         P(t) = kW*1000*wind(t)^3/turb.ura^3; %[W]
-    elseif turb.ura < wind(t) && wind(t) <= turb.uco
+    elseif turb.ura < wind(t) && wind(t) <= turb.uco %above rated
         P(t) = kW*1000; %[W]
-    else
+    else %above cut out
         P(t) = 0; %[W]
     end
-    %find next storage state
+    %find next battery storage level
     sd = S(t)*(batt.sdr/100)*(1/(30*24))*dt; %[Wh] self discharge
     S(t+1) = dt*(P(t) - uc.draw) + S(t) - sd; %[Wh]
-    if S(t+1) > Smax*1000 %dump power if over limit
+    if S(t+1) > Smax*1000 %dump power if larger than battery capacity
         D(t) = S(t+1) - Smax*1000; %[Wh]
         S(t+1) = Smax*1000; %[Wh]
-    elseif S(t+1) <= 0 %bottomed out
-        S(t+1) = 0; %no less than bottom
-        L(t) = S(t)/dt; %adjust load to what was consumed
+    elseif S(t+1) <= Smax*batt.dmax*1000 %empty battery bank
+        S(t+1) = dt*P(t) + S(t) - sd; %[Wh] save what's remaining, L = 0
+        %L(t) = S(t)/dt; %adjust load to what can be consumed
+        L(t) = 0; %drop load to zero because not enough power
     end
 end
 
 CF = nanmean(P)/(kW*1000); %capacity factor
 
+%dynamic battery degradation model
 if batt.dyn_lc
-    opt.phi = Smax/(Smax - (min(S)/1000)); %extra depth
-    batt.lc = batt.lc_nom*opt.phi^(batt.beta); %new lifetime
+    opt.phi = Smax/(Smax - (min(S)/1000)); %unused depth
+    batt.lc = batt.lc_nom*opt.phi^(batt.beta); %[m] new lifetime
     batt.lc(batt.lc > batt.lc_max) = batt.lc_max; %no larger than max 
+else
+    batt.lc = batt.lc_nom; %[m]
+end
+nbr = ceil((12*uc.lifetime/batt.lc-1)); %number of battery replacements
+
+%find added battery maintenance/installation time
+if Smax > batt.t_add_min
+    t_add_batt = batt.t_add_m*Smax-batt.t_add_m*batt.t_add_min;
+else
+    t_add_batt = 0;
 end
 
 %economic modeling
 kWcost = polyval(opt.p_dev.t,kW)*econ.wind.marinization; %turbine
 Icost = (econ.wind.installed - kWcost/ ...
-    (kW*econ.wind.marinization))*kW*econ.wind.mim; %installation
+    (kW*econ.wind.marinization))*kW; %installation
 if Icost < 0, Icost = 0; end
-%compute foundation costs using scale factor
-FScost = applyScaleFactor(econ.wind.foundsub.cost,5640,kW, ...
-    econ.wind.foundsub.sf)*kW;
-if Smax < opt.p_dev.kWhmax %less than linear region
-    Scost = polyval(opt.p_dev.b,Smax);
-else %in linear region
-    Scost = polyval(opt.p_dev.b,opt.p_dev.kWhmax)*(Smax/opt.p_dev.kWhmax);
+if bc == 1 %lead acid
+    if Smax < opt.p_dev.kWhmax %less than linear region
+        Scost = polyval(opt.p_dev.b,Smax);
+    else %in linear region
+        Scost = polyval(opt.p_dev.b,opt.p_dev.kWhmax)*(Smax/opt.p_dev.kWhmax);
+    end
+elseif bc == 2 %lithium phosphate
+    Scost = batt.cost*Smax;
 end
-battvol = Smax*10^3/(batt.ed*batt.V/1.638e-5);
-battencl = applyScaleFactor(econ.batt.encl.cost,econ.batt.encl.scale, ...
-    battvol,econ.batt.encl.sf)*battvol; %battery ecnlosure
-if Smax > 8030, battencl = 2085142.66; end %can't be negative
-platform = (1/2204.62)*Smax*1000/(batt.V*batt.wf)* ...
-    econ.platform.wf*econ.platform.steel;
-trips = ceil((uc.lifetime)*(12/batt.lc - 12/uc.SI)); %number of trips
-if trips < 0, trips = 0; end
-trips = trips + uc.turb.iv;
-triptime = dist*kts2mps(econ.wind.vessel.speed)^(-1)*(1/86400); %[d]
-vesselcost = 2*trips*econ.wind.vessel.cost*triptime;
-if isfield(uc.ship,'t_add') %add cost due to instrumentation vessel usage
-    addedcost = (uc.ship.t_add/24)*uc.ship.cost* ... 
-        (uc.lifetime)*(12/uc.SI);
-    vesselcost = vesselcost + addedcost;
+battencl = applyScaleFactor(econ.batt.encl.cost,econ.batt.encl.cap, ...
+    Smax,econ.batt.encl.sf); %battery enclosure
+Pmtrl = (1/1000)*econ.platform.wf*econ.platform.steel* ... 
+    kW*turb.wf; %platform material
+Pinst = econ.vessel.speccost* ... 
+    ((econ.platform.t_i+t_add_batt)/24); %platform instllation
+dp = getSparDiameter(kW,atmo,turb);
+% if turb.nu*kW > batt.nu*Smax %platform diameter
+%     dp = turb.nu*kW; %set by turbine
+% else
+%     dp = batt.nu*Smax; %set by battery
+% end
+% Fdmax = (1/1000)*(2/(3*pi))*atmo.rho_w*econ.platform.k_ext ...
+%     *econ.platform.Cd*Amax^3*dp;
+% Pmoor = 4*Fdmax*(econ.platform.S*depth*econ.platform.fiber + ...
+%     econ.platform.anchor); %mooring cost
+%Pmoor = dp*depth*econ.platform.moorcost; %mooring cost
+Pline = dp*depth*econ.platform.line;
+Panchor = dp*econ.platform.anchor;
+if Panchor < econ.platform.anchor_min 
+    Panchor = econ.platform.anchor_min;
 end
-maint = econ.wind.maintenance*kW*trips*uc.lifetime;
-%add planned turbine replacements (should not require vessel)
-if isfield(uc,'turb_planned_rep')
-    uc.turb.iv = uc.turb.iv + uc.turb_planned_rep;
+Fdmax = 0;
+nvi = nbr + uc.turb.lambda; %number of vessel interventions
+if uc.SI < 12 %short term instrumentation
+    triptime = 0; %attributed to instrumentation
+    t_os = econ.vessel.t_ms/24; %[d]
+    C_v = econ.vessel.speccost;
+else %long term instrumentation and infrastructure
+    triptime = dist*kts2mps(econ.vessel.speed)^(-1)*(1/86400); %[d]
+    t_os = econ.vessel.t_mosv/24; %[d]
+    C_v = econ.vessel.osvcost;
 end
-turbrepair = kWcost*(2 + 1/2*(12/batt.lc*uc.lifetime-1+uc.turb.iv-1));
-battreplace = Scost*(12/batt.lc*uc.lifetime-1);
-if battreplace < 0, battreplace = 0; end
-if turbrepair < 0, turbrepair = 0; end
-CapEx = platform + battencl + Scost + FScost + Icost + kWcost;
-OpEx = battreplace + turbrepair + maint + vesselcost;
+vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr*t_add_batt); %vessel cost
+turbrepair = 1/2*kWcost*(uc.turb.lambda-1); %turbine repair cost
+battreplace = Scost*nbr; %number of battery replacements
+CapEx = Pline + Panchor + Pinst + Pmtrl + battencl + Scost + Icost + ...
+kWcost;
+OpEx = battreplace + turbrepair + vesselcost;
 cost = CapEx + OpEx;
 if opt.fmin && opt.fmindebug
     kW
@@ -109,6 +135,7 @@ if opt.fmin && opt.fmindebug
     pause
 end
 
+%determine if desired uptime was met. if not, output infinite cost.
 if sum(L == uc.draw)/(length(L)) < uc.uptime 
     surv = 0;
     if opt.fmin
@@ -117,7 +144,3 @@ if sum(L == uc.draw)/(length(L)) < uc.uptime
 end
 
 end
-
-
-
-

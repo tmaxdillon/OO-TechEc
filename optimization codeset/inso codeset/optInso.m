@@ -1,19 +1,22 @@
-function [output,opt] = optInso(opt,data,atmo,batt,econ,uc,inso)
+function [output,opt] = optInso(opt,data,atmo,batt,econ,uc,bc,inso)
 
-%set kW, Smax and pvsi mesh
-opt.kW_1 = 0;
-opt.kW_m = 8*uc.draw/1000; %rated power eight times draw
-opt.Smax_1 = 0.1;
-opt.Smax_n = uc.draw*24*opt.nm.battgriddur/1000; %bgd days without power
+%set kW, Smax and pvci mesh
+opt.kW_1 = 2;
+opt.kW_m = opt.nm.ratedpowermultiplier*uc.draw/1000; %rpm times draw
+opt.Smax_1 = 2;
+opt.Smax_n = uc.draw*24*5/1000; %5 days without power
 
 %check to make sure coarse mesh will work
 opt.fmin = false;
 check_s = 0;
 while ~check_s
     [~,check_s] = simInso(opt.kW_m,opt.Smax_n,opt,data, ...
-        atmo,batt,econ,uc,inso);
-    opt.kW_m = 2*opt.kW_m;
-    opt.Smax_n = 2*opt.Smax_n;
+        atmo,batt,econ,uc,bc,inso);
+    if ~check_s
+        opt.kW_m = 2*opt.kW_m;
+        %opt.Smax_n = 2*opt.Smax_n; 
+        %increasing battery size decreases cleaning
+    end
 end
 
 %initialize inputs/outputs
@@ -24,11 +27,12 @@ output.surv = zeros(opt.nm.m,opt.nm.n);
 
 %initial/coarse optimization
 tInitOpt = tic;
+disp('Populating coarse grid...')
 for i = 1:opt.nm.m
     for j = 1:opt.nm.n
         [output.cost(i,j),output.surv(i,j)] = ...
             simInso(opt.kW(i),opt.Smax(j), ...
-            opt,data,atmo,batt,econ,uc,inso);
+            opt,data,atmo,batt,econ,uc,bc,inso);
     end
 end
 X = output.cost;
@@ -47,16 +51,19 @@ output.tInitOpt = toc(tInitOpt);
 tFminOpt = tic; %start timer
 opt.fmin = true; %let simWind know that fminsearch is on
 %objective function
-fun = @(x)simInso(x(1),x(2),opt,data,atmo,batt,econ,uc,inso);
+fun = @(x)simInso(x(1),x(2),opt,data,atmo,batt,econ,uc,bc,inso);
 %set options (show convergence and objective space or not)
 if opt.nm.show
-    options = optimset('MaxFunEvals',10000,'Algorithm','sqp','MaxIter',10000, ...
+    options = optimset('MaxFunEvals',10000,'Algorithm', ... 
+        'sqp','MaxIter',10000, ...
         'TolFun',opt.nm.tolfun,'TolX',opt.nm.tolx, ...
         'PlotFcns',@optimplotfval);
 else
-    options = optimset('MaxFunEvals',10000,'Algorithm','sqp','MaxIter',10000, ...
+    options = optimset('MaxFunEvals',10000,'Algorithm', ...
+        'sqp','MaxIter',10000, ...
         'TolFun',opt.nm.tolfun,'TolX',opt.nm.tolx);
 end
+disp('Beginning Nelder Mead')
 %fminsearch
 [opt_ind] = ...
     fminsearch(fun,[opt.kW_init opt.Smax_init],options);
@@ -64,16 +71,21 @@ end
 output.min.kW = opt_ind(1);
 output.min.Smax = opt_ind(2);
 [output.min.cost,output.min.surv,output.min.CapEx,output.min.OpEx,...
-    output.min.Mcost,output.min.Scost,output.min.Ecost,output.min.Icost, ...
-    output.min.maint,output.min.vesselcost, ...
-    output.min.PVreplace,output.min.battreplace,output.min.battencl, ...
-    output.min.platform, ...
-    output.min.battvol,output.min.triptime,output.min.trips, ... 
+    output.min.Mcost,output.min.Scost,output.min.Ecost, ... 
+    output.min.Icost, ...
+    output.min.Strcost,output.min.Pmtrl,output.min.Pinst,... 
+    output.min.Pline,output.min.Panchor,output.min.vesselcost, ...
+    output.min.battreplace,output.min.battencl, ...
+    output.min.triptime,output.min.nvi,output.min.Fdmax, ... 
+    output.min.dp, ...
     output.min.CF,output.min.S,output.min.P,output.min.D,output.min.L, ... 
     output.min.eff_t,output.min.pvci,output.min.battlc] ...
     = simInso(output.min.kW,output.min.Smax, ...
-    opt,data,atmo,batt,econ,uc,inso);
+    opt,data,atmo,batt,econ,uc,bc,inso);
 output.min.A = output.min.kW/(inso.eff*inso.rated);
+output.min.cyc60 = countCycles(output.min.S,output.min.Smax,60);
+output.min.cyc80 = countCycles(output.min.S,output.min.Smax,80);
+output.min.cyc100 = countCycles(output.min.S,output.min.Smax,100);
 output.tFminOpt = toc(tFminOpt); %end timer
 
 end

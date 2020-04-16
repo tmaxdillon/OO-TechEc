@@ -1,8 +1,8 @@
-function [output,opt] = optWave(opt,data,atmo,batt,econ,uc,wave)
+function [output,opt] = optWave(opt,data,atmo,batt,econ,uc,bc,wave)
 
 %set kW and Smax mesh
 opt.kW_1 = 0.1;
-opt.kW_m = uc.draw/10; %divide load (kW) by ten
+opt.kW_m = (uc.draw/1000)*(100); %[kW] 100 times the load
 opt.Smax_1 = 1;
 opt.Smax_n = uc.draw*24*opt.nm.battgriddur/1000; %bgd days without power
 
@@ -11,9 +11,11 @@ opt.fmin = false;
 check_s = 0;
 while ~check_s
     [~,check_s] = simWave(opt.kW_m,opt.Smax_n,opt,data, ... 
-        atmo,batt,econ,uc,wave);
-    opt.kW_m = 2*opt.kW_m;
-    opt.Smax_n = 2*opt.Smax_n;
+        atmo,batt,econ,uc,bc,wave);
+    if ~check_s
+        opt.kW_m = 2*opt.kW_m;
+        opt.Smax_n = 2*opt.Smax_n;
+    end
 end
 
 %initialize inputs/outputs
@@ -28,7 +30,7 @@ disp('Populating coarse grid...')
 for i = 1:opt.nm.m
     for j = 1:opt.nm.n
         [output.cost(i,j),output.surv(i,j)] = ...
-            simWave(opt.kW(i),opt.Smax(j),opt,data,atmo,batt,econ,uc,wave);
+            simWave(opt.kW(i),opt.Smax(j),opt,data,atmo,batt,econ,uc,bc,wave);
     end
 end
 X = output.cost;
@@ -47,14 +49,16 @@ output.tInitOpt = toc(tInitOpt);
 tFminOpt = tic; %start timer
 opt.fmin = true; %let simWind know that fminsearch is on
 %objective function
-fun = @(x)simWave(x(1),x(2),opt,data,atmo,batt,econ,uc,wave);
+fun = @(x)simWave(x(1),x(2),opt,data,atmo,batt,econ,uc,bc,wave);
 %set options (show convergence and objective space or not)
 if opt.nm.show
-    options = optimset('MaxFunEvals',10000,'Algorithm','sqp','MaxIter',10000, ...
+    options = optimset('MaxFunEvals',10000, ...
+        'Algorithm','sqp','MaxIter',10000, ...
         'TolFun',opt.nm.tolfun,'TolX',opt.nm.tolx, ... 
         'PlotFcns',@optimplotfval);
 else
-    options = optimset('MaxFunEvals',10000,'Algorithm','sqp','MaxIter',10000, ...
+    options = optimset('MaxFunEvals',10000, ...
+        'Algorithm','sqp','MaxIter',10000, ...
         'TolFun',opt.nm.tolfun,'TolX',opt.nm.tolx);
 end
 disp('Beginning Nelder Mead')
@@ -65,13 +69,20 @@ disp('Beginning Nelder Mead')
 output.min.kW = opt_ind(1);
 output.min.Smax = opt_ind(2);
 [output.min.cost,output.min.surv,output.min.CapEx,output.min.OpEx,...
-    output.min.kWcost,output.min.Scost,output.min.Icost,output.min.FScost, ...
-    output.min.maint,output.min.vesselcost, ... 
+    output.min.kWcost,output.min.Scost,output.min.Icost, ...
+    output.min.Pmtrl,output.min.Pinst,output.min.Pline, ... 
+    output.min.Panchor,output.min.vesselcost, ... 
     output.min.wecrepair,output.min.battreplace,output.min.battencl, ...
-    output.min.platform,output.min.battvol,output.min.triptime, ... 
-    output.min.trips,output.min.width, ...
+    output.min.triptime,output.min.nvi,output.min.Fdmax, ... 
+    output.min.dp,output.min.width,output.min.cw, ...
     output.min.CF,output.min.S,output.min.P,output.min.D,output.min.L] ...
-    = simWave(output.min.kW,output.min.Smax,opt,data,atmo,batt,econ,uc,wave);
+    = simWave(output.min.kW,output.min.Smax, ... 
+    opt,data,atmo,batt,econ,uc,bc,wave);
+output.min.cw_avg = mean(output.min.cw); %average capture width
+output.min.cwr_avg = mean(output.min.cw_avg/output.min.width); %average cwr
+output.min.cyc60 = countCycles(output.min.S,output.min.Smax,60);
+output.min.cyc80 = countCycles(output.min.S,output.min.Smax,80);
+output.min.cyc100 = countCycles(output.min.S,output.min.Smax,100);
 output.tFminOpt = toc(tFminOpt); %end timer
 
 end

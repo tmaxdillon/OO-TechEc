@@ -8,7 +8,7 @@ function [ss,y,Y,prob_max] = findSkewedSS_oo(y,c,wave,Tpm)
 Y = zeros(1,length(y)); %probability density array
 
 for i = 1:length(y)
-    [~,Y(i)] = skewedGaussian(y(i),c(1),c(2));
+    [~,Y(i)] = skewedGaussian_oo(y(i),c(1),c(2),1);
 end
 
 % %normalize

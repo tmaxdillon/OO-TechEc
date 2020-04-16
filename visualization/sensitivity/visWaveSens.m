@@ -50,7 +50,7 @@ if exist('ylab','var'), ylabel(ylab), else, ylabel('cost in thousands'), end
 ylim([0 1.25*max(cost)*yscale])
 xticks(xt)
 legend('CapEx: WEC','CapEx: Battery','OpEx: WEC','OpEx: Battery', ... 
-    'OpEx: Vessel','Location','NorthEast')
+    'OpEx: Vessel','Location','best')
 set(gca,'LineWidth',1.1,'Fontsize',14)
 if isequal(multStruct(1).opt.tuned_parameter,'utp') || ...
         isequal(multStruct(1).opt.tuned_parameter,'wcp')
@@ -64,7 +64,7 @@ plot(multStruct(1).opt.tuning_array*xscale,kW,'Color',[0,255,127]/256, ...
 ylabel('[kW]')
 ylim([0 1.25*max(kW)])
 xticks(xt)
-legend('show','Location','NorthEast')
+legend('show','Location','best')
 set(gca,'LineWidth',1.1,'Fontsize',14)
 if isequal(multStruct(1).opt.tuned_parameter,'utp') || ...
         isequal(multStruct(1).opt.tuned_parameter,'wcp')
@@ -78,7 +78,7 @@ plot(multStruct(1).opt.tuning_array*xscale,Smax,'k','LineWidth',1.6,'DisplayName
 ylabel('[kWh]')
 ylim([0 1.25*max(Smax)])
 xticks(xt)
-legend('show','Location','NorthEast')
+legend('show','Location','best')
 set(gca,'LineWidth',1.1,'Fontsize',14)
 if isequal(multStruct(1).opt.tuned_parameter,'utp') || ...
         isequal(multStruct(1).opt.tuned_parameter,'wcp')
@@ -93,7 +93,7 @@ ylabel('[kWh]')
 ylim([0 1])
 xticks(xt)
 xlabel(xlab)
-legend('show','Location','NorthEast')
+legend('show','Location','best')
 set(gca,'LineWidth',1.1,'Fontsize',14)
 if isequal(multStruct(1).opt.tuned_parameter,'utp') || ...
         isequal(multStruct(1).opt.tuned_parameter,'wcp')

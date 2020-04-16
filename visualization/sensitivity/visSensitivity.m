@@ -49,6 +49,18 @@ elseif isequal(multStruct(1).opt.tuned_parameter,'wrp')
 elseif isequal(multStruct(1).opt.tuned_parameter,'wcp')
     xlab = 'Tp, Hs Percentile for Power Matrix Cut Out';
     xt = fliplr(multStruct(1).opt.tuning_array);
+elseif isequal(multStruct(1).opt.tuned_parameter,'whl')
+    xlab = 'House Load [%]';
+    xt = multStruct(1).opt.tuning_array;
+elseif isequal(multStruct(1).opt.tuned_parameter,'imf')
+    xlab = 'Marinization Multiplier';
+    xt = multStruct(1).opt.tuning_array;
+elseif isequal(multStruct(1).opt.tuned_parameter,'btm')
+    xlab = 'Added time on site per kWh of Battery > 20 kWh';
+    xt = multStruct(1).opt.tuning_array;
+elseif isequal(multStruct(1).opt.tuned_parameter,'mbt')
+    xlab = 'Minimum Battery Size for Added Time';
+    xt = multStruct(1).opt.tuning_array;
 end
 
 if ~exist('xscale','var')
@@ -69,7 +81,7 @@ elseif multStruct(1).pm == 2
     if ~exist('ylab','var'), ylab = 'cost in thousands'; end
     if ~exist('yscale','var'), yscale = 1; end
     visInsoSens(multStruct,xlab,xt,xscale,ylab,yscale)
-elseif multStruct(1).pm == 3
+elseif multStruct(1).pm == 3 %wave
     if ~exist('ylab','var'), ylab = 'cost in thousands'; end
     if ~exist('yscale','var'), yscale = 1; end
     visWaveSens(multStruct,xlab,xt,xscale,ylab,yscale)
