@@ -5,7 +5,7 @@ opt.tdsens = 0;
 opt.ninepanel = 0;
 pm = 3; %power module
 bc = 1; %battery chemistry
-c = 1;  %use case
+c = 2;  %use case
 loc = 'argBasin'; %location
 
 %strings
@@ -211,9 +211,10 @@ opt.tdsens_tp{1} = 'btm'; %battery time slope
 opt.tdsens_tp{2} = 'mbt'; %minimum battery for time added
 
 %optimization parameters
+opt.V = 2;
 opt.nm.m = 5; %input grid resolution for rated power
 opt.nm.n = 5; %input grid resolution for storage
-opt.nm.many = true; %seed many initial points into nelder
+opt.nm.many = false; %seed many initial points into nelder
 opt.nm.battgriddur = 80; %[d]
 opt.nm.ratedpowermultiplier = 120;
 opt.nm.bgd_array = [1,5,20,50,100]; %[d]
@@ -222,6 +223,11 @@ opt.nm.show = false; %show
 opt.nm.initminlim = .5; %percentage of grid to wipe out
 opt.nm.tolfun = 100; %nelder mead output tolerance
 opt.nm.tolx = 10; %nelder mead input tolerance
+opt.nm.fmindebug = 0;
+opt.bf.m = 30;
+opt.bf.n = 30;
+opt.bf.M = 4; %[kW] max kW in grid
+opt.bf.N = 250; %[kWh] max Smax in grid
 % opt.cliff.srv_wind = ... %search ratio values for wind
 % [2    1    1    1     1    1    1    1    1    1    1; ...
 %  1    2    5    10    20   35   50   100  150  500  1000];
@@ -232,5 +238,3 @@ opt.nm.tolx = 10; %nelder mead input tolerance
 % opt.cliff.show = true; %show cliff after running
 % opt.cliff.mfe = 10000; %max function evals
 % opt.cliff.mi = 10000; %max iterations
-opt.v2 = false;
-opt.fmindebug = 0;

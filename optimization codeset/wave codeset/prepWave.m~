@@ -32,7 +32,7 @@ opt.wave.wavepower_ts = (1/(16*4*pi))*atmo.rho_w*atmo.g^2* ...
     Hs.^2.*Tp./1000; %[kW/m] %timeseries of wavepower
 
 %compute wavelength
-opt.wave.L = atmo.g.*Tp.^2/(2*pi); %wavelength timeseries
+opt.wave.L = atmo.g.*Tp.^2
 
 end
 

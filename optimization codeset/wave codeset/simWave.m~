@@ -1,6 +1,6 @@
 function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst,Pline, ...
     Panchor,vesselcost,wecrepair,battreplace,battencl, ...
-    triptime,nvi,Fdmax,dp,width,cw,CF,S,P,D,L] =  ...
+    triptime,nvi,dp,width,cw,S,P,D,L] =  ...
     simWave(kW,Smax,opt,data,atmo,batt,econ,uc,bc,wave)
 
 %if fmin is suggesting a negative input, block it
@@ -13,24 +13,21 @@ end
 %extract data
 Hs = data.wave.significant_wave_height; %[m]
 Tp = data.wave.peak_wave_period; %[s]
-Tp_eff = opt.wave.cwr_b_ts; %[m^-1] period efficiency timeseries
+cwr_b = opt.wave.cwr_b_ts; %[m^-1] period efficiency timeseries (cwr/b)
 wavepower = opt.wave.wavepower_ts; %wavepower timeseries
-T = length(Tp_eff); %total time steps
+T = length(cwr_b); %total time steps
 dt = 24*(data.wave.time(2) - data.wave.time(1)); %time in hours
 dist = data.dist; %[m] dist to shore
 depth = data.depth;   %[m] water depth
-Amax = data.Amax; %[m] 50 year storm maximum amplitude
 
 %find width through rated power conditions, computed up front
 %in optRun(), from rated conditions: hs_eff_ra, tp_eff_ra, wavepower_ra
-width = sqrt(1000*kW*(1+wave.house)/(wave.eta_ct* ... 
-    interp1(opt.wave.Tp_ws,opt.wave.cwr_b_ws,wave.Tp_ra,'spline')* ...
+width = sqrt(1000*kW*(1+wave.house)/(wave.eta_ct*opt.wave.cwr_b_ra* ...
     opt.wave.wavepower_ra)); %[m] physical width of wec
-P = (wave.eta_ct.*width.^2.*Tp_eff.*wavepower - kW*wave.house); %[kW]
-L = atmo.g.*Tp.^2/(2*pi); %wavelength
-P(Hs./L > .14) = 0; %breaking waves, set to zero
+P = (wave.eta_ct.*width.^2.*cwr_b.*wavepower - kW*wave.house); %[kW]
+P(Hs./opt.wave.L > .14) = 0; %breaking waves, set to zero
 P(P<0) = 0; %no negative power
-cw = Tp_eff.*width^2; %m
+cw = cwr_b.*width^2; %m
 P(P>kW) = kW; %no larger than rated power
 
 %initialize
@@ -56,7 +53,6 @@ for t = 1:T
     end
 end
 
-CF = nanmean(P)/(kW); %capacity factor
 P = P*1000; %convert to watts
 
 %dynamic battery degradation model
@@ -69,6 +65,8 @@ else
 end
 nbr = ceil((12*uc.lifetime/batt.lc-1)); %number of battery replacements
 
+nvi = econ.wave.lambda + nbr; %vessel interventions
+
 %find added battery maintenance/installation time
 if Smax > batt.t_add_min
     t_add_batt = batt.t_add_m*Smax-batt.t_add_m*batt.t_add_min;
@@ -76,28 +74,11 @@ else
     t_add_batt = 0;
 end
 
-if isfield(econ.wave,'enf_scen') %sensitivity analysis
-    costmult = econ.wave.enf_scen(1);
-    nvi = nbr + econ.wave.enf_scen(2);
-else %scenario analysis
-    switch econ.wave.scen
-        case 1 %conservative
-            costmult = econ.wave.costmult_con; %cost multiplier
-            nvi = nbr + uc.turb.lambda; %number of vessel interventions
-        case 2 %optimistic cost
-            costmult = econ.wave.costmult_opt; %cost multiplier
-            nvi = nbr + uc.turb.lambda; %number of vessel interventions
-        case 3 %optimistic durability
-            costmult = econ.wave.costmult_con; %cost multiplier
-            nvi = nbr; %number of vessel interventions
-    end
-end
-
 %economic modeling
-kWcost = costmult*polyval(opt.p_dev.t,kW)* ...
+kWcost = econ.wave.costmult*polyval(opt.p_dev.t,kW)* ...
     econ.wind.marinization; %wec
 Icost = (econ.wind.installed - kWcost/ ...
-    (kW*econ.wind.marinization*costmult))*kW; %installation
+    (kW*econ.wind.marinization*econ.wave.costmult))*kW; %installation
 if Icost < 0, Icost = 0; end
 if bc == 1 %lead acid
     if Smax < opt.p_dev.kWhmax %less than linear region
@@ -110,28 +91,15 @@ elseif bc == 2 %lithium phosphate
 end
 battencl = applyScaleFactor(econ.batt.encl.cost,econ.batt.encl.cap, ...
     Smax,econ.batt.encl.sf); %battery enclosure
-% Pmtrl = (1/1000)*econ.platform.wf*econ.platform.steel ...
-%     *(Smax*1000/(batt.V*batt.se)); %platform material, no generation mass
 Pmtrl = 0;
 Pinst = econ.vessel.speccost* ... 
     ((econ.platform.t_i+t_add_batt)/24); %platform instllation
-% if wave.nu*kW > batt.nu*Smax %platform diameter
-%     dp = wave.nu*kW; %set by panels
-% else
-%     dp = batt.nu*Smax; %set by battery
-% end
 dp = width;
-% Fdmax = (1/1000)*(2/(3*pi))*atmo.rho_w*econ.platform.k_ext ...
-%     *econ.platform.Cd*Amax^3*dp;
-% Pmoor = 4*Fdmax*(econ.platform.S*depth*econ.platform.fiber + ...
-%     econ.platform.anchor); %mooring cost
-%Pmoor = dp*depth*econ.platform.moorcost; %mooring cost
 Pline = dp*depth*econ.platform.line;
 Panchor = dp*econ.platform.anchor;
 if Panchor < econ.platform.anchor_min 
     Panchor = econ.platform.anchor_min;
 end
-Fdmax = 0;
 if uc.SI < 12
     triptime = 0; %attributed to instrumentation
     t_os = econ.vessel.t_ms/24; %[d]
@@ -149,7 +117,7 @@ CapEx = Pline + Panchor + Pinst + Pmtrl + ...
     battencl + Scost + Icost + kWcost;
 OpEx = battreplace + wecrepair + vesselcost;
 cost = CapEx + OpEx;
-if opt.fmin && opt.fmindebug
+if opt.fmin && opt.nm.fmindebug
     kW
     cost
     %pause

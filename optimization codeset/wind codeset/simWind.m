@@ -129,7 +129,7 @@ CapEx = Pline + Panchor + Pinst + Pmtrl + battencl + Scost + Icost + ...
 kWcost;
 OpEx = battreplace + turbrepair + vesselcost;
 cost = CapEx + OpEx;
-if opt.fmin && opt.fmindebug
+if opt.fmin && opt.nm.fmindebug
     kW
     cost
     pause

@@ -63,27 +63,30 @@ elseif pm == 2
 elseif pm == 3
     opt = prepWave(data,opt,wave,atmo);
     if opt.V == 1 %optimization version 1: nelder-mead
-        if opt.nm.many
-            opt.C = length(opt.nm.bgd_array);
-            compare(opt.C) = struct();
-            costcompare = zeros(1,opt.C);
-            for i = 1:opt.C
-                opt.c = i;
-                opt.nm.battgriddur = opt.nm.bgd_array(i);
-                [compare(i).output,compare(i).opt] = ...
-                    optWave_nm(opt,data,atmo,batt,econ,uc,bc,wave);
-                costcompare(i) = compare(i).output.min.cost;
-            end
-            [~,min_ind] = min(costcompare(:));
-            output = compare(min_ind).output;
-            opt = compare(min_ind).opt;
-            opt.nm.battgriddur = opt.nm.bgd_array(min_ind);
-        else
-            [output,opt] = optWave_nm(opt,data,atmo,batt,econ,uc,bc,wave);
+    if opt.nm.many
+        opt.C = length(opt.nm.bgd_array);
+        compare(opt.C) = struct();
+        costcompare = zeros(1,opt.C);
+        for i = 1:opt.C
+            opt.c = i;
+            opt.nm.battgriddur = opt.nm.bgd_array(i);
+            [compare(i).output,compare(i).opt] = ...
+                optWave(opt,data,atmo,batt,econ,uc,bc,wave);
+            costcompare(i) = compare(i).output.min.cost;
         end
-    elseif opt.V == 2 %optimization version 2: brute force
+        [~,min_ind] = min(costcompare(:));
+        output = compare(min_ind).output;
+        opt = compare(min_ind).opt;
+        opt.nm.battgriddur = opt.nm.bgd_array(min_ind);
+    else
         [output,opt] = optWave(opt,data,atmo,batt,econ,uc,bc,wave);
+    elseif opt.V == 2
+        
     end
+  
+        
+ 
+    
     results.width = output.min.width;
     results.cw_avg = output.min.cw_avg;
     results.cwr_avg = output.min.cwr_avg;

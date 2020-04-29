@@ -5,7 +5,10 @@ output = optStruct.output;
 
 %adjust cost to thousands
 output.cost = output.cost/1000;
-opt.init = opt.init/1000;
+%opt.init = opt.init/1000;
+opt.init = 0;
+opt.Smax_init = 0;
+opt.kW_init = 0;
 output.min.cost = output.min.cost/1000;
 
 %create grid
@@ -61,8 +64,8 @@ initval = scatter3(opt.Smax_init,opt.kW_init,opt.init+z_adj, ...
 view(0,90)
 xlabel('Storage Capacity [kWh]')
 ylabel('Rated Power [kW]')
-xlim([min(opt.Smax) inf])
-ylim([min(opt.kW) inf])
+xlim([0 inf])
+ylim([0 inf])
 c = colorbar;
 c.Label.String = '[$] in thousands';
 lb = output.min.cost/max(output.cost(:));

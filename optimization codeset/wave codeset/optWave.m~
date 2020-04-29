@@ -1,7 +1,7 @@
 function [output,opt] = optWave(opt,data,atmo,batt,econ,uc,bc,wave)
 
 %set kW and Smax mesh
-opt.kW_1 = 0.25;
+opt.kW_1 = 1;
 opt.kW_m = opt.bf.M; %[kW]
 opt.Smax_1 = 1;
 opt.Smax_n = opt.bf.N; %[kWh]
@@ -58,8 +58,8 @@ output.tInitOpt = toc(tInitOpt);
 
 disp('Brute forcing global minimum...')
 [I(1),I(2)] = find(X == min(X(:)),1);
-output.min.kW = opt.kW(I(1));
-output.min.Smax = opt.Smax(I(2));
+output.min.kW = I(1);
+output.min.Smax = I(2);
 [output.min.cost,output.min.surv,output.min.CapEx,output.min.OpEx,...
     output.min.kWcost,output.min.Scost,output.min.Icost, ...
     output.min.Pmtrl,output.min.Pinst,output.min.Pline, ...
