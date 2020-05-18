@@ -7,7 +7,7 @@ opt.p_dev.d_cost = calcDeviceVal('dieselcost',[],econ.diescost_n);
 opt.p_dev.d_mass = calcDeviceVal('dieselmass',[],econ.diesmass_n);
 opt.p_dev.d_size = calcDeviceVal('dieselsize',[],econ.diessize_n);
 opt.p_dev.d_burn = calcDeviceVal('dieselburn',[],econ.diesburn_n);
-[opt.p_dev.b,~,opt.p_dev.kWhmax] = calcDeviceVal('battery',[],econ.batt_n);
+[opt.p_dev.b,~,opt.p_dev.kWhmax] = calcDeviceVal('agm',[],econ.batt_n);
 
 %WIND
 if pm == 1

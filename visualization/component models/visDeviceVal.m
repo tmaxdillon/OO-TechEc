@@ -14,10 +14,14 @@ if isequal(type,'turbine')
     end
     %ylab = '[$1000/kW]';
     ylab = '[$1000]';
-elseif isequal(type,'battery')
+elseif isequal(type,'agm') || isequal(type,'lfp')
     xf = 0:0.01:xmax; %kWh
     xlab = 'Storage Capacity [kWh]';
-    batteryLibrary
+    if isequal(type,'agm')
+        batteryLibrary_agm
+    else
+        batteryLibrary_lfp
+    end
     x = zeros(1,length(batteryLib));
     y = zeros(1,length(batteryLib));
     %unpack into arrays

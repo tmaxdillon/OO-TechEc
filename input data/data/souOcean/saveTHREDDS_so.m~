@@ -66,19 +66,14 @@ clear Y M D H MI S v i wave_filenames vars temp opendap
 
 %% WAVE: additional structure adjustments
 
-%remove outliers by setting to mean
-souOcean.wave.peak_wave_period_orig = souOcean.wave.peak_wave_period;
 souOcean.wave.peak_wave_period(souOcean.wave.peak_wave_period > 22) = ...
-    mean(souOcean.wave.peak_wave_period);
-
+    mean(souOcean.wave.peak_wave_period)
 %% MET: set up filenames
 
 %telemetered, metbk hourly
 opendap = 'https://opendap.oceanobservatories.org';
-threddspath = '/thredds/dodsC/ooi/tmaxd@uw.edu/20200515T052222627Z-GS01SUMO-SBD11-06-METBKA000-telemetered-metbk_hourly/';
-deppath(1,:) = 'deployment0001_GS01SUMO-SBD11-06-METBKA000-telemetered-metbk_hourly_20151124T070237.970000-20151222T182906.239000.nc';
-deppath(2,:) = 'deployment0002_GS01SUMO-SBD11-06-METBKA000-telemetered-metbk_hourly_20151214T205021.824000-20161128T065659.929000.nc';
-deppath(3,:) = 'deployment0003_GS01SUMO-SBD11-06-METBKA000-telemetered-metbk_hourly_20161125T014201.966000-20180709T192951.873000.nc';
+threddspath = '/thredds/dodsC/ooi/tmaxd@uw.edu/20200515T044511502Z-GI01SUMO-SBD11-06-METBKA000-telemetered-metbk_hourly/';
+deppath(1,:) = 'deployment0005_GI01SUMO-SBD11-06-METBKA000-telemetered-metbk_hourly_20180608T175109.234000-20190628T152920.840000.nc';
 
 met_filenames = cell(1,size(deppath,1));
 for i = 1:length(met_filenames)
@@ -130,9 +125,9 @@ souOcean.met.wind_ht_orig = 10;
 
 %adjust time window and interpolate over outages
 [~,souOcean.met.tstart] = min(abs(souOcean.met.time_orig - ...
-    datenum('24-Nov-2015 10:02:37.97')));
+    datenum('08-Jun-2018 17:51:9')));
 [~,souOcean.met.tend] = min(abs(souOcean.met.time_orig - ...
-    datenum('07-Jul-2018 03:29:33')));
+    datenum('20-Jun-2019 13:29:14')));
 %time
 souOcean.met.time = ...
     souOcean.met.time_orig(souOcean.met.tstart:souOcean.met.tend);
@@ -140,7 +135,6 @@ souOcean.met.time = ...
 souOcean.met.shortwave_irradiance = ...
     souOcean.met.shortwave_irradiance_orig(souOcean.met.tstart: ...
     souOcean.met.tend);
-souOcean.met.shortwave_irradiance(souOcean.met.shortwave_irradiance < 0) = 0;
 %wind
 souOcean.met.wind_spd = ...
     fillmissing(souOcean.met.wind_spd_orig(souOcean.met.tstart: ...

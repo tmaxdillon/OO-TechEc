@@ -14,8 +14,22 @@ if isequal(type,'turbine')
         x(i) = turbineLib(i).kW;
         y(i) = turbineLib(i).cost;
     end
-elseif isequal(type,'battery')
-    batteryLibrary
+elseif isequal(type,'agm')
+    batteryLibrary_agm
+    x = zeros(1,length(batteryLib));
+    y = zeros(1,length(batteryLib));
+    %unpack into arrays
+    for i = 1:length(batteryLib)
+        x(i) = batteryLib(i).kWh;
+        y(i) = batteryLib(i).cost;
+    end
+    xmax = max(x);
+    if xq > xmax & n > 1
+        linmult = xq/xmax;
+        xq = xmax;
+    end
+elseif isequal(type,'lfp')
+    batteryLibrary_lfp
     x = zeros(1,length(batteryLib));
     y = zeros(1,length(batteryLib));
     %unpack into arrays

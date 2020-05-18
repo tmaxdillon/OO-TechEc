@@ -12,7 +12,6 @@ end
 
 %extract data
 Hs = data.wave.significant_wave_height; %[m]
-Tp = data.wave.peak_wave_period; %[s]
 cwr_b = opt.wave.cwr_b_ts; %[m^-1] period efficiency timeseries (cwr/b)
 wavepower = opt.wave.wavepower_ts; %wavepower timeseries
 T = length(cwr_b); %total time steps

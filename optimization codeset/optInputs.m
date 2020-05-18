@@ -4,9 +4,9 @@ opt.sens = 0;
 opt.tdsens = 0;
 opt.ninepanel = 0;
 pm = 3; %power module
-bc = 1; %battery chemistry
+bc = 2; %battery chemistry
 c = 2;  %use case
-loc = 'argBasin'; %location
+loc = 'souOcean'; %location
 
 %strings
 opt.locations = {'argBasin';'souOcean';'cosPioneer'};
