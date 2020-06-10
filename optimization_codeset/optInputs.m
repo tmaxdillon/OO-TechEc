@@ -1,5 +1,5 @@
 %settings
-opt.alllocuses = 0;
+opt.alllocuses = 1;
 opt.sens = 0;
 opt.tdsens = 0;
 opt.ninepanel = 0;
@@ -9,7 +9,8 @@ c = 2;  %use case
 loc = 'souOcean'; %location
 
 %strings
-opt.locations = {'argBasin';'souOcean';'cosPioneer'};
+opt.locations = {'argBasin';'cosEndurance_or';'cosEndurance_wa'; ...
+    'cosPioneer';'irmSea';'souOcean'};
 opt.powermodules = {'wind';'inso';'wave';'dies'};
 opt.usecases = {'short term';'long term'};
 opt.wavescens = {'Conservative';'Optimistic Cost';'Optimistic Durability'};
@@ -23,6 +24,11 @@ econ.diesmass_n = 1;                %[~]
 econ.diessize_n = 1;                %[~]   
 econ.diesburn_n = 1;                %[~]   
 %platform 
+load('mdd_output.mat')
+econ.platform.mdd.cost = cost;          %mooring cost lookup matrix
+econ.platform.mdd.depth = depth;        %mooring cost lookup depth
+econ.platform.mdd.diameter = diameter;  %mooring cost lookup diameter
+clear cost depth diameter e_subsurface e_tension w_tension
 econ.platform.wf = 5;               %weight factor (of light ship)
 econ.platform.steel = 600;          %[$/metric ton]
 econ.platform.t_i = 12;             %[h] additional time on site for inst
@@ -45,9 +51,10 @@ econ.vessel.t_mosv = 6;             %[h] time on site for maint (osv)
 econ.vessel.speccost = 70000;       %[$/day] 
 econ.vessel.t_ms = 1;               %[h] time on site for maint (spec)
 %battery 
-econ.batt.encl.sf = .5;             %scaling factor
-econ.batt.encl.cost = 5000;         %[$], WAMP
-econ.batt.encl.cap = 10;            %[kWh]
+% econ.batt.encl.sf = .5;             %scaling factor
+% econ.batt.encl.cost = 5000;         %[$], WAMP
+% econ.batt.encl.cap = 10;            %[kWh]
+econ.batt.enclmult = 2;             %multiplier on battery cost for encl
 %wind
 econ.wind.installed = 10117;        %[$/kW] installed cost (DWR)
 %econ.wind.mim = 137/49;             %marine installment multiplier (CoWR)
@@ -61,8 +68,10 @@ econ.inso.marinization = 1.2;       %[~]
 %wave costs
 econ.wave.scen = 1;                 %scenario indicator 1:C,2:OC,3:OD
 econ.wave.scenarios = 3;            %number of scenarios
-econ.wave.costmult_con = 4;         %conservative cost multiplier
-econ.wave.costmult_opt = 2;         %optimistic cost multiplier
+econ.wave.costmult_con = 10;         %conservative cost multiplier
+econ.wave.costmult_opt = 4;         %optimistic cost multiplier
+econ.wave.lowfail = 0;              %optimistic failures
+econ.wave.highfail = 4;              %conservative failures
 %diesel costs
 econ.dies.fcost = .83;              %[$/L] diesel fuel cost
 econ.dies.enclcost = 5000;          %[$]
@@ -224,8 +233,8 @@ opt.nm.initminlim = .5; %percentage of grid to wipe out
 opt.nm.tolfun = 100; %nelder mead output tolerance
 opt.nm.tolx = 10; %nelder mead input tolerance
 opt.nm.fmindebug = 0;
-opt.bf.m = 30;
-opt.bf.n = 30;
+opt.bf.m = 60;
+opt.bf.n = 60;
 opt.bf.M = 4; %[kW] max kW in grid
 opt.bf.N = 250; %[kWh] max Smax in grid
 % opt.cliff.srv_wind = ... %search ratio values for wind

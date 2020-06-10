@@ -19,7 +19,7 @@ lw = 1.2;
     linspace(0,max(depth(:)),n));
 
 Cq = interp2(diameter,depth,cost,Xq,Yq,'linear');
-Eq = interp2(diameter,depth,e_tension,Xq,Yq,'linear');
+% Eq = interp2(diameter,depth,e_tension,Xq,Yq,'linear');
 
 %cost
 figure

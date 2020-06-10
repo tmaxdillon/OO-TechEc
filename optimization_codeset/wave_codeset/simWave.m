@@ -1,5 +1,5 @@
-function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst,Pline, ...
-    Panchor,vesselcost,wecrepair,battreplace,battencl, ...
+function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst,Pmooring, ...
+    vesselcost,wecrepair,battreplace,battencl, ...
     triptime,nvi,dp,width,cw,S,P,D,L] =  ...
     simWave(kW,Smax,opt,data,atmo,batt,econ,uc,bc,wave)
 
@@ -19,8 +19,7 @@ dt = 24*(data.wave.time(2) - data.wave.time(1)); %time in hours
 dist = data.dist; %[m] dist to shore
 depth = data.depth;   %[m] water depth
 
-%find width through rated power conditions, computed up front
-%in optRun(), from rated conditions: hs_eff_ra, tp_eff_ra, wavepower_ra
+%find width through rated power conditions
 width = sqrt(1000*kW*(1+wave.house)/(wave.eta_ct*opt.wave.cwr_b_ra* ...
     opt.wave.wavepower_ra)); %[m] physical width of wec
 P = (wave.eta_ct.*width.^2.*cwr_b.*wavepower - kW*wave.house); %[kW]
@@ -37,9 +36,7 @@ L = ones(1,T)*uc.draw; %power put to sensing timeseries
 surv = 1;
 
 %run simulation
-for t = 1:T
-%     %find power from wec
-%     P(t) = powerFromWEC_oo(Hs(t),Tp(t),kW,wave,opt,width)*1000; %[W]
+for t = 1:T    
     sd = S(t)*(batt.sdr/100)*(1/(30*24))*dt; %[Wh] self discharge
     S(t+1) = dt*(P(t)*1000 - uc.draw) + S(t) - sd; %[Wh]
     if S(t+1) > Smax*1000 %dump power if over limit
@@ -47,7 +44,6 @@ for t = 1:T
         S(t+1) = Smax*1000; %[Wh]
     elseif S(t+1) <= Smax*batt.dmax*1000 %bottomed out
         S(t+1) = dt*P(t)*1000 + S(t) - sd; %[Wh] save what's remaining
-        %L(t) = S(t)/dt; %adjust load to what can be consumed
         L(t) = 0; %drop load to zero because not enough power
     end
 end
@@ -74,10 +70,9 @@ else
 end
 
 %economic modeling
-kWcost = econ.wave.costmult*polyval(opt.p_dev.t,kW)* ...
-    econ.wind.marinization; %wec
-Icost = (econ.wind.installed - kWcost/ ...
-    (kW*econ.wind.marinization*econ.wave.costmult))*kW; %installation
+kWcost = 2*econ.wave.costmult*polyval(opt.p_dev.t,kW); %wec
+Icost = (econ.wind.installed - kWcost/ ... 
+    (kW*econ.wave.costmult))*kW; %installation
 if Icost < 0, Icost = 0; end
 if bc == 1 %lead acid
     if Smax < opt.p_dev.kWhmax %less than linear region
@@ -88,17 +83,14 @@ if bc == 1 %lead acid
 elseif bc == 2 %lithium phosphate
     Scost = batt.cost*Smax;
 end
-battencl = applyScaleFactor(econ.batt.encl.cost,econ.batt.encl.cap, ...
-    Smax,econ.batt.encl.sf); %battery enclosure
+battencl = econ.batt.enclmult*Scost; %battery enclosure cost
 Pmtrl = 0;
 Pinst = econ.vessel.speccost* ... 
     ((econ.platform.t_i+t_add_batt)/24); %platform instllation
 dp = width;
-Pline = dp*depth*econ.platform.line;
-Panchor = dp*econ.platform.anchor;
-if Panchor < econ.platform.anchor_min 
-    Panchor = econ.platform.anchor_min;
-end
+if dp > 4, dp = 4; end %just to keep within mdd bounds, temporary
+Pmooring = interp2(econ.platform.mdd.diameter,econ.platform.mdd.depth, ...
+    econ.platform.mdd.cost,dp,depth,'linear'); %mooring cost
 if uc.SI < 12
     triptime = 0; %attributed to instrumentation
     t_os = econ.vessel.t_ms/24; %[d]
@@ -112,7 +104,7 @@ vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr*t_add_batt); %vessel cost
 wecrepair = 1/2*kWcost*(nvi-1); %wec repair cost
 if wecrepair < 0, wecrepair = 0; end %if nvi = 0, wec repair must be 0
 battreplace = Scost*nbr; %number of battery replacements
-CapEx = Pline + Panchor + Pinst + Pmtrl + ... 
+CapEx = Pmooring + Pinst + Pmtrl + ... 
     battencl + Scost + Icost + kWcost;
 OpEx = battreplace + wecrepair + vesselcost;
 cost = CapEx + OpEx;

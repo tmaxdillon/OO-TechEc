@@ -25,6 +25,15 @@ function [X,Y,Z,iobj]=moordyn(U,z,H,B,Cd,ME,V,W,rho)
 % May be passed with no arguments, assuming: global U z H B Cd V W rho
 % RKD 12/97
 
+%trent inputs, May 20th 2020
+d_trent = .5;
+imax_hard = 1000;
+imax_avg = 900;
+
+%the rand was added so that there was jitter and so that we wouldn't settle
+%on a local minimum that wasn't the global minimum. you could decrease the
+%convergence requirement to smaller than one centimeter.
+
 if nargin == 0,
     global U V W z rho uw vw
     global H B Cd ME
@@ -384,7 +393,7 @@ for izloop=1:2, % loop through at least twice with this mooring.
     breaknow=0;iconv=0;
     icnt=0;
     iavg=0;
-    isave=0;
+    isave=0; %counts number of iterations - trent
     dg=0.1;gf=2;dgf=0;
     dgc=0;
     if izloop==1,
@@ -430,7 +439,7 @@ for izloop=1:2, % loop through at least twice with this mooring.
                     if dg < 1e-10, dg = 1e-5; end % shake things up a bit.
                     dgc=0;
                 end
-                gamma=gamma + gammas*dg*(gf * rand);
+                gamma=gamma + gammas*dg*(gf * d_trent);
                 if dgc > dgci,
                     dg=dg*10;
                     dgc=0;
@@ -445,7 +454,7 @@ for izloop=1:2, % loop through at least twice with this mooring.
                         dg=dg/10;
                         dgc=0;
                     end
-                    gamma=gamma + gammas*dg*(gf * rand);
+                    gamma=gamma + gammas*dg*(gf * d_trent);
                     if dgc > dgci,
                         dg=dg*10;
                         dgc=0;
@@ -456,7 +465,7 @@ for izloop=1:2, % loop through at least twice with this mooring.
                         dg=dg/10;
                         dgc=0;
                     end
-                    gamma=gamma + gammas*dg*(gf * rand);
+                    gamma=gamma + gammas*dg*(gf * d_trent);
                     if dgc > dgci,
                         dg=dg*10;
                         dgc=0;
@@ -492,7 +501,7 @@ for izloop=1:2, % loop through at least twice with this mooring.
                     dgc=0;
                 end
                 if dgf > 5, dg=1e-3; dgf=0; end % we gotta get back into the water
-                gamma=gamma + gammas*dg*(gf * rand);
+                gamma=gamma + gammas*dg*(gf * d_trent);
                 if dgc > dgci,
                     dg=dg*10;
                     dgc=0;
@@ -571,6 +580,9 @@ for izloop=1:2, % loop through at least twice with this mooring.
         for j=1:N,      % loop through the interpolated in-line segments and any clamp-on devices
             ico=[];if ~isempty(Iobj),ico=find(Iobj==j); end % If ~isempty(ico), then there is a clamp on device here
             i=find(zi>=(Z(j)-1.0)&zi<=(Z(j)+1.0));
+            if isempty(i) %added by trent - larger buffer
+                i=find(zi>=(Z(j)-2.0)&zi<=(Z(j)+2.0));
+            end
             if j==1,
                 i=find(zi>=(Z(j)-Hi(1,1)) & zi<=(Z(j)+Hi(1,1)));
                 if isempty(i), i=1; end % take the top velocity value
@@ -835,7 +847,7 @@ for izloop=1:2, % loop through at least twice with this mooring.
                     end
                 end
             end
-            if iavg == 120 | (iavg > 100 & dg < 1e-10), % after many iterations, force convergence
+            if iavg == imax_hard | (iavg > imax_avg & dg < 1e-10), % after many iterations, force convergence
                 X=Xavg/iavg;
                 Y=Yavg/iavg;
                 Z=Zavg/iavg;
@@ -920,6 +932,10 @@ disp(['Safe wet anchor mass = ',num2str(TWa,'%8.1f'),' [kg] = ',num2str((TWa*2.2
 disp(['Safe dry steel anchor mass = ',num2str((TWa/0.87),'%8.1f'),' [kg] = ',num2str((TWa*2.2/0.87),'%8.1f'),' [lb]']);
 disp(['Safe dry concrete anchor mass = ',num2str((TWa/0.65),'%8.1f'),' [kg] = ',num2str((TWa*2.2/0.65),'%8.1f'),' [lb]']);
 disp(['Weight under anchor = ',num2str(WoB,'%8.1f'),' [kg]  (negative is down)']);
+disp(['Maximum tension = ' num2str(max(Ti./9.81))]);
+disp(['3/4 factor of safety: wkg = ' num2str(1540/max(Ti./9.81)) ', ext = ' num2str(6930/max(Ti./9.81))]);
+disp(['1 factor of safety: wkg = ' num2str(2450/max(Ti./9.81)) ', ext = ' num2str(11025/max(Ti./9.81))]);
+disp(['Number of iterations = ' num2str(isave) ' then ' num2str(iavg)]);
 %
 if abs(B(end)) < TWa,
     disp('*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*');
