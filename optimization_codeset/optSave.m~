@@ -12,5 +12,8 @@ else
 end
 
 save([name '.mat'], '-struct','stru','-v7.3')
+
+
+%must re push to github, then pull to home directory on eagle login node
 end
 

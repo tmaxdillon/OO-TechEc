@@ -1,5 +1,5 @@
 %settings
-opt.alllocuses = 1;
+opt.alllocuses = 0;
 opt.sens = 0;
 opt.tdsens = 0;
 opt.ninepanel = 0;
