@@ -237,6 +237,7 @@ opt.bf.m = 60;
 opt.bf.n = 60;
 opt.bf.M = 4; %[kW] max kW in grid
 opt.bf.N = 250; %[kWh] max Smax in grid
+opt.bf.maxworkers = 36; %maximum cores
 % opt.cliff.srv_wind = ... %search ratio values for wind
 % [2    1    1    1     1    1    1    1    1    1    1; ...
 %  1    2    5    10    20   35   50   100  150  500  1000];

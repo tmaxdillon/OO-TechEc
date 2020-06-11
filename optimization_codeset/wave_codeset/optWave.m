@@ -45,7 +45,7 @@ X = zeros(m*n,1);
 %parallel computing via parfor
 tGrid = tic;
 disp('Populating grid values...')
-parfor (i = 1:m*n,0)
+parfor (i = 1:m*n,opt.bf.maxworkers)
     [C_temp(i),S_temp(i)] = ...
         simWave(K(i),S(i),opt,data,atmo,batt,econ,uc,bc,wave);
     if S_temp(i) == 0 %update obj val X
