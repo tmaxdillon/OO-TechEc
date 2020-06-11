@@ -55,11 +55,12 @@ parfor i = 1:m*n
     end
 end
 output.cost = reshape(C_temp,[m n])'; %return cost to matrix and structure
-output.surv = reshape(S_temp,[m n])'; %return surv to matrix and structure
+output.surv_par = reshape(S_temp,[m n])'; %return surv to matrix and structure
 X = reshape(X,[m n])'; %return objval X to matrix
 output.tGrid = toc(tGrid);
+KM = reshape(K,[m n])';
+SM = reshape(S,[m n])';
 
-% %NON PARALLELIZED CODE
 % %preallocate
 % m = opt.bf.m;
 % n = opt.bf.n;
