@@ -6,7 +6,7 @@ opt.ninepanel = 0;
 pm = 3; %power module
 bc = 2; %battery chemistry
 c = 2;  %use case
-loc = 'souOcean'; %location
+loc = 'cosEndurance_wa'; %location
 
 %strings
 opt.locations = {'argBasin';'cosEndurance_or';'cosEndurance_wa'; ...
