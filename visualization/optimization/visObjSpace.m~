@@ -70,7 +70,7 @@ c = colorbar;
 c.Label.String = '[$] in thousands';
 lb = output.min.cost/max(output.cost(:));
 AdvancedColormap('bg l w r',8000,[lb,lb+.05*(1-lb),lb+0.1*(1-lb),1])
-caxis([360 1000])
+caxis([output.min.cost/2000 1000])
 hold on
 % l = legend([s initval minval con],'Input Mesh','Coarse Grid Minima', ...
 %     'Nelder-Mead Minima','Cost Contours','location','NorthEast');

@@ -5,7 +5,7 @@ opt.tdsens = 0;
 opt.ninepanel = 0;
 pm = 3; %power module
 bc = 2; %battery chemistry
-c = 1;  %use case
+c = 2;  %use case
 loc = 'souOcean'; %location
 
 %strings
@@ -233,8 +233,8 @@ opt.nm.initminlim = .5; %percentage of grid to wipe out
 opt.nm.tolfun = 100; %nelder mead output tolerance
 opt.nm.tolx = 10; %nelder mead input tolerance
 opt.nm.fmindebug = 0;
-opt.bf.m = 60;
-opt.bf.n = 60;
+opt.bf.m = 100;
+opt.bf.n = 100;
 opt.bf.M = 4; %[kW] max kW in grid
 opt.bf.N = 250; %[kWh] max Smax in grid
 opt.bf.maxworkers = 36; %maximum cores

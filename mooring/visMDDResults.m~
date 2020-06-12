@@ -33,9 +33,9 @@ xlim([.9 4.1])
 ylim([0 5600])
 c = colorbar;
 c.Label.String = '[$k]';
-%colormap(brewermap(10,'blues'))
-colormap(flipud(viridis(16)))
-caxis([0 80])
+%colormap(brewermap(50,'blues'))
+colormap(flipud(viridis(m)))
+caxis([0 inf])
 %[~,con] = contour3(Xq,Yq,Cq./1000,'LineColor','w','LineWidth',.5);
 hold on
 scatter3(diameter(:),depth(:),cost(:)./1000+z_adj,ms,'filled', ...
