@@ -44,7 +44,7 @@ S_temp = zeros(m*n,1);
 X = zeros(m*n,1);
 %parallel computing via parfor
 tGrid = tic;
-disp('Populating grid values...')
+disp(['Populating grid values: m=' num2str(m) ', n=' num2str(n)])
 parfor (i = 1:m*n,opt.bf.maxworkers)
     [C_temp(i),S_temp(i)] = ...
         simWave(K(i),S(i),opt,data,atmo,batt,econ,uc,bc,wave);
@@ -100,9 +100,13 @@ output.min.batt_dyn_lc = batt.lc_nom*(output.min.Smax/ ...
 output.min.CF = mean(output.min.P)/(1000*output.min.kW);
 output.min.cw_avg = mean(output.min.cw); %average capture width
 output.min.cwr_avg = mean(output.min.cw_avg/output.min.width); %average cwr
-output.min.cyc60 = countCycles(output.min.S,output.min.Smax,60);
-output.min.cyc80 = countCycles(output.min.S,output.min.Smax,80);
-output.min.cyc100 = countCycles(output.min.S,output.min.Smax,100);
+%cycles per year
+output.min.cyc60 = countCycles(output.min.S,output.min.Smax,60)/ ...
+    (length(data.wave.time)/8760);
+output.min.cyc80 = countCycles(output.min.S,output.min.Smax,80)/ ...
+    (length(data.wave.time)/8760);
+output.min.cyc100 = countCycles(output.min.S,output.min.Smax,100)/ ...
+    (length(data.wave.time)/8760);
 
 end
 

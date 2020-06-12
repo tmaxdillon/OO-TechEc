@@ -5,7 +5,7 @@ opt.tdsens = 0;
 opt.ninepanel = 0;
 pm = 3; %power module
 bc = 2; %battery chemistry
-c = 2;  %use case
+c = 1;  %use case
 loc = 'souOcean'; %location
 
 %strings
