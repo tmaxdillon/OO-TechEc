@@ -16,7 +16,7 @@ output.min.cost = output.min.cost/1000;
 ms = 100;
 lw = 1.1;
 fs = 14;
-z_adj = 35;
+z_adj = 100;
 
 %remove failure configurations
 alive = output.cost;
@@ -64,13 +64,15 @@ hold on
 view(0,90)
 xlabel('Storage Capacity [kWh]')
 ylabel('Rated Power [kW]')
-xlim([0 140])
-ylim([0 3])
+xlim([0 inf])
+ylim([0 inf])
+%xlim([0 140])
+%ylim([0 3])
 c = colorbar;
 c.Label.String = '[$] in thousands';
-lb = output.min.cost/max(output.cost(:));
-AdvancedColormap('bg l w r',8000,[lb,lb+.05*(1-lb),lb+0.1*(1-lb),1])
-caxis([360 1000])
+lb = (output.min.cost)/max(output.cost(:));
+AdvancedColormap('bg l w r',8000,[.9999*lb,lb+.05*(1-lb),lb+0.1*(1-lb),1])
+%caxis([360 1000]) %to produce cartoon
 hold on
 % l = legend([s initval minval con],'Input Mesh','Coarse Grid Minima', ...
 %     'Nelder-Mead Minima','Cost Contours','location','NorthEast');

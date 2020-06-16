@@ -28,13 +28,13 @@ switch econ.wave.scen
     case 3 %optimistic durability
         econ.wave.costmult = econ.wave.costmult_con; %cost multiplier
         econ.wave.lambda = econ.wave.lowfail; %vessel interventions
-end
-%if sensitivity analysis
-if isfield(econ.wave,'lambda_mod')
-    econ.wave.lambda = econ.wave.lambda_mod; %lamdba modifier
-end
-if isfield(econ.wave,'costmult_mod')
-    econ.wave.costmult = econ.wave.costmult_mod; %cost modifier
+    %if sensitivity analysis
+    if isfield(econ.wave,'lambda_mod')
+        econ.wave.lambda = econ.wave.lambda_mod; %lamdba modifier
+    end
+    if isfield(econ.wave,'costmult_mod')
+        econ.wave.costmult = econ.wave.costmult_mod; %cost modifier
+    end
 end
 
 %check to make sure coarse mesh will work

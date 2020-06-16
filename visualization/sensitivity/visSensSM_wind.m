@@ -1,4 +1,4 @@
-function [] = visNinePanel(s1,s2,s3,s4,s5,s6,s7,s8,s9)
+function [] = visSensSM_wind(s1,s2,s3,s4,s5,s6,s7,s8,s9)
 
 %merge
 panel(1,:) = s1;

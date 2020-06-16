@@ -1,6 +1,6 @@
 %settings
 opt.alllocuses = 0;
-opt.sens = 0;
+opt.sens = 1;
 opt.tdsens = 0;
 opt.senssm = 1;
 pm = 3; %power module
@@ -212,10 +212,8 @@ uc(2).dies.lambda = 1;          %diesel interventions
 % opt.tuned_parameter = 'btm'; %battery time slope
 % opt.tuning_array = [10 20 30 40 50 60 70 80 90 100];
 % opt.tuned_parameter = 'mbt'; %minimum battery for time added
-% opt.tuning_array = linspace(1/2,2,10);
-% opt.tuned_parameter = 'cwm'; %capture width multiplier
-opt.tuning_array = 1:1:10;
-opt.tuned_parameter = 'wcm'; %wave cost multiplier
+opt.tuning_array = linspace(1/2,2,10);
+opt.tuned_parameter = 'cwm'; %capture width multiplier
 
 
 %opt 2D sens

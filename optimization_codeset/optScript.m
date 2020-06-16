@@ -31,14 +31,28 @@
 %% run optimization
 
 optInputs
-if opt.sens && ~opt.alllocuses %multiple simulations for sensitivity analysis
+if opt.sens && ~opt.alllocuses %multiple simulations, sensitivity
     multStruct = doSens();
 elseif opt.tdsens && ~opt.alllocuses %two dimensional sensitivity analysis
     multStruct = doTdSens();
 elseif opt.alllocuses %run all dimensions
     allLocUses = doAllLocUses();
-elseif opt.ninepanel
-    [s1,s2,s3,s4,s5,s6,s7,s8,s9] = doNinePanel();
+elseif opt.senssm
+    [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s0] = doSensSM();
+    if pm == 3 %assign output to descriptive variables
+        cwm = s1;
+        wiv = s2;
+        wcm = s3;
+        whl = s4;
+        ild = s5;
+        osv = s6;
+        nbl = s7;
+        sdr = s8;
+        utp = s9;
+        bhc = s10;
+        dep = s11;
+        dtc = s12;
+    end
 else %just one simulation
     disp(['Optimization (' char(loc) ', pm: ' num2str(pm), ...
         ', bc: ' num2str(bc) ...
@@ -48,8 +62,7 @@ else %just one simulation
     data = load(loc,loc);
     data = data.(loc);
     [output,opt] = ...
-        optRun(pm,opt,data,atmo,batt,econ,uc(c),bc,inso,turb,wave, ...
-        dies);
+        optRun(pm,opt,data,atmo,batt,econ,uc(c),bc,inso,turb,wave,dies);
     optStruct.output = output;
     optStruct.opt = opt;
     optStruct.data = data;

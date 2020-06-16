@@ -36,9 +36,6 @@ for i = 1:opt.S
     if isequal(opt.tuned_parameter,'zo')
         atmo.zo = opt.tuning_array(i);
     end
-    if isequal(opt.tuned_parameter,'whl')
-        wave.house = opt.tuning_array(i);
-    end
     if isequal(opt.tuned_parameter,'imf')
         econ.inso.marinization = opt.tuning_array(i);
     end
@@ -74,6 +71,27 @@ for i = 1:opt.S
     end
     if isequal(opt.tuned_parameter,'utp')
         uc(c).uptime = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'bhc')
+        econ.batt.enclmult = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'dep')
+        data.depth_mod = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'dtc')
+        data.dist_mod = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'cwm')
+        wave.cw_mod = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'wiv')
+        econ.wave.lambda_mod = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'wcm')
+        econ.wave.costmult_mod = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'whl')
+        wave.house = opt.tuning_array(i);
     end
     [multStruct(i).output,multStruct(i).opt] =  ...
         optRun(pm,opt,data,atmo,batt,econ,uc(c),bc, ...

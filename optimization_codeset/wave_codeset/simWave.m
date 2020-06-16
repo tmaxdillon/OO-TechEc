@@ -10,17 +10,21 @@ if opt.fmin && Smax < 0 || kW < 0
     return
 end
 
+%set capture width modifier
+cw_mod = wave.cw_mod;
+
 %extract data
 Hs = data.wave.significant_wave_height; %[m]
-cwr_b = opt.wave.cwr_b_ts; %[m^-1] period efficiency timeseries (cwr/b)
+cwr_b = wave.cw_mod.*opt.wave.cwr_b_ts; %[m^-1] Tp eta timeseries (cwr/b)
 wavepower = opt.wave.wavepower_ts; %wavepower timeseries
 T = length(cwr_b); %total time steps
 dt = 24*(data.wave.time(2) - data.wave.time(1)); %time in hours
-dist = data.dist; %[m] dist to shore
-depth = data.depth;   %[m] water depth
+dist = data.dist*data.dist_mod; %[m] dist to shore
+depth = data.depth*data.depth_mod;   %[m] water depth
 
 %find width through rated power conditions
-width = sqrt(1000*kW*(1+wave.house)/(wave.eta_ct*opt.wave.cwr_b_ra* ...
+width = sqrt(1000*kW*(1+wave.house)/(wave.eta_ct* ...
+    cw_mod*opt.wave.cwr_b_ra* ...
     opt.wave.wavepower_ra)); %[m] physical width of wec
 P = (wave.eta_ct.*width.^2.*cwr_b.*wavepower - kW*wave.house); %[kW]
 P(Hs./opt.wave.L > .14) = 0; %breaking waves, set to zero
