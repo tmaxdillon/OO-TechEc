@@ -3,9 +3,11 @@ opt.alllocuses = 0;
 opt.sens = 0;
 opt.tdsens = 0;
 opt.senssm = 1;
-pm = 3; %power module
-bc = 2; %battery chemistry
-c = 2;  %use case
+opt.bf.m = 20;
+opt.bf.n = 20;
+pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
+bc = 2; %battery chemistry 1:AGM 2:LFP
+c = 2;  %use case 1:ST 2:LT
 loc = 'irmSea'; %location
 
 %strings
@@ -217,7 +219,6 @@ uc(2).dies.lambda = 1;          %diesel interventions
 opt.tuning_array = 1:1:10;
 opt.tuned_parameter = 'wcm'; %wave cost multiplier
 
-
 %opt 2D sens
 opt.tdsens_ta(1,:) = 0.1:0.04:1.7;
 opt.tdsens_ta(2,:) = 40:2:120;
@@ -226,8 +227,6 @@ opt.tdsens_tp{2} = 'mbt'; %minimum battery for time added
 
 %optimization parameters
 opt.V = 2;
-opt.bf.m = 20;
-opt.bf.n = 20;
 opt.bf.M = 4; %[kW] max kW in grid
 opt.bf.N = 250; %[kWh] max Smax in grid
 opt.bf.maxworkers = 36; %maximum cores

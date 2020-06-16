@@ -3,6 +3,8 @@ function [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s0] = doSensSM()
 n = 10;
 f = 2;
 
+disp('Sensitivity small multiple beginning.')
+tTot = tic;
 optInputs %load inputs
 uc = uc(c);
 opt.S = length(opt.tuning_array); %for command window notification
@@ -85,6 +87,9 @@ elseif pm == 3
 elseif pm == 4
     s0.dies = dies;
 end
+
+disp(['Sensitivity small multiple complete after ' ...
+        num2str(round(toc(tTot)/60,2)) ' minutes.'])
 
 end
 
