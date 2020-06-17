@@ -62,8 +62,8 @@ leg = {'Platform/Mooring','Generation CapEx', ...
 fs = 8.5; %font size
 cbuff = 10; %cost text buffer
 gbuff = .1; %generation text buffer
-bbuff = 1.5;  %battery text buffer
-cybuff = 1; %battery cycle buffer
+bbuff = 1;  %battery text buffer
+cybuff = 3; %
 
 %colors
 cols = 6;
@@ -162,8 +162,8 @@ for c = 1:nu
         h3(i,c).CData = [255,170,159]/256;
         x = get(h3(i,c),'XData');
         for j = 1:length(Y)
-            tx = round(massdata(j,i,1,c));
-            text(x(j),Y(j)+bbuff,[ num2str(tx,'%i') ' kg'], ...
+            tx = massdata(j,i,1,c);
+            text(x(j),Y(j)+bbuff,[ num2str(tx,4) ' kg'], ...
                 'Rotation',90, ...
                 'HorizontalAlignment','left', ...
                 'verticalAlignment','middle', ...
@@ -209,7 +209,7 @@ for c = 1:nu
     set(gca,'XTickLabel',opt.locations);
     xtickangle(45)
     if c == 1
-        ylabel({'60% Discharge','Cycles per Week'})
+        ylabel({'60% Discharge','Cycles'})
     end
     grid on
     ylim([0 1.3*max(cycdata(:))])

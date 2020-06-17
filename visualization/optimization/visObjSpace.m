@@ -46,11 +46,14 @@ figure
 %     sdead.EdgeColor = 'none';
 %     hold on
 % end
-s = surf(Smaxgrid,kWgrid,output.cost,zeros(length(Smaxgrid),length(kWgrid),3));
+s = surf(Smaxgrid,kWgrid,output.cost,zeros(length(Smaxgrid), ... 
+    length(kWgrid),3));
 s.EdgeColor = 'none';
+s.FaceColor = 'flat';
 hold on
 s = surf(Smaxgrid,kWgrid,alive);
 s.EdgeColor = 'none';
+s.FaceColor = 'flat';
 hold on
 % [~,con] = contour3(Smaxgrid,kWgrid,output.cost,'LineColor','w');
 % hold on
@@ -70,9 +73,9 @@ ylim([0 inf])
 %ylim([0 3])
 c = colorbar;
 c.Label.String = '[$] in thousands';
-lb = (output.min.cost)/max(output.cost(:));
-AdvancedColormap('bg l w r',8000,[.9999*lb,lb+.05*(1-lb),lb+0.1*(1-lb),1])
-%caxis([360 1000]) %to produce cartoon
+lb = (output.min.cost)/max(alive(:));
+AdvancedColormap('bg l w r',8000,[1*lb,lb+.05*(1-lb),lb+0.1*(1-lb),1])
+caxis([0 inf]) %to produce cartoon
 hold on
 % l = legend([s initval minval con],'Input Mesh','Coarse Grid Minima', ...
 %     'Nelder-Mead Minima','Cost Contours','location','NorthEast');

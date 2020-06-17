@@ -1,14 +1,15 @@
 %settings
-opt.alllocuses = 0;
+opt.alllocuses = 1;
 opt.sens = 0;
 opt.tdsens = 0;
-opt.senssm = 1;
+opt.senssm = 0;
 opt.bf.m = 20;
 opt.bf.n = 20;
 pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
 bc = 2; %battery chemistry 1:AGM 2:LFP
 c = 2;  %use case 1:ST 2:LT
 loc = 'irmSea'; %location
+econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
 
 %strings
 opt.locations = {'argBasin';'cosEndurance_or';'cosEndurance_wa'; ...
@@ -68,7 +69,6 @@ econ.inso.electrical = 210;         %[$/kW]
 econ.inso.structural = 100;         %[$/kW]
 econ.inso.marinization = 1.2;       %[~]
 %wave costs
-econ.wave.scen = 1;                 %scenario indicator 1:C,2:OC,3:OD
 econ.wave.scenarios = 3;            %number of scenarios
 econ.wave.costmult_con = 10;         %conservative cost multiplier
 econ.wave.costmult_opt = 4;         %optimistic cost multiplier
