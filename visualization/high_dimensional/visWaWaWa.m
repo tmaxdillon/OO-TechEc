@@ -63,7 +63,7 @@ fs = 8.5; %font size
 cbuff = 10; %cost text buffer
 gbuff = .1; %generation text buffer
 bbuff = 1.5;  %battery text buffer
-cybuff = 1; %battery cycle buffer
+cybuff = .7; %battery cycle buffer
 
 %colors
 cols = 6;
@@ -195,7 +195,8 @@ for c = 1:nu
         h4(i,c).CData = [255,170,179]/256;
         x = get(h4(i,c),'XData');
         for j = 1:length(Y)
-            text(x(j),Y(j)+cybuff,num2str(Y(j)), ...
+            tx = round(Y(j),1);
+            text(x(j),Y(j)+cybuff,num2str(tx), ...
                 'Rotation',90, ...
                 'HorizontalAlignment','left', ...
                 'verticalAlignment','middle', ...

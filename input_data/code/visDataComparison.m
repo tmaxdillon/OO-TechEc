@@ -104,14 +104,14 @@ Kmean_wave = zeros(3,l);
 for i = l:-1:1
     dists(i) = allData.(fn{i}).dist;
     labels(i) = allData.(fn{i}).title;
-    lats(i) = abs(allData.(fn{i}).met.lat);
+    lats(i) = abs(allData.(fn{i}).lat);
     Kmean_wave(i,1) = mean(Kwave_ts{i}(:,2))/1000;
     Kmean_wave(i,2) = Kmean_wave(i,1) - prctile(Kwave_ts{i}(:,2),25)/1000;
     Kmean_wave(i,3) = prctile(Kwave_ts{i}(:,2),75)/1000 - Kmean_wave(i,1);
     Kmean_wind(i,1) = mean(Kwind_ts{i}(:,2))/1000;
     Kmean_wind(i,2) = Kmean_wind(i,1) - prctile(Kwind_ts{i}(:,2),25)/1000;
     Kmean_wind(i,3) = prctile(Kwind_ts{i}(:,2),75)/1000 - Kmean_wind(i,1);
-    Kmean_inso(i,1) = mean(Kinso_ts{i}(:,2))/1000;
+    Kmean_inso(i,1) = nanmean(Kinso_ts{i}(:,2))/1000;
     Kmean_inso(i,2) = Kmean_inso(i,1) - prctile(Kinso_ts{i}(:,2),25)/1000;
     Kmean_inso(i,3) = prctile(Kinso_ts{i}(:,2),75)/1000 - Kmean_inso(i,1);     
 end
