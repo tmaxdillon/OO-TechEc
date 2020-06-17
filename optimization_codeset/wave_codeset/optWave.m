@@ -60,6 +60,11 @@ S = reshape(S,[m*n 1]);
 C_temp = zeros(m*n,1);
 S_temp = zeros(m*n,1);
 X = zeros(m*n,1);
+%set number of cores
+cores = feature('numcores');
+if cores > 2 %using HPC
+    parpool(cores);
+end
 %parallel computing via parfor
 tGrid = tic;
 disp(['Populating grid values: m=' num2str(m) ', n=' num2str(n)])
