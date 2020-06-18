@@ -2,14 +2,14 @@
 opt.alllocuses = 0;
 opt.sens = 0;
 opt.tdsens = 0;
-opt.senssm = 0;
+opt.senssm = 1;
 opt.bf.m = 20;
 opt.bf.n = 20;
 pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
 bc = 2; %battery chemistry 1:AGM 2:LFP
 c = 2;  %use case 1:ST 2:LT
-loc = 'irmSea'; %location
-econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
+loc = 'souOcean'; %location
+econ.wave.scen = 3; %scenario indicator 1:C,2:OC,3:OD
 
 %strings
 opt.locations = {'argBasin';'cosEndurance_or';'cosEndurance_wa'; ...
@@ -218,8 +218,10 @@ uc(2).dies.lambda = 1;          %diesel interventions
 % opt.tuned_parameter = 'cwm'; %capture width multiplier
 % opt.tuning_array = 1:1:10;
 % opt.tuned_parameter = 'wcm'; %wave cost multiplier
-opt.tuning_array = linspace(0,9,50);
-opt.tuned_parameter = 'wiv'; %wec interventions
+% opt.tuning_array = linspace(0,9,50);
+% opt.tuned_parameter = 'wiv'; %wec interventions
+opt.tuning_array = linspace(1/2,2,10);
+opt.tuned_parameter = 'dep'; %depth modifier
 
 %opt 2D sens
 opt.tdsens_ta(1,:) = 0.1:0.04:1.7;

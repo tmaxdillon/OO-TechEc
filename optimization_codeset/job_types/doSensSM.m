@@ -1,6 +1,6 @@
 function [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s0] = doSensSM()
 
-n = 50;
+n = 10;
 f = 2;
 
 disp(['Sensitivity small multiple beginning. n = ' num2str(n) ])
@@ -43,7 +43,7 @@ ta(nps+5,:) = linspace(.80,1,n);
 tp{nps+6} = 'bhc'; %battery housing cost
 ta(nps+6,:) = linspace(econ.batt.enclmult/f,econ.batt.enclmult*f,n);
 tp{nps+7} = 'dep'; %depth modifier
-ta(nps+7,:) = linspace(1/f,f,n);
+ta(nps+7,:) = linspace(.15,1.15,n); %watch MDD bounds!
 tp{nps+8} = 'dtc'; %battery housing cost
 ta(nps+8,:) = linspace(1/f,f,n);
 

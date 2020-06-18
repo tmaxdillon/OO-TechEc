@@ -51,12 +51,9 @@ for t = 1:length(wind)
         S(t+1) = Smax*1000; %[Wh]
     elseif S(t+1) <= Smax*batt.dmax*1000 %empty battery bank
         S(t+1) = dt*P(t) + S(t) - sd; %[Wh] save what's remaining, L = 0
-        %L(t) = S(t)/dt; %adjust load to what can be consumed
         L(t) = 0; %drop load to zero because not enough power
     end
 end
-
-CF = nanmean(P)/(kW*1000); %capacity factor
 
 %dynamic battery degradation model
 if batt.dyn_lc
@@ -67,6 +64,8 @@ else
     batt.lc = batt.lc_nom; %[m]
 end
 nbr = ceil((12*uc.lifetime/batt.lc-1)); %number of battery replacements
+
+nvi = nbr + uc.turb.lambda; %number of vessel interventions
 
 %find added battery maintenance/installation time
 if Smax > batt.t_add_min
@@ -89,8 +88,7 @@ if bc == 1 %lead acid
 elseif bc == 2 %lithium phosphate
     Scost = batt.cost*Smax;
 end
-battencl = applyScaleFactor(econ.batt.encl.cost,econ.batt.encl.cap, ...
-    Smax,econ.batt.encl.sf); %battery enclosure
+battencl = econ.batt.enclmult*Scost; %battery enclosure cost
 Pmtrl = (1/1000)*econ.platform.wf*econ.platform.steel* ... 
     kW*turb.wf; %platform material
 Pinst = econ.vessel.speccost* ... 
@@ -112,7 +110,6 @@ if Panchor < econ.platform.anchor_min
     Panchor = econ.platform.anchor_min;
 end
 Fdmax = 0;
-nvi = nbr + uc.turb.lambda; %number of vessel interventions
 if uc.SI < 12 %short term instrumentation
     triptime = 0; %attributed to instrumentation
     t_os = econ.vessel.t_ms/24; %[d]

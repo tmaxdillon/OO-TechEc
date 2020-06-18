@@ -62,9 +62,36 @@ X = reshape(X,[m n])'; %return objval X to matrix
 output.tGrid = toc(tGrid);
 
 disp('Brute forcing global minimum...')
-[I(1),I(2)] = find(X == min(X(:)),1);
-output.min.kW = opt.kW(I(1));
-output.min.Smax = opt.Smax(I(2));
+[I(1),I(2)] = find(X == min(X(:)),1,'first');
+opt.init = output.cost(I(1),I(2));
+opt.kW_init = opt.kW(I(1));
+opt.Smax_init = opt.Smax(I(2));
+opt.I_init = I;
+output.tInitOpt = toc(tInitOpt);
+
+%nelder mead optimization
+tFminOpt = tic; %start timer
+opt.fmin = true; %let simWind know that fminsearch is on
+%objective function
+fun = @(x)simWind(x(1),x(2),opt,data,atmo,batt,econ,uc,bc,turb);
+%set options (show convergence and objective space or not)
+if opt.nm.show
+    options = optimset('MaxFunEvals',10000,'Algorithm', ... 
+        'sqp','MaxIter',10000, ...
+        'TolFun',opt.nm.tolfun,'TolX',opt.nm.tolx, ... 
+        'PlotFcns',@optimplotfval);
+else
+    options = optimset('MaxFunEvals',10000,'Algorithm', ... 
+        'sqp','MaxIter',10000, ...
+        'TolFun',opt.nm.tolfun,'TolX',opt.nm.tolx);
+end
+disp('Beginning Nelder Mead')
+%fminsearch
+[opt_ind] = ...
+    fminsearch(fun,[opt.kW_init opt.Smax_init],options);
+%store outputs of minima into output.min
+output.min.kW = opt_ind(1);
+output.min.Smax = opt_ind(2);
 [output.min.cost,output.min.surv,output.min.CapEx,output.min.OpEx,...
     output.min.kWcost,output.min.Scost,output.min.Icost, ... 
     output.min.Pmtrl,output.min.Pinst,...
@@ -76,18 +103,12 @@ output.min.Smax = opt.Smax(I(2));
     output.min.CF,output.min.S,output.min.P,output.min.D,output.min.L] ...
     = simWind(output.min.kW,output.min.Smax, ... 
     opt,data,atmo,batt,econ,uc,bc,turb);
-output.min.batt_dyn_lc = batt.lc_nom*(output.min.Smax/ ...
-    (output.min.Smax - (min(output.min.S)/1000)))^batt.beta;
-output.min.CF = mean(output.min.P)/(1000*output.min.kW);
 output.min.rotor_h = turb.clearance + ... 
     sqrt(1000*2*output.min.kW/(atmo.rho_a*pi*turb.ura^3)); %rotor height
-%cycles per year
-output.min.cyc60 = countCycles(output.min.S,output.min.Smax,60)/ ...
-    (length(data.wave.time)/8760);
-output.min.cyc80 = countCycles(output.min.S,output.min.Smax,80)/ ...
-    (length(data.wave.time)/8760);
-output.min.cyc100 = countCycles(output.min.S,output.min.Smax,100)/ ...
-    (length(data.wave.time)/8760);
+output.min.cyc60 = countCycles(output.min.S,output.min.Smax,60);
+output.min.cyc80 = countCycles(output.min.S,output.min.Smax,80);
+output.min.cyc100 = countCycles(output.min.S,output.min.Smax,100);
+output.tFminOpt = toc(tFminOpt); %end timer
 
 end
 
