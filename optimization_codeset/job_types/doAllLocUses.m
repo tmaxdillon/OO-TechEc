@@ -31,7 +31,7 @@ for loc_n = 1:length(opt.locations)
         allLocUses(loc_n,c).uc = uc(c);
         allLocUses(loc_n,c).pm = pm;
         allLocUses(loc_n,c).c = c;
-        allLocUses(loc_n,c).loc = loc;
+        allLocUses(loc_n,c).loc = string(opt.locations(loc_n));
         if pm == 1
             allLocUses(loc_n,c).turb = turb;
         elseif pm == 2

@@ -3,7 +3,7 @@ function [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s0] = doSensSM()
 n = 50;
 f = 2;
 
-disp(['Sensitivity small multiple beginning. n = ' num2str(n) ])
+disp('Sensitivity small multiple beginning.')
 tTot = tic;
 optInputs %load inputs
 uc = uc(c);
@@ -24,11 +24,11 @@ elseif pm == 3 %wave
     tp{1} = 'cwm'; %capture width multiplier
     ta(1,:) = linspace(1/f,f,n);
     tp{2} = 'wiv'; %wec interventions
-    ta(2,:) = linspace(0,9,n);
+    ta(2,:) = 0:1:9;
     tp{3} = 'wcm'; %wec cost multiplier
-    ta(3,:) = linspace(1,10,n);
+    ta(3,:) = 1:1:10;
     tp{4} = 'whl'; %wec hotel load
-    ta(4,:) = linspace(0,.18,n);
+    ta(4,:) = 0:.02:.18;
 end
 tp{nps+1} = 'ild'; %instrumentation load
 ta(nps+1,:) = linspace(uc.draw/f,uc.draw*f,n);

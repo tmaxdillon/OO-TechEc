@@ -1,11 +1,11 @@
-function [] = visWaWaWa(pm1,pm2,pm3)
+function [] = visWaWaWa_hl(pm1,pm2,pm3)
 
 allStruct = mergeWaWaWa(pm1,pm2,pm3);
 
 np = 3; %number of power modules
-nc = 6; %number of costs
+nc = 2; %number of costs
 nl = size(pm1,1)-1; %number of locations
-fixer = [1 3 4 5 6]; %because you accidentally ran cosEndurance_or
+fixer = [1 3 4 5 6];
 nu = size(pm1,2); %number of use cases
 
 %initialize/preallocate
@@ -21,27 +21,24 @@ opt = allStruct(1,1,1).opt;
 for loc = 1:nl
     for pm = 1:np
         for c = 1:nu
-            costdata(loc,pm,1,c) = ... %platform
+            costdata(loc,pm,1,c) = ... %capex
                 allStruct(fixer(loc),pm,c).output.min.Pinst/1000 + ...
-                allStruct(fixer(loc),pm,c).output.min.Pmooring/1000;
-            costdata(loc,pm,6,c) = ... %vessel
-                allStruct(fixer(loc),pm,c).output.min.vesselcost/1000;
-            costdata(loc,pm,3,c) = ... %storage capex
+                allStruct(fixer(loc),pm,c).output.min.Pmooring/1000 + ...
                 allStruct(fixer(loc),pm,c).output.min.Scost/1000 + ...
-                allStruct(fixer(loc),pm,c).output.min.battencl/1000;
-            costdata(loc,pm,5,c) = ... %storage opex
-                allStruct(fixer(loc),pm,c).output.min.battreplace/1000;
-            costdata(loc,pm,2,c) = ... %gen capex
+                allStruct(fixer(loc),pm,c).output.min.battencl/1000 + ...
                 allStruct(fixer(loc),pm,c).output.min.kWcost/1000 + ...
                 allStruct(fixer(loc),pm,c).output.min.Icost/1000;
-            costdata(loc,pm,4,c) = ... %gen opex
+            costdata(loc,pm,2,c) = ... %opex
+                allStruct(fixer(loc),pm,c).output.min.vesselcost/1000 + ...
+                allStruct(fixer(loc),pm,c).output.min.battreplace/1000 + ...
                 allStruct(fixer(loc),pm,c).output.min.wecrepair/1000;
             gendata(loc,pm,1,c) = allStruct(fixer(loc),pm,c).output.min.kW;
             stordata(loc,pm,1,c) = allStruct(fixer(loc),pm,c).output.min.Smax;
             cycdata(loc,pm,1,c) = allStruct(fixer(loc),pm,c).output.min.cyc60;
             massdata(loc,pm,1,c) = ...
                 1000*allStruct(fixer(loc),pm,c).output.min.Smax/ ...
-                (allStruct(fixer(loc),pm,c).batt.V*allStruct(fixer(loc),pm,c).batt.se);
+                (allStruct(fixer(loc),pm,c).batt.V* ...
+                allStruct(fixer(loc),pm,c).batt.se);
             dpdata(loc,pm,1,c) = allStruct(fixer(loc),pm,c).output.min.dp;
         end
     end
@@ -56,9 +53,7 @@ groupOffset = MaxGroupWidth/NumStacksPerGroup;
 titles = {'Short Term Instrumentation'; ...
     'Long Term Instrumentation'};
 pms = {'Optimistic Durability','Optimistic Cost','Conservative'};
-leg = {'Mooring','WEC CapEx', ...
-    'Battery CapEx','WEC OpEx', ...
-    'Battery OpEx','Vessel'};
+leg = {'CapEx','OpEx'};
 fs = 11; %font size
 fs2 = 15; %axis font size
 cbuff = 10; %cost text buffer
@@ -67,11 +62,9 @@ bbuff = 1.5;  %battery text buffer
 cybuff = .7; %battery cycle buffer
 
 %colors
-cols = 6;
-col(1,:) = [0,0,51]/256; %platform cost
-col([2 4],:) = flipud(brewermap(2,'purples')); %generation cost
-col([3 5],:) = flipud(brewermap(2,'blues')); %storage cost
-col(6,:) = [238,232,170]/256; %vessel cost
+cols = 2;
+col(1,:) = [153,153,255]/256; %capex
+col(2,:) = [204 204 255]/256; %opex
 gscol(1:5,:) = flipud(brewermap(5,'reds')); %generation capacity
 gscol(6:10,:) = flipud(brewermap(5,'oranges')); %storage capacity
 
@@ -108,12 +101,12 @@ for c = 1:nu
     set(gca,'XTickMode','manual');
     set(gca,'XTick',1:NumGroupsPerAxis);
     set(gca,'XTickLabelMode','manual');
-    %set(gca,'XTickLabel',opt.locations);
     set(gca,'FontSize',fs2)
+    %set(gca,'XTickLabel',opt.locations);
     xtickangle(45)
-    %title(titles(c))
+    %     title(titles(c))
     if c == 1
-        %ylabel('Total Cost [$1000]')
+        %         ylabel('Total Cost [$1000]')
     end
     grid on
     ylim([0 1.3*max(max(max(sum(costdata,3))))])
@@ -143,11 +136,11 @@ for c = 1:nu
     set(gca,'XTickMode','manual');
     set(gca,'XTick',1:NumGroupsPerAxis);
     set(gca,'XTickLabelMode','manual');
-    %set(gca,'XTickLabel',opt.locations);
     set(gca,'FontSize',fs2)
+    %set(gca,'XTickLabel',opt.locations);
     xtickangle(45)
     if c == 1
-        %ylabel({'Generation','Capacity [kW]'})
+        %         ylabel({'Generation','Capacity [kW]'})
     end
     grid on
     ylim([0 1.8*max(gendata(:))])
@@ -178,11 +171,11 @@ for c = 1:nu
     set(gca,'XTickMode','manual');
     set(gca,'XTick',1:NumGroupsPerAxis);
     set(gca,'XTickLabelMode','manual');
-    %set(gca,'XTickLabel',opt.locations);
     set(gca,'FontSize',fs2)
+    %set(gca,'XTickLabel',opt.locations);
     xtickangle(45)
     if c == 1
-        %ylabel({'Storage','Capacity [kWh]'})
+        %         ylabel({'Storage','Capacity [kWh]'})
     end
     grid on
     ylim([0 2.2*max(stordata(:))])
@@ -216,7 +209,7 @@ for c = 1:nu
     %set(gca,'XTickLabel',opt.locations);
     xtickangle(45)
     if c == 1
-        %ylabel({'60% Discharge','Cycles per Week'})
+        %         ylabel({'60% Discharge','Cycles per Week'})
     end
     grid on
     ylim([0 1.3*max(cycdata(:))])

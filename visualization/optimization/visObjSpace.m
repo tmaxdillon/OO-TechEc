@@ -15,7 +15,7 @@ output.min.cost = output.min.cost/1000;
 [Smaxgrid,kWgrid] = meshgrid(opt.Smax,opt.kW);
 ms = 100;
 lw = 1.1;
-fs = 14;
+fs = 18;
 z_adj = 100;
 
 %remove failure configurations
@@ -65,22 +65,23 @@ hold on
 %     ms,'filled','MarkerEdgeColor','k', ...
 %     'MarkerFaceColor','w');
 view(0,90)
-xlabel('Storage Capacity [kWh]')
-ylabel('Rated Power [kW]')
+%xlabel('Storage Capacity [kWh]')
+%ylabel('Rated Power [kW]')
 xlim([0 inf])
+yticks([0 1 2 3 4])
 ylim([0 inf])
 %xlim([0 140])
 %ylim([0 3])
 c = colorbar;
-c.Label.String = '[$] in thousands';
+%c.Label.String = '[$] in thousands';
+caxis([0 max(alive(:))]) %to produce cartoon
 lb = (output.min.cost)/max(alive(:));
 AdvancedColormap('bg l w r',8000,[1*lb,lb+.05*(1-lb),lb+0.1*(1-lb),1])
-caxis([0 inf]) %to produce cartoon
 hold on
 % l = legend([s initval minval con],'Input Mesh','Coarse Grid Minima', ...
 %     'Nelder-Mead Minima','Cost Contours','location','NorthEast');
 %l.Color = [.5 .5 .5];
-title('Total Cost')
+%title('Total Cost')
 set(gca,'FontSize',fs)
 set(gca,'LineWidth',lw)
 grid on

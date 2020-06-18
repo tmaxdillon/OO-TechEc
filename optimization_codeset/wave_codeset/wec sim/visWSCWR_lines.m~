@@ -218,21 +218,21 @@ for i = 1:length(Hs_6)
     end
 end
 hold on
-% xline(Tp_trh_ab,'-','Argentine Basin 90% Tp', ...
+xline(Tp_trh_ab,'-','Argentine Basin 90% Tp', ...
+    'DisplayName','10th & 90th prctile Tp');
+xline(Tp_trl_ab,'-','Argentine Basin 10% Tp');
+% xline(Tp_trh_ce,':','Coastal Endurance', ...
 %     'DisplayName','10th & 90th prctile Tp');
-% xline(Tp_trl_ab,'-','Argentine Basin 10% Tp');
-% % xline(Tp_trh_ce,':','Coastal Endurance', ...
-% %     'DisplayName','10th & 90th prctile Tp');
-% % xline(Tp_trl_ce,':');
-% xline(Tp_trh_cp,':','Coastal Pioneer 90% Tp', ...
+% xline(Tp_trl_ce,':');
+xline(Tp_trh_cp,':','Coastal Pioneer 90% Tp', ...
+    'DisplayName','10th & 90th prctile Tp');
+xline(Tp_trl_cp,':','Coastal Pioneer 10% Tp');
+xline(Tp_trh_is,'--','Irminger Sea 90% Tp', ...
+    'DisplayName','10th & 90th prctile Tp');
+xline(Tp_trl_is,'--');
+% xline(Tp_trh_so,'--','Southern Ocean', ...
 %     'DisplayName','10th & 90th prctile Tp');
-% xline(Tp_trl_cp,':','Coastal Pioneer 10% Tp');
-% xline(Tp_trh_is,'--','Irminger Sea 90% Tp', ...
-%     'DisplayName','10th & 90th prctile Tp');
-% xline(Tp_trl_is,'--');
-% % xline(Tp_trh_so,'--','Southern Ocean', ...
-% %     'DisplayName','10th & 90th prctile Tp');
-% % xline(Tp_trl_so,'--');
+% xline(Tp_trl_so,'--');
 ylabel('CWR')
 xlabel('Tp [s]')
 title('Capture Width Ratio')
@@ -307,7 +307,7 @@ hold on
 for i = 1:length(Hs_6)
     if i == h_ind_6
         p6 = plot(linspace(min(Tp_6),max(Tp_6),Tp_res), ...
-            cwr_6_int(i,:)/struct6m_opt.B,'Color',col6m(end,:), ...
+            cwr_6_int(i,:)/struct6m_opt.B,'Color',col5m(end,:), ...
             'DisplayName','6 meter WEC, Hs = 3m','LineWidth',lw1);
     else
         plot(linspace(min(Tp_6),max(Tp_6),Tp_res), ...
@@ -316,21 +316,21 @@ for i = 1:length(Hs_6)
     end
 end
 hold on
-% xline(Tp_trh_ab,'-','Argentine Basin 90% T_p', ...
-%     'DisplayName','10th & 90th prctile T_p');
-% xline(Tp_trl_ab,'-','Argentine Basin 10% T_p');
+xline(Tp_trh_ab,'-','Argentine Basin 90% Tp', ...
+    'DisplayName','10th & 90th prctile Tp');
+xline(Tp_trl_ab,'-','Argentine Basin 10% Tp');
 % xline(Tp_trh_ce,':','Coastal Endurance', ...
 %     'DisplayName','10th & 90th prctile Tp');
 % xline(Tp_trl_ce,':');
-xline(Tp_trh_cp,':','Coastal Pioneer 90% T_p', ...
-    'DisplayName','10th & 90th prctile T_p');
-xline(Tp_trl_cp,':','Coastal Pioneer 10% T_p');
-% xline(Tp_trh_is,'--','Irminger Sea 90% T_p', ...
-%     'DisplayName','10th & 90th prctile T_p');
-% xline(Tp_trl_is,'--','Irminger Sea 10% T_p');
-xline(Tp_trh_so,'--','Southern Ocean 90% T_p', ...
+xline(Tp_trh_cp,':','Coastal Pioneer 90% Tp', ...
     'DisplayName','10th & 90th prctile Tp');
-xline(Tp_trl_so,'--','Southern Ocean 10% T_p');
+xline(Tp_trl_cp,':','Coastal Pioneer 10% Tp');
+xline(Tp_trh_is,'--','Irminger Sea 90% Tp', ...
+    'DisplayName','10th & 90th prctile Tp');
+xline(Tp_trl_is,'--');
+% xline(Tp_trh_so,'--','Southern Ocean', ...
+%     'DisplayName','10th & 90th prctile Tp');
+% xline(Tp_trl_so,'--');
 ylabel('CWR/B')
 xlabel('Tp [s]')
 title('Capture Width Ratio Normalized by WEC Width (B)')
@@ -339,23 +339,6 @@ legend([p1 p2 p3 p4 p5 p6],'location','east')
 grid on
 set(gcf, 'Position', [100, 100, 1000, 350])
 set(gca,'FontSize',13)
-
-figure
-pa = plot(linspace(min(Tp_3),max(Tp_3),Tp_res), ...
-    cwr_3_int(i,:)/struct3m_opt.B,'Color',col3m(end-5,:), ...
-    'DisplayName','3 meter WEC, Hs = 3m','LineWidth',lw1);
-%ylabel('CWR/B')
-%xlabel('Tp [s]')
-%title('Capture Width Ratio Normalized by WEC Width (B)')
-xlim([0 max([Tp_1 ; Tp_2 ; Tp_3 ; Tp_4 ; Tp_5 ; Tp_6])])
-ylim([0 .2])
-legend(pa,'location','east')
-grid on
-set(gcf, 'Position', [100, 100, 1000, 275])
-set(gca,'FontSize',16)
-set(gca,'FontName','Calibri')
-set(gcf,'color','w')
-
 
 set(gcf, 'Position', [100, 100, 1000, 650])
 
