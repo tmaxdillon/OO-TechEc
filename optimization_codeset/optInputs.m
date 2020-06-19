@@ -1,18 +1,18 @@
 %settings
-opt.alllocuses = 0;
+opt.alllocuses = 1;
 opt.sens = 0;
 opt.tdsens = 0;
 opt.senssm = 0;
-opt.bf.m = 20;
-opt.bf.n = 20;
+opt.bf.m = 200;
+opt.bf.n = 2000;
 pm = 1; %power module, 1:Wi 2:In 3:Wa 4:Di
 bc = 2; %battery chemistry 1:AGM 2:LFP
-c = 1;  %use case 1:ST 2:LT
-loc = 'souOcean'; %location
+c = 2;  %use case 1:ST 2:LT
+loc = 'cosEndurance_or'; %location
 econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
 
 %strings
-opt.locations = {'argBasin';'cosEndurance_or';'cosEndurance_wa'; ...
+opt.locations = {'argBasin';'cosEndurance_wa'; ...
     'cosPioneer';'irmSea';'souOcean'};
 opt.powermodules = {'wind';'inso';'wave';'dies'};
 opt.usecases = {'short term';'long term'};
