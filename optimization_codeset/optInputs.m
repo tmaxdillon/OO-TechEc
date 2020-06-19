@@ -7,7 +7,7 @@ opt.bf.m = 20;
 opt.bf.n = 20;
 pm = 1; %power module, 1:Wi 2:In 3:Wa 4:Di
 bc = 2; %battery chemistry 1:AGM 2:LFP
-c = 2;  %use case 1:ST 2:LT
+c = 1;  %use case 1:ST 2:LT
 loc = 'souOcean'; %location
 econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
 
