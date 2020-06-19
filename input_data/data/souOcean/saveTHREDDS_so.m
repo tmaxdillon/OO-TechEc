@@ -130,7 +130,7 @@ souOcean.met.wind_ht_orig = 10;
 
 %adjust time window and interpolate over outages
 [~,souOcean.met.tstart] = min(abs(souOcean.met.time_orig - ...
-    datenum('24-Nov-2015 10:02:37.97')));
+    datenum('15-Dec-2015 10:02:37.97')));
 [~,souOcean.met.tend] = min(abs(souOcean.met.time_orig - ...
     datenum('07-Jul-2018 03:29:33')));
 %time

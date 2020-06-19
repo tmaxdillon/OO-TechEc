@@ -2,13 +2,10 @@ function [] = visWiWaDiIn(pm1,pm2,pm3,pm4)
 
 allStruct = mergeWiWaDiIn(pm1,pm2,pm3,pm4);
 
-%rearrange
 asadj(:,1,:) = allStruct(:,4,:);
 asadj(:,2,:) = allStruct(:,3,:);
 asadj(:,3,:) = allStruct(:,2,:);
 asadj(:,4,:) = allStruct(:,1,:);
-
-allStruct = asadj;
 
 np = 4; %number of power modules
 nc = 6; %number of costs
@@ -59,7 +56,7 @@ for loc = 1:nl
                 costdata(loc,pm,4,c) = ... %gen opex
                     allStruct(loc,pm,c).output.min.wecrepair/1000;
             end
-            if pm == 2 %dies-specific 
+            if pm == 3 %dies-specific 
                 costdata(loc,pm,2,c) = ... %gen capex
                     allStruct(loc,pm,c).output.min.kWcost/1000 + ...
                     allStruct(loc,pm,c).output.min.genencl/1000;
@@ -86,7 +83,7 @@ MaxGroupWidth = 0.75;
 groupOffset = MaxGroupWidth/NumStacksPerGroup;
 titles = {'Short Term Instrumentation'; ...
     'Long Term Instrumentation'};
-pms = {'Solar','Diesel','Wave','Wind'};
+pms = {'Wind','Wave','Diesel','Solar'};
 leg = {'Mooring','WEC CapEx', ...
     'Battery CapEx','WEC OpEx', ...
     'Battery OpEx','Vessel'};

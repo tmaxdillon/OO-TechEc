@@ -86,23 +86,19 @@ for a = 1:size(array,1)
         %title(({'Battery Self-','Discharge-Rate',''}))
 %         xticklabels({'0.5\Gamma',['\Gamma = ' ...
 %             num2str(ta(a,4))],'1.5\Gamma','2\Gamma'})
-        %xticklabels({'1.5','3.0','4.5','6.0'})
-        xticklabels({'1.5%','6.0%'})
+        xticklabels({'1.5','3.0','4.5','6.0'})
     elseif isequal(array(a,1).opt.tuned_parameter,'utp')
         %title(({'Percent','Availability',''}))
         xticklabels({'80%','100%'}) 
     elseif isequal(array(a,1).opt.tuned_parameter,'dep')
         tx = round(4589.*xt,-1);
         xticklabels({num2str(tx(1)),num2str(tx(2))})
-    elseif isequal(array(a,1).opt.tuned_parameter,'dtc')
-        tx = round(9.7461e02.*xt,-1);
-        xticklabels({num2str(tx(1)),num2str(tx(2))})
     end
 end
 
 set(gcf, 'Position', [0, 0, 200, 550])
 set(ax,'FontSize',14)
-set(ax,'LineWidth',1.1)
+set(ax,'LineWidth',1.2)
 set(gcf,'color','w')
 % hL = legend('show','location','southoutside','Orientation','horizontal');
 % newPosition = [0.41 .03 0.2 0.01];
