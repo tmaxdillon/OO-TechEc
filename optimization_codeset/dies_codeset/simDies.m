@@ -1,6 +1,6 @@
-function [cost,surv,CapEx,OpEx,kWcost,Scost,Pmtrl,Pinst,Pline, ...
-    Panchor,vesselcost,genrepair,battreplace,battencl,genencl,fuel, ...
-    triptime,runtime,nvi,nbr,nfr,noc,Fdmax,dp,CF,S,P,D,L] =  ...
+function [cost,surv,CapEx,OpEx,kWcost,Scost,Pmtrl,Pinst,Pmooring, ...
+    vesselcost,genrepair,battreplace,battencl,genencl,fuel, ...
+    triptime,runtime,nvi,nbr,nfr,noc,dp,S,P,D,L] =  ...
     simDies(kW,Smax,opt,data,atmo,batt,econ,uc,bc,dies)
 
 %if fmin is suggesting a negative input (physically impossible), exit
@@ -10,20 +10,11 @@ if opt.fmin && Smax < 0 || kW < 0
     return
 end
 
-if kW > dies.kWmax
-    kW = dies.kWmax;
-end
-
-if kW < dies.kWmin
-    kW = dies.kWmin;
-end
-
 %extract data
 time = data.time;
 dt = 24*(data.met.time(2) - data.met.time(1)); %time in hours
 dist = data.dist; %[m] distance to shore
 depth = data.depth; %[m] water depth
-Amax = data.Amax; %[m] 50 year storm maximum amplitude
 
 %initialize diagnostic variables
 S = zeros(1,length(time)); %battery level timeseries
@@ -57,8 +48,6 @@ for t = 1:length(time)
         L(t) = 0; %load drops to zero
     end
 end
-
-CF = nanmean(P)/(kW*1000); %capacity factor
 
 %dynamic battery degradation model
 if batt.dyn_lc
@@ -103,29 +92,21 @@ if bc == 1 %lead acid
 elseif bc == 2 %lithium phosphate
     Scost = batt.cost*Smax;
 end
-battencl = applyScaleFactor(econ.batt.encl.cost,econ.batt.encl.cap, ...
-    Smax,econ.batt.encl.sf); %battery enclosure
+battencl = econ.batt.enclmult*Scost; %battery enclosure cost
 Pmtrl = (1/1000)*econ.platform.wf*econ.platform.steel* ...
     polyval(opt.p_dev.d_mass,kW); %platform material
 Pinst = econ.vessel.speccost* ... 
     ((econ.platform.t_i+t_add_batt)/24); %platform instllation
 dp = polyval(opt.p_dev.d_size,kW)*dies.bm;
-% if turb.nu*kW > batt.nu*Smax %platform diameter
-%     dp = turb.nu*kW; %set by turbine
-% else
-%     dp = batt.nu*Smax; %set by battery
-% end
-% Fdmax = (1/1000)*(2/(3*pi))*atmo.rho_w*econ.platform.k_ext ...
-%     *econ.platform.Cd*Amax^3*dp;
-% Pmoor = 4*Fdmax*(econ.platform.S*depth*econ.platform.fiber + ...
-%     econ.platform.anchor); %mooring cost
-%Pmoor = dp*depth*econ.platform.moorcost; %mooring cost
-Pline = dp*depth*econ.platform.line;
-Panchor = dp*econ.platform.anchor;
-if Panchor < econ.platform.anchor_min 
-    Panchor = econ.platform.anchor_min;
+if dp < 4 %within bounds, use linear interpolation
+    Pmooring = interp2(econ.platform.mdd.diameter, ...
+        econ.platform.mdd.depth, ...
+        econ.platform.mdd.cost,dp,depth,'linear'); %mooring cost
+else %not within bounds, use spline extrapolation
+    Pmooring = interp2(econ.platform.mdd.diameter, ...
+        econ.platform.mdd.depth, ...
+        econ.platform.mdd.cost,dp,depth,'spline'); %mooring cost
 end
-Fdmax = 0;
 if uc.SI < 12 %short term instrumentation
     triptime = 0; %attributed to instrumentation
     t_os = econ.vessel.t_ms/24; %[d]
@@ -138,15 +119,15 @@ end
 vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr*t_add_batt); %vessel cost
 genrepair = 1/2*kWcost*(uc.dies.lambda-1); %turbine repair cost
 battreplace = Scost*nbr; %number of battery replacements
-CapEx = Pline + Panchor + Pinst + Pmtrl + battencl + Scost + ...
+CapEx = Pmooring + Pinst + Pmtrl + battencl + Scost + ...
     genencl + kWcost;
 OpEx = fuel + battreplace + genrepair + vesselcost;
 cost = CapEx + OpEx;
-if opt.fmin && opt.nm.fmindebug
-    kW
-    cost
-    pause
-end
+% if opt.fmin && opt.nm.fmindebug
+%     kW
+%     cost
+%     pause
+% end
 
 %determine if desired uptime was met. if not, output infinite cost.
 if sum(L == uc.draw)/(length(L)) < uc.uptime

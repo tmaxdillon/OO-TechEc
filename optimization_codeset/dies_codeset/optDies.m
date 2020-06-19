@@ -4,7 +4,15 @@ function [output,opt] = optDies(opt,data,atmo,batt,econ,uc,bc,dies)
 opt.kW_1 = dies.kWmin; %min size
 opt.kW_m = dies.kWmax; %max size
 opt.Smax_1 = 1;
-opt.Smax_n = uc.draw*24*opt.nm.battgriddur/1000*(1/3); %bgd days no power
+opt.Smax_n = opt.bf.N; %[kWh]
+
+%set sensitivity modifiers to 1 if absent
+if ~isfield(data,'depth_mod')
+    data.depth_mod = 1; %capture width modifier
+end
+if ~isfield(data,'dist_mod')
+    data.dist_mod = 1; %capture width modifier
+end
 
 %check to make sure coarse mesh will work
 opt.fmin = false;
@@ -18,76 +26,65 @@ while ~check_s
     end
 end
 
-%initialize inputs/outputs
-opt.kW = linspace(opt.kW_1,opt.kW_m,opt.nm.m);              %[kW] 
-opt.Smax = linspace(opt.Smax_1,opt.Smax_n,opt.nm.n);        %[kWh] 
-output.cost = zeros(opt.nm.m,opt.nm.n);
-output.surv = zeros(opt.nm.m,opt.nm.n);
-
-%initial/coarse optimization
-tInitOpt = tic;
-disp('Populating coarse grid...')
-for i = 1:opt.nm.m
-    for j = 1:opt.nm.n
-        [output.cost(i,j),output.surv(i,j)] = ...
-            simDies(opt.kW(i),opt.Smax(j),opt,data,atmo,batt,econ, ...
-            uc,bc,dies);
+%initialize inputs/outputs and set up for parallelization
+m = opt.bf.m;
+n = opt.bf.n;
+opt.kW = linspace(opt.kW_1,opt.kW_m,m);              %[kW]
+opt.Smax = linspace(opt.Smax_1,opt.Smax_n,n);    %[kWh]
+[K,S] = meshgrid(opt.kW,opt.Smax);
+K = reshape(K,[m*n 1]);
+S = reshape(S,[m*n 1]);
+C_temp = zeros(m*n,1);
+S_temp = zeros(m*n,1);
+X = zeros(m*n,1);
+%set number of cores
+if isempty(gcp('nocreate')) %no parallel pool running
+    cores = feature('numcores'); %find number of cofes
+    if cores > 2 %only start if using HPC
+        parpool(cores);
     end
 end
-X = output.cost;
-X(output.surv == 0) = inf;
-%no initial minima near origin
-X(:,1:floor(opt.nm.n*opt.nm.initminlim)) = inf;
-X(1:floor(opt.nm.m*opt.nm.initminlim),:) = inf;
-[I(1),I(2)] = find(X == min(X(:)),1,'first');
-opt.init = output.cost(I(1),I(2));
-opt.kW_init = opt.kW(I(1));
-opt.Smax_init = opt.Smax(I(2));
-opt.I_init = I;
-output.tInitOpt = toc(tInitOpt);
+%parallel computing via parfor
+tGrid = tic;
+disp(['Populating grid values: m=' num2str(m) ', n=' num2str(n)])
+parfor (i = 1:m*n,opt.bf.maxworkers)
+    [C_temp(i),S_temp(i)] = ...
+        simDies(K(i),S(i),opt,data,atmo,batt,econ,uc,bc,dies);
+    if S_temp(i) == 0 %update obj val X
+        X(i) = inf;
+    else
+        X(i) = C_temp(i);
+    end
+end
+output.cost = reshape(C_temp,[m n])'; %return cost to matrix and structure
+output.surv = reshape(S_temp,[m n])'; %return surv to matrix and structure
+X = reshape(X,[m n])'; %return objval X to matrix
+output.tGrid = toc(tGrid);
 
-%nelder mead optimization
-tFminOpt = tic; %start timer
-opt.fmin = true; %let simWind know that fminsearch is on
-%objective function
-fun = @(x)simDies(x(1),x(2),opt,data,atmo,batt,econ,uc,bc,dies);
-%set options (show convergence and objective space or not)
-if opt.nm.show
-    options = optimset('MaxFunEvals',10000,'Algorithm', ... 
-        'sqp','MaxIter',10000, ...
-        'TolFun',opt.nm.tolfun,'TolX',opt.nm.tolx, ... 
-        'PlotFcns',@optimplotfval);
-else
-    options = optimset('MaxFunEvals',10000,'Algorithm', ... 
-        'sqp','MaxIter',10000, ...
-        'TolFun',opt.nm.tolfun,'TolX',opt.nm.tolx);
-end
-disp('Beginning Nelder Mead')
-%fminsearch
-[opt_ind] = ...
-    fminsearch(fun,[opt.kW_init opt.Smax_init],options);
-%store outputs of minima into output.min
-if opt_ind(1) > dies.kWmax
-    output.min.kW = dies.kWmax;
-else
-    output.min.kW = opt_ind(1);
-end
-output.min.Smax = opt_ind(2);
+disp('Brute forcing global minimum...')
+[I(1),I(2)] = find(X == min(X(:)),1,'first');
+output.min.kW = opt.kW(I(1));
+output.min.Smax = opt.Smax(I(2));
 [output.min.cost,output.min.surv,output.min.CapEx,output.min.OpEx,...
     output.min.kWcost,output.min.Scost,output.min.Pmtrl,...
-    output.min.Pinst,output.min.Pline,output.min.Panchor, ...
+    output.min.Pinst,output.min.Pmooring, ...
     output.min.vesselcost,output.min.genrepair, ...
     output.min.battreplace,output.min.battencl,output.min.genencl, ...
     output.min.fuel,output.min.triptime,output.min.runtime, ... 
     output.min.nvi,output.min.nbr,output.min.nfr,output.min.noc, ...
-    output.min.Fdmax,output.min.dp, ...
-    output.min.CF,output.min.S,output.min.P,output.min.D,output.min.L] ...
+    output.min.dp,output.min.S,output.min.P,output.min.D,output.min.L] ...
     = simDies(output.min.kW,output.min.Smax, ...
     opt,data,atmo,batt,econ,uc,bc,dies);
-output.min.cyc60 = countCycles(output.min.S,output.min.Smax,60);
-output.min.cyc80 = countCycles(output.min.S,output.min.Smax,80);
-output.min.cyc100 = countCycles(output.min.S,output.min.Smax,100);
-output.tFminOpt = toc(tFminOpt); %end timer
+output.min.batt_dyn_lc = batt.lc_nom*(output.min.Smax/ ...
+    (output.min.Smax - (min(output.min.S)/1000)))^batt.beta;
+output.min.CF = mean(output.min.P)/(1000*output.min.kW);
+%cycles per year
+output.min.cyc60 = countCycles(output.min.S,output.min.Smax,60)/ ...
+    (length(data.wave.time)/8760);
+output.min.cyc80 = countCycles(output.min.S,output.min.Smax,80)/ ...
+    (length(data.wave.time)/8760);
+output.min.cyc100 = countCycles(output.min.S,output.min.Smax,100)/ ...
+    (length(data.wave.time)/8760);
 
 end
 

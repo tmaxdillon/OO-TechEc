@@ -1,6 +1,6 @@
 function [cost,surv,CapEx,OpEx,Mcost,Scost,Ecost,Icost,Strcost, ...
-    Pmtrl,Pinst,Pmooring,vesselcost,battreplace,battencl, ...
-    triptime,nvi,dp,S,P,D,L,eff_t,pvci,battlc] = ...
+    Pmtrl,Pinst,Pline,Panchor,vesselcost,battreplace,battencl, ...
+    triptime,nvi,Fdmax,dp,CF,S,P,D,L,eff_t,pvci,battlc] = ...
     simInso(kW,Smax,opt,data,atmo,batt,econ,uc,bc,inso)
 
 %if fmin is suggesting a negative input, block it
@@ -144,6 +144,8 @@ else
     t_add_batt = 0;
 end
 
+CF = nanmean(P)/(kW*1000); %capacity factor [W_avg/W_rated]
+
 %economic modeling
 Mcost = econ.inso.module*kW*econ.inso.marinization; %module
 Icost = econ.inso.installation*kW; %installation
@@ -158,20 +160,30 @@ if bc == 1 %lead acid
 elseif bc == 2 %lithium phosphate
     Scost = batt.cost*Smax;
 end
-battencl = econ.batt.enclmult*Scost; %battery enclosure cost
+battencl = applyScaleFactor(econ.batt.encl.cost,econ.batt.encl.cap, ...
+    Smax,econ.batt.encl.sf); %battery enclosure
 if Smax > 8030, battencl = 2085142.66; end %hard coded, can't be negative
 Pmtrl = (1/1000)*econ.platform.wf*econ.platform.steel* ...
     inso.wf*kW/inso.rated; %platform material
 Pinst = econ.vessel.speccost* ... 
     ((econ.platform.t_i+t_add_batt)/24); %platform instllation
 dp = getInsoDiameter(kW,inso);
-if dp < 4 %within bounds, use linear interpolation
-    Pmooring = interp2(econ.platform.mdd.diameter,econ.platform.mdd.depth, ...
-        econ.platform.mdd.cost,dp,depth,'linear'); %mooring cost
-else %not within bounds, use spline extrapolation
-    Pmooring = interp2(econ.platform.mdd.diameter,econ.platform.mdd.depth, ...
-        econ.platform.mdd.cost,dp,depth,'spline'); %mooring cost
+% if inso.nu*kW > batt.nu*Smax %platform diameter
+%     dp = inso.nu*kW; %set by panels
+% else
+%     dp = batt.nu*Smax; %set by battery
+% end
+% Fdmax = (1/1000)*(2/(3*pi))*atmo.rho_w*econ.platform.k_ext ...
+%     *econ.platform.Cd*Amax^3*dp;
+% Pmoor = 4*Fdmax*(econ.platform.S*depth*econ.platform.fiber + ...
+%     econ.platform.anchor); %mooring cost
+%Pmoor = dp*depth*econ.platform.moorcost; %mooring cost
+Pline = dp*depth*econ.platform.line;
+Panchor = dp*econ.platform.anchor;
+if Panchor < econ.platform.anchor_min 
+    Panchor = econ.platform.anchor_min;
 end
+Fdmax = 0;
 if inso.cleanstrat == 1
     nvi = nbr;
 elseif inso.cleanstrat == 2
@@ -199,15 +211,15 @@ end
 vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr*t_add_batt); %vessel cost
 battreplace = Scost*(12/batt.lc*uc.lifetime-1);
 if battreplace < 0, battreplace = 0; end
-CapEx = Pmooring + Pinst + Pmtrl + battencl + Scost + Icost + ...
+CapEx = Pline + Panchor + Pinst + Pmtrl + battencl + Scost + Icost + ...
     Mcost + Ecost + Strcost;
 OpEx = battreplace + vesselcost;
 cost = CapEx + OpEx;
-% if opt.fmin && opt.nm.fmindebug
-%     kW
-%     cost
-%     pause
-% end
+if opt.fmin && opt.nm.fmindebug
+    kW
+    cost
+    pause
+end
 
 %evaluate if system requirements were met
 if sum(L == uc.draw)/(length(L)) < uc.uptime

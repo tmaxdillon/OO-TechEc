@@ -2,10 +2,10 @@
 opt.alllocuses = 0;
 opt.sens = 0;
 opt.tdsens = 0;
-opt.senssm = 1;
+opt.senssm = 0;
 opt.bf.m = 20;
 opt.bf.n = 20;
-pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
+pm = 1; %power module, 1:Wi 2:In 3:Wa 4:Di
 bc = 2; %battery chemistry 1:AGM 2:LFP
 c = 2;  %use case 1:ST 2:LT
 loc = 'souOcean'; %location

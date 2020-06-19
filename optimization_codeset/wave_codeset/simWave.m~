@@ -93,15 +93,11 @@ Pmtrl = 0;
 Pinst = econ.vessel.speccost* ... 
     ((econ.platform.t_i+t_add_batt)/24); %platform instllation
 dp = width;
-if dp < 4 %within bounds, use linear interpolation
-    Pmooring = interp2(econ.platform.mdd.diameter, ...
-        econ.platform.mdd.depth, ...
-        econ.platform.mdd.cost,dp,depth,'linear'); %mooring cost
-else %not within bounds, use spline extrapolation
-    Pmooring = interp2(econ.platform.mdd.diameter, ...
-        econ.platform.mdd.depth, ...
-        econ.platform.mdd.cost,dp,depth,'spline'); %mooring cost
-end
+if dp > 4, dp = 4; end %just to keep within mdd bounds, temporary
+Pmooring = interp2(econ.platform.mdd.diameter,econ.platform.mdd.depth, ...
+    econ.platform.mdd.cost,dp,depth,'linear'); %mooring cost
+Pmooring = interp2(econ.platform.mdd.diameter,econ.platform.mdd.depth, ...
+    econ.platform.mdd.cost,dp,depth,'linear'); %mooring cost
 if uc.SI < 12
     triptime = 0; %attributed to instrumentation
     t_os = econ.vessel.t_ms/24; %[d]
@@ -119,11 +115,11 @@ CapEx = Pmooring + Pinst + Pmtrl + ...
     battencl + Scost + Icost + kWcost;
 OpEx = battreplace + wecrepair + vesselcost;
 cost = CapEx + OpEx;
-% if opt.fmin && opt.nm.fmindebug
-%     kW
-%     cost
-%     %pause
-% end
+if opt.fmin && opt.nm.fmindebug
+    kW
+    cost
+    %pause
+end
 
 if sum(L == uc.draw)/(length(L)) < uc.uptime 
     surv = 0;
