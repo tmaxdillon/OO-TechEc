@@ -1,14 +1,17 @@
-function [] = visWiWaDiIn(pm1,pm2,pm3,pm4)
+function [] = visWiWaDiIn_hl(pm1,pm2,pm3,pm4)
 
 allStruct = mergeWiWaDiIn(pm1,pm2,pm3,pm4);
 
+%rearrange
 asadj(:,1,:) = allStruct(:,4,:);
 asadj(:,2,:) = allStruct(:,3,:);
 asadj(:,3,:) = allStruct(:,2,:);
 asadj(:,4,:) = allStruct(:,1,:);
 
+allStruct = asadj;
+
 np = 4; %number of power modules
-nc = 6; %number of costs
+nc = 2; %number of costs
 nl = size(pm1,1); %number of locations
 nu = size(pm1,2); %number of use cases
 
@@ -25,42 +28,40 @@ opt = allStruct(1,1,1).opt;
 for loc = 1:nl
     for pm = 1:np
         for c = 1:nu
-            costdata(loc,pm,1,c) = ... %platform
+            costdata(loc,pm,1,c) = ... %capex
                 allStruct(loc,pm,c).output.min.Pinst/1000 + ...
-                allStruct(loc,pm,c).output.min.Pmooring/1000;
-            costdata(loc,pm,6,c) = ... %vessel
-                allStruct(loc,pm,c).output.min.vesselcost/1000;
-            costdata(loc,pm,3,c) = ... %storage capex
+                allStruct(loc,pm,c).output.min.Pmooring/1000 + ...
                 allStruct(loc,pm,c).output.min.Scost/1000 + ...
                 allStruct(loc,pm,c).output.min.battencl/1000;
-            costdata(loc,pm,5,c) = ... %storage opex
-                allStruct(loc,pm,c).output.min.battreplace/1000;
+            costdata(loc,pm,2,c) = ... %opex
+                allStruct(loc,pm,c).output.min.vesselcost/1000 + ...
+                allStruct(loc,pm,c).output.min.battreplace/1000;                
             if pm == 4 %wind-specific
-                costdata(loc,pm,2,c) = ... %gen capex
+                costdata(loc,pm,1,c) = costdata(loc,pm,1,c) + ... 
                     allStruct(loc,pm,c).output.min.kWcost/1000 + ...
                     allStruct(loc,pm,c).output.min.Icost/1000;
-                costdata(loc,pm,4,c) = ... %gen opex
+                costdata(loc,pm,2,c) = costdata(loc,pm,2,c) + ... 
                     allStruct(loc,pm,c).output.min.turbrepair/1000;            
             end
             if pm == 1 %inso-specific
-                costdata(loc,pm,2,c) = ... %gen capex
+                costdata(loc,pm,1,c) = costdata(loc,pm,1,c) + ... 
                     allStruct(loc,pm,c).output.min.Mcost/1000 + ...
                     allStruct(loc,pm,c).output.min.Ecost/1000 + ...
                     allStruct(loc,pm,c).output.min.Icost/1000 + ...
                     allStruct(loc,pm,c).output.min.Strcost/1000;
             end
             if pm == 3 %wave-specific
-                costdata(loc,pm,2,c) = ... %gen capex
+                costdata(loc,pm,1,c) = costdata(loc,pm,1,c) + ... 
                     allStruct(loc,pm,c).output.min.kWcost/1000 + ...
                     allStruct(loc,pm,c).output.min.Icost/1000;
-                costdata(loc,pm,4,c) = ... %gen opex
+                costdata(loc,pm,2,c) = costdata(loc,pm,2,c) + ... 
                     allStruct(loc,pm,c).output.min.wecrepair/1000;
             end
-            if pm == 3 %dies-specific 
-                costdata(loc,pm,2,c) = ... %gen capex
+            if pm == 2 %dies-specific 
+                costdata(loc,pm,1,c) = costdata(loc,pm,1,c) + ... 
                     allStruct(loc,pm,c).output.min.kWcost/1000 + ...
                     allStruct(loc,pm,c).output.min.genencl/1000;
-                costdata(loc,pm,4,c) = ... %gen opex
+                costdata(loc,pm,2,c) = costdata(loc,pm,2,c) + ... 
                     allStruct(loc,pm,c).output.min.genrepair/1000 + ...
                     allStruct(loc,pm,c).output.min.fuel/1000;
             end
@@ -83,10 +84,8 @@ MaxGroupWidth = 0.75;
 groupOffset = MaxGroupWidth/NumStacksPerGroup;
 titles = {'Short Term Instrumentation'; ...
     'Long Term Instrumentation'};
-pms = {'Wind','Wave','Diesel','Solar'};
-leg = {'Mooring','WEC CapEx', ...
-    'Battery CapEx','WEC OpEx', ...
-    'Battery OpEx','Vessel'};
+pms = {'Solar','Diesel','Wave','Wind'};
+leg = {'CapEx','OpEx'};
 fs = 11; %font size
 fs2 = 15; %axis font size
 cbuff = 10; %cost text buffer
@@ -95,11 +94,15 @@ bbuff = 10;  %battery text buffer
 cybuff = .7; %battery cycle buffer
 
 %colors
-cols = 6;
-col(1,:) = [0,0,51]/256; %platform cost
-col([2 4],:) = flipud(brewermap(2,'purples')); %generation cost
-col([3 5],:) = flipud(brewermap(2,'blues')); %storage cost
-col(6,:) = [238,232,170]/256; %vessel cost
+cols = 2;
+col(1,:,1) = [255 130 130]/256; %inso capex
+col(2,:,1) = [255 204 204]/256; %inso opex
+col(1,:,2) = [160 160 160]/256; %dies capex
+col(2,:,2) = [220 220 220]/256; %dies opex
+col(1,:,3) = [153,153,255]/256; %wave capex
+col(2,:,3) = [204 204 255]/256; %wave opex
+col(1,:,4) = [132 235 163]/256; %wind capex
+col(2,:,4) = [204 255 204]/256; %wind opex
 gscol(1:5,:) = flipud(brewermap(5,'reds')); %generation capacity
 gscol(6:10,:) = flipud(brewermap(5,'oranges')); %storage capacity
 
@@ -126,10 +129,10 @@ for c = 1:nu
         end
         %set colors and legend
         for lay = 1:cols
-            h(i,lay,c).CData = col(lay,:);
+            h(i,lay,c).CData = col(lay,:,i);
         end
         if c == 2 && i == np
-            legend(h(i,:,c),leg,'Location','northeast')
+            %legend(h(i,:,c),leg,'Location','northeast')
         end
     end
     hold off;
@@ -144,7 +147,7 @@ for c = 1:nu
         %ylabel('Total Cost [$1000]')
     end
     grid on
-    ylim([0 1.25*max(max(max(sum(costdata,3))))])
+    ylim([0 1.15*max(max(max(sum(costdata,3))))])
     linkaxes(ax(1,:),'y')
     
     ax(2,c) = subplot(7,nu,8+c);
@@ -178,7 +181,7 @@ for c = 1:nu
         %ylabel({'Generation','Capacity [kW]'})
     end
     grid on
-    ylim([0 1.8*max(gendata(:))])
+    ylim([0 1.9*max(gendata(:))])
     %yticks([0 1 2 3])
     linkaxes(ax(2,:),'y')
     
@@ -213,7 +216,7 @@ for c = 1:nu
         %ylabel({'Storage','Capacity [kWh]'})
     end
     grid on
-    ylim([0 2.2*max(stordata(:))])
+    ylim([0 2.5*max(stordata(:))])
     linkaxes(ax(3,:),'y')
     
     ax(4,c) = subplot(7,nu,12+c);

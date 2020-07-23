@@ -18,10 +18,12 @@ ms = 50;
 fs = 16;
 lw = 1.2;
 
-[Xq,Yq] = meshgrid(linspace(0,max(diameter(:))+4,n), ...
+addond = 0; %add on diameter range
+
+[Xq,Yq] = meshgrid(linspace(0,max(diameter(:))+addond,n), ...
     linspace(0,max(depth(:)),n));
 
-Cq = interp2(diameter,depth,cost,Xq,Yq,'spline');
+Cq = interp2(diameter,depth,cost,Xq,Yq,'linear');
 % Eq = interp2(diameter,depth,e_tension,Xq,Yq,'linear');
 
 %cost
@@ -32,13 +34,13 @@ hold on
 view(0,90)
 xlabel('WEC Diameter [m]')
 ylabel('Water Depth [m]')
-xlim([.9 8.1])
+xlim([.9 (4 +.1 + addond)])
 ylim([0 5600])
 c = colorbar;
 c.Label.String = '[$k]';
-%colormap(brewermap(10,'blues'))
-colormap(flipud(viridis(16)))
-%caxis([0 80])
+colormap(brewermap(8,'reds'))
+%colormap(flipud(viridis(16)))
+caxis([0 80])
 %[~,con] = contour3(Xq,Yq,Cq./1000,'LineColor','w','LineWidth',.5);
 hold on
 scatter3(diameter(:),depth(:),cost(:)./1000+z_adj,ms,'filled', ...

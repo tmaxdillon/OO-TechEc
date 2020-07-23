@@ -147,7 +147,7 @@ for c = 1:nu
         %ylabel('Total Cost [$1000]')
     end
     grid on
-    ylim([0 1.25*max(max(max(sum(costdata,3))))])
+    ylim([0 1.15*max(max(max(sum(costdata,3))))])
     linkaxes(ax(1,:),'y')
     
     ax(2,c) = subplot(7,nu,8+c);
@@ -181,7 +181,7 @@ for c = 1:nu
         %ylabel({'Generation','Capacity [kW]'})
     end
     grid on
-    ylim([0 1.8*max(gendata(:))])
+    ylim([0 1.9*max(gendata(:))])
     %yticks([0 1 2 3])
     linkaxes(ax(2,:),'y')
     
@@ -216,7 +216,7 @@ for c = 1:nu
         %ylabel({'Storage','Capacity [kWh]'})
     end
     grid on
-    ylim([0 2.2*max(stordata(:))])
+    ylim([0 2.5*max(stordata(:))])
     linkaxes(ax(3,:),'y')
     
     ax(4,c) = subplot(7,nu,12+c);

@@ -5,14 +5,14 @@ opt.tdsens = 0;
 opt.senssm = 0;
 opt.bf.m = 20;
 opt.bf.n = 20;
-pm = 1; %power module, 1:Wi 2:In 3:Wa 4:Di
+pm = 4; %power module, 1:Wi 2:In 3:Wa 4:Di
 bc = 2; %battery chemistry 1:AGM 2:LFP
 c = 2;  %use case 1:ST 2:LT
-loc = 'souOcean'; %location
+loc = 'cosEndurance_or'; %location
 econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
 
 %strings
-opt.locations = {'argBasin';'cosEndurance_or';'cosEndurance_wa'; ...
+opt.locations = {'argBasin';'cosEndurance_wa'; ...
     'cosPioneer';'irmSea';'souOcean'};
 opt.powermodules = {'wind';'inso';'wave';'dies'};
 opt.usecases = {'short term';'long term'};
@@ -57,7 +57,7 @@ econ.vessel.t_ms = 1;               %[h] time on site for maint (spec)
 % econ.batt.encl.sf = .5;             %scaling factor
 % econ.batt.encl.cost = 5000;         %[$], WAMP
 % econ.batt.encl.cap = 10;            %[kWh]
-econ.batt.enclmult = 2;             %multiplier on battery cost for encl
+econ.batt.enclmult = 1;             %multiplier on battery cost for encl
 %wind
 econ.wind.installed = 10117;        %[$/kW] installed cost (DWR)
 %econ.wind.mim = 137/49;             %marine installment multiplier (CoWR)
@@ -120,6 +120,7 @@ wave.eta_ct = 0.6;          %[~] wec efficiency
 wave.house = 0.10;          %percent of rated power as house load
 %wave.enf_wave_med = false;  %enforce median sea state
 %wave.nu = 1.21;             %[m/kW]
+wave.method = 2;            %1: 3d interpolation, 2: 
 %diesel parameters
 dies.fmax = 800;            %[liters] fuel capacity
 dies.ftmax = 18;            %[m] fuel can sit idle before going "bad"

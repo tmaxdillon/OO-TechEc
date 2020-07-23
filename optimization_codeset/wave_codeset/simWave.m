@@ -14,22 +14,33 @@ end
 cw_mod = wave.cw_mod;
 
 %extract data
-Hs = data.wave.significant_wave_height; %[m]
-cwr_b = wave.cw_mod.*opt.wave.cwr_b_ts; %[m^-1] Tp eta timeseries (cwr/b)
 wavepower = opt.wave.wavepower_ts; %wavepower timeseries
-T = length(cwr_b); %total time steps
-dt = 24*(data.wave.time(2) - data.wave.time(1)); %time in hours
+T = length(opt.wave.wavepower_ts); %total time steps
+dt = 24*(data.wave.time(2) - data.wave.time(1)); %delta time in hours
 dist = data.dist*data.dist_mod; %[m] dist to shore
 depth = data.depth*data.depth_mod;   %[m] water depth
 
-%find width through rated power conditions
-width = sqrt(1000*kW*(1+wave.house)/(wave.eta_ct* ...
-    cw_mod*opt.wave.cwr_b_ra* ...
-    opt.wave.wavepower_ra)); %[m] physical width of wec
-P = (wave.eta_ct.*width.^2.*cwr_b.*wavepower - kW*wave.house); %[kW]
-P(Hs./opt.wave.L > .14) = 0; %breaking waves, set to zero
+tic
+if wave.method == 1 %divide by B methodology       
+    cwr_b = wave.cw_mod.*opt.wave.cwr_b_ts; %[m^-1] eta timeseries (cwr/b)    
+    %find width through rated power conditions
+    width = sqrt(1000*kW*(1+wave.house)/(wave.eta_ct* ...
+        cw_mod*opt.wave.cwr_b_ra* ...
+        opt.wave.wavepower_ra)); %[m] physical width of wec
+    cw = cwr_b.*width^2; %[m] capture width timeseries
+elseif wave.method == 2 %3d interpolation methodology
+    %extract data
+    Hs = data.wave.significant_wave_height; %Hs timeseries
+    Tp = data.wave.peak_wave_period; %Tp timeseries
+    %find width through rated power conditions
+    width = interp1(opt.wave.B_func(2,:),opt.wave.B_func(1,:),kW); %[m], B
+    cw = width.*opt.wave.F(Tp,Hs,width*ones(length(Tp),1)); %[m] cw ts
+end
+toc
+
+%compute power timeseries
+P = wave.eta_ct*cw.*wavepower - kW*wave.house; %[kW] 
 P(P<0) = 0; %no negative power
-cw = cwr_b.*width^2; %m
 P(P>kW) = kW; %no larger than rated power
 
 %initialize
@@ -40,7 +51,7 @@ L = ones(1,T)*uc.draw; %power put to sensing timeseries
 surv = 1;
 
 %run simulation
-for t = 1:T    
+for t = 1:T
     sd = S(t)*(batt.sdr/100)*(1/(30*24))*dt; %[Wh] self discharge
     S(t+1) = dt*(P(t)*1000 - uc.draw) + S(t) - sd; %[Wh]
     if S(t+1) > Smax*1000 %dump power if over limit
@@ -58,7 +69,7 @@ P = P*1000; %convert to watts
 if batt.dyn_lc
     opt.phi = Smax/(Smax - (min(S)/1000)); %extra depth
     batt.lc = batt.lc_nom*opt.phi^(batt.beta); %new lifetime
-    batt.lc(batt.lc > batt.lc_max) = batt.lc_max; %no larger than max 
+    batt.lc(batt.lc > batt.lc_max) = batt.lc_max; %no larger than max
 else
     batt.lc = batt.lc_nom; %[m]
 end
@@ -75,7 +86,7 @@ end
 
 %economic modeling
 kWcost = 2*econ.wave.costmult*polyval(opt.p_dev.t,kW); %wec
-Icost = (econ.wind.installed - kWcost/ ... 
+Icost = (econ.wind.installed - kWcost/ ...
     (kW*econ.wave.costmult))*kW; %installation
 if Icost < 0, Icost = 0; end
 if bc == 1 %lead acid
@@ -90,7 +101,7 @@ elseif bc == 2 %lithium phosphate
 end
 battencl = econ.batt.enclmult*Scost; %battery enclosure cost
 Pmtrl = 0;
-Pinst = econ.vessel.speccost* ... 
+Pinst = econ.vessel.speccost* ...
     ((econ.platform.t_i+t_add_batt)/24); %platform instllation
 dp = width;
 if dp < 1, dp = 1; end
@@ -116,7 +127,7 @@ vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr*t_add_batt); %vessel cost
 wecrepair = 1/2*kWcost*(nvi-1); %wec repair cost
 if wecrepair < 0, wecrepair = 0; end %if nvi = 0, wec repair must be 0
 battreplace = Scost*nbr; %number of battery replacements
-CapEx = Pmooring + Pinst + Pmtrl + ... 
+CapEx = Pmooring + Pinst + Pmtrl + ...
     battencl + Scost + Icost + kWcost;
 OpEx = battreplace + wecrepair + vesselcost;
 cost = CapEx + OpEx;
@@ -126,7 +137,7 @@ cost = CapEx + OpEx;
 %     %pause
 % end
 
-if sum(L == uc.draw)/(length(L)) < uc.uptime 
+if sum(L == uc.draw)/(length(L)) < uc.uptime
     surv = 0;
     if opt.fmin
         cost = inf;

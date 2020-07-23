@@ -81,7 +81,7 @@ for a = 1:size(array,1)
         %         xticklabels({'0.5L_{batt}',['L_{batt} = ' ...
         %             num2str(ta(a,4))],'1.5L_{batt}','2L_{batt}'})
         xticklabels({'9','36'})
-        set(gca,'xdir','reverse')
+        %set(gca,'xdir','reverse')
     elseif isequal(array(a,1).opt.tuned_parameter,'sdr')
         %title(({'Battery Self-','Discharge-Rate',''}))
 %         xticklabels({'0.5\Gamma',['\Gamma = ' ...

@@ -1,11 +1,11 @@
 %settings
-opt.alllocuses = 1;
+opt.alllocuses = 0;
 opt.sens = 0;
 opt.tdsens = 0;
 opt.senssm = 0;
 opt.bf.m = 20;
 opt.bf.n = 20;
-pm = 4; %power module, 1:Wi 2:In 3:Wa 4:Di
+pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
 bc = 2; %battery chemistry 1:AGM 2:LFP
 c = 2;  %use case 1:ST 2:LT
 loc = 'cosEndurance_or'; %location
@@ -57,7 +57,7 @@ econ.vessel.t_ms = 1;               %[h] time on site for maint (spec)
 % econ.batt.encl.sf = .5;             %scaling factor
 % econ.batt.encl.cost = 5000;         %[$], WAMP
 % econ.batt.encl.cap = 10;            %[kWh]
-econ.batt.enclmult = 2;             %multiplier on battery cost for encl
+econ.batt.enclmult = 1;             %multiplier on battery cost for encl
 %wind
 econ.wind.installed = 10117;        %[$/kW] installed cost (DWR)
 %econ.wind.mim = 137/49;             %marine installment multiplier (CoWR)
@@ -107,19 +107,10 @@ wave.wsr = 'struct3m_opt';  %wec sim run
 wave.wsHs = 3;              %[m] wec sim Hs
 wave.Hs_ra = 3;             %[m], rated wave height
 wave.Tp_ra = 10;            %[s], rated peak period
-%wave.w = 60;                %width of gaussian power matrix in Hs
 wave.eta_ct = 0.6;          %[~] wec efficiency
-%wave.kW_gf = 0.5;           %resource % reduction for coarse grid
-%wave.tp_N = 1000;           %discretization for Tp skewed gaussian fit
-%wave.tp_res = 0.2;          %multiplier on median tp for resonance
-%wave.tp_rated = 1;          %multiplier on median tp for rated power
-%wave.hs_res = 1;            %multiplier on median hs for resonance
-%wave.hs_rated = 1.2;          %multiplier on median hs for rated power
-%wave.med_prob = 0.01;        %median probability for skewed gaussian
-%wave.cutout = 15;           %wavepower X times ratedpower initiates cutout
 wave.house = 0.10;          %percent of rated power as house load
-%wave.enf_wave_med = false;  %enforce median sea state
-%wave.nu = 1.21;             %[m/kW]
+wave.method = 1;            %1: divide by B, 2: 3d interpolation
+wave.B_func_n = 1000;       %number of points in B(Gr) function
 %diesel parameters
 dies.fmax = 800;            %[liters] fuel capacity
 dies.ftmax = 18;            %[m] fuel can sit idle before going "bad"

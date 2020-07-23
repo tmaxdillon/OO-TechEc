@@ -1,3 +1,8 @@
+close all
+%set(0,'defaulttextinterpreter','none')
+set(0,'defaulttextinterpreter','latex')
+set(0,'DefaultTextFontname', 'helvetica')
+set(0,'DefaultAxesFontName', 'helvetica')
 
 %load data
 load('argBasin')
@@ -101,7 +106,7 @@ end
 
 %set discretization
 Tp_res = 1000;
-%preallocate 
+%preallocate
 cwr_1_int = zeros(length(Hs_1),Tp_res);
 cwr_2_int = zeros(length(Hs_2),Tp_res);
 cwr_3_int = zeros(length(Hs_3),Tp_res);
@@ -143,7 +148,7 @@ col5m = brewermap(length(Hs_5)*2,'purples');
 col6m = brewermap(length(Hs_6)*2,'greys');
 
 figure
-subplot(2,1,1)
+ax(1) = subplot(2,1,1);
 for i = 1:length(Hs_1)
     hold on
     if i == h_ind_1
@@ -235,13 +240,16 @@ hold on
 % % xline(Tp_trl_so,'--');
 ylabel('CWR')
 xlabel('Tp [s]')
-title('Capture Width Ratio')
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle', ... 
+    'HorizontalAlignment','right')
+%title('Capture Width Ratio')
 xlim([0 max([Tp_1 ; Tp_2 ; Tp_3 ; Tp_4 ; Tp_5 ; Tp_6])])
 legend([p1 p2 p3 p4 p5 p6],'location','east')
 grid on
 set(gca,'FontSize',13)
 
-subplot(2,1,2)
+ax(2) = subplot(2,1,2);
 for i = 1:length(Hs_1)
     hold on
     if i == h_ind_1
@@ -320,41 +328,45 @@ hold on
 %     'DisplayName','10th & 90th prctile T_p');
 % xline(Tp_trl_ab,'-','Argentine Basin 10% T_p');
 % xline(Tp_trh_ce,':','Coastal Endurance', ...
-%     'DisplayName','10th & 90th prctile Tp');
-% xline(Tp_trl_ce,':');
-xline(Tp_trh_cp,':','Coastal Pioneer 90% T_p', ...
-    'DisplayName','10th & 90th prctile T_p');
-xline(Tp_trl_cp,':','Coastal Pioneer 10% T_p');
-% xline(Tp_trh_is,'--','Irminger Sea 90% T_p', ...
+% %     'DisplayName','10th & 90th prctile Tp');
+% % xline(Tp_trl_ce,':');
+% xline(Tp_trh_cp,':','Coastal Pioneer 90% T_p', ...
 %     'DisplayName','10th & 90th prctile T_p');
-% xline(Tp_trl_is,'--','Irminger Sea 10% T_p');
-xline(Tp_trh_so,'--','Southern Ocean 90% T_p', ...
-    'DisplayName','10th & 90th prctile Tp');
-xline(Tp_trl_so,'--','Southern Ocean 10% T_p');
-ylabel('CWR/B')
+% xline(Tp_trl_cp,':','Coastal Pioneer 10% T_p');
+% % xline(Tp_trh_is,'--','Irminger Sea 90% T_p', ...
+% %     'DisplayName','10th & 90th prctile T_p');
+% % xline(Tp_trl_is,'--','Irminger Sea 10% T_p');
+% xline(Tp_trh_so,'--','Southern Ocean 90% T_p', ...
+%     'DisplayName','10th & 90th prctile Tp');
+% xline(Tp_trl_so,'--','Southern Ocean 10% T_p');
+ylabel('$$\mathrm{\frac{CWR}{B}}$$')
 xlabel('Tp [s]')
-title('Capture Width Ratio Normalized by WEC Width (B)')
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle', ... 
+    'HorizontalAlignment','right')
+%title('Capture Width Ratio Normalized by WEC Width (B)')
 xlim([0 max([Tp_1 ; Tp_2 ; Tp_3 ; Tp_4 ; Tp_5 ; Tp_6])])
 legend([p1 p2 p3 p4 p5 p6],'location','east')
 grid on
-set(gcf, 'Position', [100, 100, 1000, 350])
+set(gcf, 'Position', [100, 100, 1000, 550])
 set(gca,'FontSize',13)
 
-figure
-pa = plot(linspace(min(Tp_3),max(Tp_3),Tp_res), ...
-    cwr_3_int(i,:)/struct3m_opt.B,'Color',col3m(end-5,:), ...
-    'DisplayName','3 meter WEC, Hs = 3m','LineWidth',lw1);
-%ylabel('CWR/B')
-%xlabel('Tp [s]')
-%title('Capture Width Ratio Normalized by WEC Width (B)')
-xlim([0 max([Tp_1 ; Tp_2 ; Tp_3 ; Tp_4 ; Tp_5 ; Tp_6])])
-ylim([0 .2])
-legend(pa,'location','east')
-grid on
-set(gcf, 'Position', [100, 100, 1000, 275])
-set(gca,'FontSize',16)
-set(gca,'FontName','Calibri')
-set(gcf,'color','w')
+% APPROXIMATION
+% figure
+% pa = plot(linspace(min(Tp_3),max(Tp_3),Tp_res), ...
+%     cwr_3_int(i,:)/struct3m_opt.B,'Color',col3m(end-5,:), ...
+%     'DisplayName','3 meter WEC, Hs = 3m','LineWidth',lw1);
+% %ylabel('CWR/B')
+% %xlabel('Tp [s]')
+% %title('Capture Width Ratio Normalized by WEC Width (B)')
+% xlim([0 max([Tp_1 ; Tp_2 ; Tp_3 ; Tp_4 ; Tp_5 ; Tp_6])])
+% ylim([0 .2])
+% legend(pa,'location','east')
+% grid on
+% set(gcf, 'Position', [100, 100, 1000, 275])
+% set(gca,'FontSize',16)
+% set(gca,'FontName','Calibri')
+% set(gcf,'color','w')
 
 
 set(gcf, 'Position', [100, 100, 1000, 650])

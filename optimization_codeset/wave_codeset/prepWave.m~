@@ -54,7 +54,18 @@ elseif wave.method == 2 %3d interpolation methodology
     s(4).wsr = wsr_4;
     s(5).wsr = wsr_5;
     s(6).wsr = wsr_6;
-    %preallocate scatter arrays
+    %     %find lowest resolution simulation in H
+    %     [~,ind] = min([length(s(1).wsr.H) length(s(1).wsr.H) ...
+    %         length(s(1).wsr.H) length(s(1).wsr.H) length(s(1).wsr.H) ...
+    %         length(s(1).wsr.H)]);
+    %     opt.wave.H = unique(s(ind).wsr.H);
+    %     %find lowest resolution simulation in T
+    %     [~,ind] = min([length(s(1).wsr.T) length(s(1).wsr.T) ...
+    %         length(s(1).wsr.T) length(s(1).wsr.T) length(s(1).wsr.T) ...
+    %         length(s(1).wsr.T)]);
+    %     opt.wave.T = unique(s(ind).wsr.T);
+    %opt.wave.B = 1:1:6; %set widths
+    %set vectors for scattered interpolant
     H_scat = [];
     T_scat = [];
     B_scat = [];
@@ -70,7 +81,7 @@ elseif wave.method == 2 %3d interpolation methodology
         J = (1/(64*pi))*atmo.rho_w*atmo.g^2.*H.^2.*T; %find wave power
         P = reshape(s(b).wsr.mat',n,1); %find wec power (use mat not P)
         CWR = P./(J.*B); %find cwr
-        %populate scatter arrays
+        %update scatter arrays
         T_scat = [T_scat ; T];
         H_scat = [H_scat ; H];    
         B_scat = [B_scat ; B];
@@ -86,10 +97,35 @@ elseif wave.method == 2 %3d interpolation methodology
         %find Gr for each B value
         opt.wave.B_func(2,i) = (opt.wave.B_func(1,i)*wave.eta_ct* ...
             opt.wave.F(wave.Tp_ra,wave.Hs_ra,opt.wave.B_func(1,i))* ...
-            opt.wave.wavepower_ra)/((1+wave.house)*(1000));
+            opt.wave.wavepower_ra)/((1+wave.house)*(1/1000));
     end
     
+    
+    %     %interpolate wec sim results onto T and H
+    %     for b = 1:length(opt.wave.B)
+    %         F = scatteredInterpolant(s(b).wsr.H,s(b).wsr.T,...
+    %             reshape(s(b).wsr.mat,length(s(b).wsr.H),1));
+    %         s(b).wsr.mat_interp = F(opt.wave.H,opt.wave.T);
+    %     end
+    %     %populate cwr tensor
+    %     opt.wave.cwr = zeros(length(opt.wave.T),length(opt.wave.H), ...
+    %         length(opt.wave.B));
+    %     for t = 1:length(opt.wave.T)
+    %         for h = 1:length(opt.wave.H)
+    %             for b = 1:length(opt.wave.B)
+    % %                 ind = find(s(b).wsr.T == opt.wave.T(t) & ...
+    % %                     s(b).wsr.H == opt.wave.H(h)); %find index for power (P)
+    %                 P = -s(b).wsr.P(s(b).wsr.T == opt.wave.T(t) & ...
+    %                     s(b).wsr.H == opt.wave.H(h)); %find wec power (ws is -)
+    %                 J = (1/(64*pi))*atmo.rho_w*atmo.g^2* ...
+    %                     opt.wave.H(h)^2*opt.wave.T(t); %find wave power
+    %                 opt.wave.cwr(t,h,b) = P/(J*b);
+    %             end
+    %         end
+    %     end
 end
+
+%compute wavelength
 
 end
 
