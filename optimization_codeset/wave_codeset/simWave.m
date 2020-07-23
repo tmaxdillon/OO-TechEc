@@ -20,7 +20,6 @@ dt = 24*(data.wave.time(2) - data.wave.time(1)); %delta time in hours
 dist = data.dist*data.dist_mod; %[m] dist to shore
 depth = data.depth*data.depth_mod;   %[m] water depth
 
-tic
 if wave.method == 1 %divide by B methodology       
     cwr_b = wave.cw_mod.*opt.wave.cwr_b_ts; %[m^-1] eta timeseries (cwr/b)    
     %find width through rated power conditions
@@ -36,7 +35,6 @@ elseif wave.method == 2 %3d interpolation methodology
     width = interp1(opt.wave.B_func(2,:),opt.wave.B_func(1,:),kW); %[m], B
     cw = width.*opt.wave.F(Tp,Hs,width*ones(length(Tp),1)); %[m] cw ts
 end
-toc
 
 %compute power timeseries
 P = wave.eta_ct*cw.*wavepower - kW*wave.house; %[kW] 
