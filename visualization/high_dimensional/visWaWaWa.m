@@ -36,13 +36,18 @@ for loc = 1:nl
                 allStruct(fixer(loc),pm,c).output.min.Icost/1000;
             costdata(loc,pm,4,c) = ... %gen opex
                 allStruct(fixer(loc),pm,c).output.min.wecrepair/1000;
-            gendata(loc,pm,1,c) = allStruct(fixer(loc),pm,c).output.min.kW;
-            stordata(loc,pm,1,c) = allStruct(fixer(loc),pm,c).output.min.Smax;
-            cycdata(loc,pm,1,c) = allStruct(fixer(loc),pm,c).output.min.cyc60;
+            gendata(loc,pm,1,c) =  ...
+                allStruct(fixer(loc),pm,c).output.min.kW;
+            stordata(loc,pm,1,c) = ...
+                allStruct(fixer(loc),pm,c).output.min.Smax;
+            cycdata(loc,pm,1,c) = ...
+                allStruct(fixer(loc),pm,c).output.min.cyc60;
             massdata(loc,pm,1,c) = ...
                 1000*allStruct(fixer(loc),pm,c).output.min.Smax/ ...
-                (allStruct(fixer(loc),pm,c).batt.V*allStruct(fixer(loc),pm,c).batt.se);
-            dpdata(loc,pm,1,c) = allStruct(fixer(loc),pm,c).output.min.dp;
+                (allStruct(fixer(loc),pm,c).batt.V* ... 
+                allStruct(fixer(loc),pm,c).batt.se);
+            dpdata(loc,pm,1,c) =  ... 
+                allStruct(fixer(loc),pm,c).output.min.width;
         end
     end
 end

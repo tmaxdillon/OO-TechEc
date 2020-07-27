@@ -1,0 +1,340 @@
+clc, close all, clear all
+%set(0,'defaulttextinterpreter','none')
+set(0,'defaulttextinterpreter','latex')
+set(0,'DefaultTextFontname', 'helvetica')
+set(0,'DefaultAxesFontName', 'helvetica')
+
+%load data
+load('struct1m_opt')
+load('struct2m_opt')
+load('struct3m_opt')
+load('struct4m_opt')
+load('struct5m_opt')
+load('struct6m_opt')
+
+%constants
+rho = 1020; %[kg/m^3]
+g = 9.81;   %[m/s^2]
+lw1 = 3;
+lw2 = .8;
+
+%extract Tps and Hs
+Tp_1 = unique(struct1m_opt.T);
+Tp_2 = unique(struct2m_opt.T);
+Tp_3 = unique(struct3m_opt.T);
+Tp_4 = unique(struct4m_opt.T);
+Tp_5 = unique(struct5m_opt.T);
+Tp_6 = unique(struct6m_opt.T);
+Hs_1 = unique(struct1m_opt.H);
+Hs_2 = unique(struct2m_opt.H);
+Hs_3 = unique(struct3m_opt.H);
+Hs_4 = unique(struct4m_opt.H);
+Hs_5 = unique(struct5m_opt.H);
+Hs_6 = unique(struct6m_opt.H);
+
+%set discretization
+Tp_res = 1000;
+Tp_all = zeros(Tp_res,6);
+Tp_all(:,1) = linspace(min(Tp_1),max(Tp_1),Tp_res);
+Tp_all(:,2) = linspace(min(Tp_2),max(Tp_2),Tp_res);
+Tp_all(:,3) = linspace(min(Tp_3),max(Tp_3),Tp_res);
+Tp_all(:,4) = linspace(min(Tp_4),max(Tp_4),Tp_res);
+Tp_all(:,5) = linspace(min(Tp_5),max(Tp_5),Tp_res);
+Tp_all(:,6) = linspace(min(Tp_6),max(Tp_6),Tp_res);
+
+%preallocate
+cwr_int = zeros(2,Tp_res,6);
+
+%spline interpolate cwr at max and min Hs onto finely resolved Tp
+cwr_int(1,:,1) = interp1(Tp_1, ...
+    struct1m_opt.mat(1,:)'./ ...
+    ((1/(64*pi))*rho*g^2*Hs_1(1)^2.*Tp_1.*struct1m_opt.B), ...
+    linspace(min(Tp_1),max(Tp_1),Tp_res),'spline');
+cwr_int(2,:,1) = interp1(Tp_1, ...
+    struct1m_opt.mat(end,:)'./ ...
+    ((1/(64*pi))*rho*g^2*Hs_1(end)^2.*Tp_1.*struct1m_opt.B), ...
+    linspace(min(Tp_1),max(Tp_1),Tp_res),'spline');
+cwr_int(1,:,2) = interp1(Tp_2, ...
+    struct2m_opt.mat(1,:)'./ ...
+    ((1/(64*pi))*rho*g^2*Hs_2(1)^2.*Tp_2.*struct2m_opt.B), ...
+    linspace(min(Tp_2),max(Tp_2),Tp_res),'spline');
+cwr_int(2,:,2) = interp1(Tp_2, ...
+    struct2m_opt.mat(end,:)'./ ...
+    ((1/(64*pi))*rho*g^2*Hs_2(end)^2.*Tp_2.*struct2m_opt.B), ...
+    linspace(min(Tp_2),max(Tp_2),Tp_res),'spline');
+cwr_int(1,:,3) = interp1(Tp_3, ...
+    struct3m_opt.mat(1,:)'./ ...
+    ((1/(64*pi))*rho*g^2*Hs_3(1)^2.*Tp_3.*struct3m_opt.B), ...
+    linspace(min(Tp_3),max(Tp_3),Tp_res),'spline');
+cwr_int(2,:,3) = interp1(Tp_3, ...
+    struct3m_opt.mat(end,:)'./ ...
+    ((1/(64*pi))*rho*g^2*Hs_3(end)^2.*Tp_3.*struct3m_opt.B), ...
+    linspace(min(Tp_3),max(Tp_3),Tp_res),'spline');
+cwr_int(1,:,4) = interp1(Tp_4, ...
+    struct4m_opt.mat(1,:)'./ ...
+    ((1/(64*pi))*rho*g^2*Hs_3(1)^2.*Tp_4.*struct4m_opt.B), ...
+    linspace(min(Tp_4),max(Tp_4),Tp_res),'spline');
+cwr_int(2,:,4) = interp1(Tp_4, ...
+    struct4m_opt.mat(end,:)'./ ...
+    ((1/(64*pi))*rho*g^2*Hs_4(end)^2.*Tp_4.*struct4m_opt.B), ...
+    linspace(min(Tp_4),max(Tp_4),Tp_res),'spline');
+cwr_int(1,:,5) = interp1(Tp_5, ...
+    struct5m_opt.mat(1,:)'./ ...
+    ((1/(64*pi))*rho*g^2*Hs_5(1)^2.*Tp_5.*struct5m_opt.B), ...
+    linspace(min(Tp_5),max(Tp_5),Tp_res),'spline');
+cwr_int(2,:,5) = interp1(Tp_5, ...
+    struct5m_opt.mat(end,:)'./ ...
+    ((1/(64*pi))*rho*g^2*Hs_5(end)^2.*Tp_5.*struct5m_opt.B), ...
+    linspace(min(Tp_5),max(Tp_5),Tp_res),'spline');
+cwr_int(1,:,6) = interp1(Tp_6, ...
+    struct6m_opt.mat(1,:)'./ ...
+    ((1/(64*pi))*rho*g^2*Hs_6(1)^2.*Tp_6.*struct6m_opt.B), ...
+    linspace(min(Tp_6),max(Tp_6),Tp_res),'spline');
+cwr_int(2,:,6) = interp1(Tp_6, ...
+    struct6m_opt.mat(end,:)'./ ...
+    ((1/(64*pi))*rho*g^2*Hs_6(end)^2.*Tp_6.*struct6m_opt.B), ...
+    linspace(min(Tp_6),max(Tp_6),Tp_res),'spline');
+
+%colors
+c = 5;
+col1 = brewermap(10,'oranges'); col(1,:) = col1(c,:);
+col2 = brewermap(10,'reds'); col(2,:) = col2(c,:);
+col3 = brewermap(10,'greens'); col(3,:) = col3(c,:);
+col4 = brewermap(10,'blues'); col(4,:) = col4(c,:);
+col5 = brewermap(10,'purples'); col(5,:) = col5(c,:);
+col6 = brewermap(10,'greys'); col(6,:) = col6(c,:);
+
+figure 
+for i = 1:size(cwr_int,3)
+    a(i,:) = area(Tp_all(:,i)', ...
+        [cwr_int(2,:,i);cwr_int(1,:,i)-cwr_int(2,:,i)]');
+    hold on
+    a(i,2).FaceColor = col(i,:);
+    a(i,2).FaceAlpha = 0.2;
+    a(i,1).FaceAlpha = 0;
+end
+
+figure
+ax(1) = subplot(2,1,1);
+for i = 1:length(Hs_1)
+    hold on
+    if i == h_ind_1
+        p1 = plot(linspace(min(Tp_1),max(Tp_1),Tp_res), ...
+            cwr_1_int(i,:),'Color',col1m(end,:), ...
+            'DisplayName','1 meter WEC, Hs = 3m','LineWidth',lw1);
+    else
+        plot(linspace(min(Tp_1),max(Tp_1),Tp_res), ...
+            cwr_1_int(i,:),'Color',col1m(5+i,:), ...
+            'LineWidth',lw2)
+    end
+end
+hold on
+for i = 1:length(Hs_2)
+    hold on
+    if i == h_ind_2
+        p2 = plot(linspace(min(Tp_2),max(Tp_2),Tp_res), ...
+            cwr_2_int(i,:),'Color',col2m(end,:), ...
+            'DisplayName','2 meter WEC, Hs = 3m','LineWidth',lw1);
+    else
+        plot(linspace(min(Tp_2),max(Tp_2),Tp_res), ...
+            cwr_2_int(i,:),'Color',col2m(5+i,:), ...
+            'LineWidth',lw2)
+    end
+end
+hold on
+for i = 1:length(Hs_3)
+    if i == h_ind_3
+        p3 = plot(linspace(min(Tp_3),max(Tp_3),Tp_res), ...
+            cwr_3_int(i,:),'Color',col3m(end,:), ...
+            'DisplayName','3 meter WEC, Hs = 3m','LineWidth',lw1);
+    else
+        plot(linspace(min(Tp_4),max(Tp_4),Tp_res), ...
+            cwr_3_int(i,:),'Color',col3m(5+i,:), ...
+            'LineWidth',lw2)
+    end
+end
+hold on
+for i = 1:length(Hs_4)
+    if i == h_ind_4
+        p4 = plot(linspace(min(Tp_4),max(Tp_4),Tp_res), ...
+            cwr_4_int(i,:),'Color',col4m(end,:), ...
+            'DisplayName','4 meter WEC, Hs = 3m','LineWidth',lw1);
+    else
+        plot(linspace(min(Tp_4),max(Tp_4),Tp_res), ...
+            cwr_4_int(i,:),'Color',col4m(5+i,:), ...
+            'LineWidth',lw2)
+    end
+end
+hold on
+for i = 1:length(Hs_5)
+    if i == h_ind_5
+        p5 = plot(linspace(min(Tp_5),max(Tp_5),Tp_res), ...
+            cwr_5_int(i,:),'Color',col5m(end,:), ...
+            'DisplayName','5 meter WEC, Hs = 3m','LineWidth',lw1);
+    else
+        plot(linspace(min(Tp_5),max(Tp_5),Tp_res), ...
+            cwr_5_int(i,:),'Color',col5m(5+i,:), ...
+            'LineWidth',lw2)
+    end
+end
+hold on
+for i = 1:length(Hs_6)
+    if i == h_ind_6
+        p6 = plot(linspace(min(Tp_6),max(Tp_6),Tp_res), ...
+            cwr_6_int(i,:),'Color',col6m(end,:), ...
+            'DisplayName','6 meter WEC, Hs = 3m','LineWidth',lw1);
+    else
+        plot(linspace(min(Tp_6),max(Tp_6),Tp_res), ...
+            cwr_6_int(i,:),'Color',col6m(5+i,:), ...
+            'LineWidth',lw2)
+    end
+end
+hold on
+% xline(Tp_trh_ab,'-','Argentine Basin 90% Tp', ...
+%     'DisplayName','10th & 90th prctile Tp');
+% xline(Tp_trl_ab,'-','Argentine Basin 10% Tp');
+% % xline(Tp_trh_ce,':','Coastal Endurance', ...
+% %     'DisplayName','10th & 90th prctile Tp');
+% % xline(Tp_trl_ce,':');
+% xline(Tp_trh_cp,':','Coastal Pioneer 90% Tp', ...
+%     'DisplayName','10th & 90th prctile Tp');
+% xline(Tp_trl_cp,':','Coastal Pioneer 10% Tp');
+% xline(Tp_trh_is,'--','Irminger Sea 90% Tp', ...
+%     'DisplayName','10th & 90th prctile Tp');
+% xline(Tp_trl_is,'--');
+% % xline(Tp_trh_so,'--','Southern Ocean', ...
+% %     'DisplayName','10th & 90th prctile Tp');
+% % xline(Tp_trl_so,'--');
+ylabel('CWR')
+xlabel('Tp [s]')
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle', ... 
+    'HorizontalAlignment','right')
+%title('Capture Width Ratio')
+xlim([0 max([Tp_1 ; Tp_2 ; Tp_3 ; Tp_4 ; Tp_5 ; Tp_6])])
+legend([p1 p2 p3 p4 p5 p6],'location','east')
+grid on
+set(gca,'FontSize',13)
+
+ax(2) = subplot(2,1,2);
+for i = 1:length(Hs_1)
+    hold on
+    if i == h_ind_1
+        p1 = plot(linspace(min(Tp_1),max(Tp_1),Tp_res), ...
+            cwr_1_int(i,:)/struct1m_opt.B,'Color',col1m(end,:), ...
+            'DisplayName','1 meter WEC, Hs = 3m','LineWidth',lw1);
+    else
+        plot(linspace(min(Tp_1),max(Tp_1),Tp_res), ...
+            cwr_1_int(i,:)/struct1m_opt.B,'Color',col1m(5+i,:), ...
+            'LineWidth',lw2)
+    end
+end
+hold on
+for i = 1:length(Hs_2)
+    hold on
+    if i == h_ind_2
+        p2 = plot(linspace(min(Tp_2),max(Tp_2),Tp_res), ...
+            cwr_2_int(i,:)/struct2m_opt.B,'Color',col2m(end,:), ...
+            'DisplayName','2 meter WEC, Hs = 3m','LineWidth',lw1);
+    else
+        plot(linspace(min(Tp_2),max(Tp_2),Tp_res), ...
+            cwr_2_int(i,:)/struct2m_opt.B,'Color',col2m(5+i,:), ...
+            'LineWidth',lw2)
+    end
+end
+hold on
+for i = 1:length(Hs_3)
+    if i == h_ind_3
+        p3 = plot(linspace(min(Tp_3),max(Tp_3),Tp_res), ...
+            cwr_3_int(i,:)/struct3m_opt.B,'Color',col3m(end,:), ...
+            'DisplayName','3 meter WEC, Hs = 3m','LineWidth',lw1);
+    else
+        plot(linspace(min(Tp_4),max(Tp_4),Tp_res), ...
+            cwr_3_int(i,:)/struct3m_opt.B,'Color',col3m(5+i,:), ...
+            'LineWidth',lw2)
+    end
+end
+hold on
+for i = 1:length(Hs_4)
+    if i == h_ind_4
+        p4 = plot(linspace(min(Tp_4),max(Tp_4),Tp_res), ...
+            cwr_4_int(i,:)/struct4m_opt.B,'Color',col4m(end,:), ...
+            'DisplayName','4 meter WEC, Hs = 3m','LineWidth',lw1);
+    else
+        plot(linspace(min(Tp_4),max(Tp_4),Tp_res), ...
+            cwr_4_int(i,:)/struct4m_opt.B,'Color',col4m(5+i,:), ...
+            'LineWidth',lw2)
+    end
+end
+hold on
+for i = 1:length(Hs_5)
+    if i == h_ind_5
+        p5 = plot(linspace(min(Tp_5),max(Tp_5),Tp_res), ...
+            cwr_5_int(i,:)/struct5m_opt.B,'Color',col5m(end,:), ...
+            'DisplayName','5 meter WEC, Hs = 3m','LineWidth',lw1);
+    else
+        plot(linspace(min(Tp_5),max(Tp_5),Tp_res), ...
+            cwr_5_int(i,:)/struct5m_opt.B,'Color',col5m(5+i,:), ...
+            'LineWidth',lw2)
+    end
+end
+hold on
+for i = 1:length(Hs_6)
+    if i == h_ind_6
+        p6 = plot(linspace(min(Tp_6),max(Tp_6),Tp_res), ...
+            cwr_6_int(i,:)/struct6m_opt.B,'Color',col6m(end,:), ...
+            'DisplayName','6 meter WEC, Hs = 3m','LineWidth',lw1);
+    else
+        plot(linspace(min(Tp_6),max(Tp_6),Tp_res), ...
+            cwr_6_int(i,:)/struct6m_opt.B,'Color',col6m(5+i,:), ...
+            'LineWidth',lw2)
+    end
+end
+hold on
+% xline(Tp_trh_ab,'-','Argentine Basin 90% T_p', ...
+%     'DisplayName','10th & 90th prctile T_p');
+% xline(Tp_trl_ab,'-','Argentine Basin 10% T_p');
+% xline(Tp_trh_ce,':','Coastal Endurance', ...
+% %     'DisplayName','10th & 90th prctile Tp');
+% % xline(Tp_trl_ce,':');
+% xline(Tp_trh_cp,':','Coastal Pioneer 90% T_p', ...
+%     'DisplayName','10th & 90th prctile T_p');
+% xline(Tp_trl_cp,':','Coastal Pioneer 10% T_p');
+% % xline(Tp_trh_is,'--','Irminger Sea 90% T_p', ...
+% %     'DisplayName','10th & 90th prctile T_p');
+% % xline(Tp_trl_is,'--','Irminger Sea 10% T_p');
+% xline(Tp_trh_so,'--','Southern Ocean 90% T_p', ...
+%     'DisplayName','10th & 90th prctile Tp');
+% xline(Tp_trl_so,'--','Southern Ocean 10% T_p');
+ylabel('$$\mathrm{\frac{CWR}{B}}$$')
+xlabel('Tp [s]')
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle', ... 
+    'HorizontalAlignment','right')
+%title('Capture Width Ratio Normalized by WEC Width (B)')
+xlim([0 max([Tp_1 ; Tp_2 ; Tp_3 ; Tp_4 ; Tp_5 ; Tp_6])])
+legend([p1 p2 p3 p4 p5 p6],'location','east')
+grid on
+set(gcf, 'Position', [100, 100, 1000, 550])
+set(gca,'FontSize',13)
+
+% APPROXIMATION
+% figure
+% pa = plot(linspace(min(Tp_3),max(Tp_3),Tp_res), ...
+%     cwr_3_int(i,:)/struct3m_opt.B,'Color',col3m(end-5,:), ...
+%     'DisplayName','3 meter WEC, Hs = 3m','LineWidth',lw1);
+% %ylabel('CWR/B')
+% %xlabel('Tp [s]')
+% %title('Capture Width Ratio Normalized by WEC Width (B)')
+% xlim([0 max([Tp_1 ; Tp_2 ; Tp_3 ; Tp_4 ; Tp_5 ; Tp_6])])
+% ylim([0 .2])
+% legend(pa,'location','east')
+% grid on
+% set(gcf, 'Position', [100, 100, 1000, 275])
+% set(gca,'FontSize',16)
+% set(gca,'FontName','Calibri')
+% set(gcf,'color','w')
+
+
+set(gcf, 'Position', [100, 100, 1000, 650])
+
