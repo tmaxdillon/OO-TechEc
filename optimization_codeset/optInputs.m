@@ -5,11 +5,12 @@ opt.tdsens = 0;
 opt.senssm = 0;
 opt.bf.m = 30;
 opt.bf.n = 30;
-wave.method = 2; %1: divide by B, 2: 3d interpolation
+wave.Hs_ra = 5;             %[m], rated wave height
+wave.Tp_ra = 12;            %[s], rated peak period
 pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
 bc = 2; %battery chemistry 1:AGM 2:LFP
 c = 2;  %use case 1:ST 2:LT
-loc = 'argBasin'; %location
+loc = 'souOcean'; %location
 econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
 
 %strings
@@ -104,10 +105,9 @@ inso.shootdebug = false;    %toggle debugging pvci shooter
 inso.cleanstrat = 1;        %panel cleaning strategy 1:NC, 2:CT, 3:CTW
 %inso.nu = 1.01;             %[m/kW]
 %wave energy parameters
-wave.wsr = 'struct3m_opt';  %wec sim run
-wave.wsHs = 3;              %[m] wec sim Hs
-wave.Hs_ra = 5;             %[m], rated wave height
-wave.Tp_ra = 12;            %[s], rated peak period
+% wave.wsr = 'struct3m_opt';  %wec sim run
+% wave.wsHs = 3;              %[m] wec sim Hs
+wave.method = 2;            %1: divide by B, 2: 3d interpolation
 wave.eta_ct = 0.6;          %[~] wec efficiency
 wave.house = 0.10;          %percent of rated power as house load
 wave.B_func_n = 1000;       %number of points in B(Gr) function
