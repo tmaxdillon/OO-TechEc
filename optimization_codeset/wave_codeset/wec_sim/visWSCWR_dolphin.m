@@ -1,6 +1,6 @@
 clc, close all, clear all
-%set(0,'defaulttextinterpreter','none')
-set(0,'defaulttextinterpreter','latex')
+set(0,'defaulttextinterpreter','none')
+%set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'helvetica')
 set(0,'DefaultAxesFontName', 'helvetica')
 
@@ -96,36 +96,61 @@ cwr_int(2,:,6) = interp1(Tp_6, ...
     linspace(min(Tp_6),max(Tp_6),Tp_res),'spline');
 
 %colors
-c = 5;
-col1 = brewermap(10,'oranges'); col(1,:) = col1(c,:);
-col2 = brewermap(10,'reds'); col(2,:) = col2(c,:);
+c = 7;
+col1 = brewermap(10,'reds'); col(1,:) = col1(c,:);
+col2 = brewermap(10,'oranges'); col(2,:) = col2(c,:);
 col3 = brewermap(10,'greens'); col(3,:) = col3(c,:);
 col4 = brewermap(10,'blues'); col(4,:) = col4(c,:);
 col5 = brewermap(10,'purples'); col(5,:) = col5(c,:);
 col6 = brewermap(10,'greys'); col(6,:) = col6(c,:);
 
-figure 
-for i = 1:size(cwr_int,3)
+wscwr = figure;
+for i = size(cwr_int,3):-1:1
     a(i,:) = area(Tp_all(:,i)', ...
         [cwr_int(2,:,i);cwr_int(1,:,i)-cwr_int(2,:,i)]');
     hold on
     a(i,2).FaceColor = col(i,:);
-    a(i,2).FaceAlpha = 0.4;
+    a(i,2).FaceAlpha = 0.2;
     a(i,1).FaceAlpha = 0;
 end
 a(1,1).EdgeColor = 'none';
 
-ylabel('CWR')
-xlabel('Tp [s]')
+set(gcf,'Units','inches')
+set(gcf, 'Position', [1, 1, 7.5, 3])
+ax = gca;
+ax.YLabel.String = 'CWR';
+ax.XLabel.String = 'T_{p} [s]';
+ax.XLabel.Interpreter = 'tex';
 hYLabel = get(gca,'YLabel');
-set(hYLabel,'rotation',0,'VerticalAlignment','middle', ... 
+set(hYLabel,'rotation',0,'VerticalAlignment','middle', ...
     'HorizontalAlignment','right')
-xlim([0 max([Tp_1 ; Tp_2 ; Tp_3 ; Tp_4 ; Tp_5 ; Tp_6])-4])
-legend([a(1,2) a(2,2) a(3,2) a(4,2) a(5,2) a(6,2)], ...
+xlim([0 15])
+ylim([0 .3])
+xticks(1:1:15)
+yticks(0:.1:.3)
+%add arrow
+x_arr = 3;
+pos = get(gca,'Position');
+X = pos(1) + [x_arr x_arr].*(pos(3)/ax.XLim(2));
+[~,ind] = min(abs(Tp_all(:,1)-x_arr));
+Y = pos(2) + [cwr_int(1,ind,1) cwr_int(2,ind,1)].*(pos(4)/ax.YLim(2));
+arrow = annotation('arrow',X,Y);
+arrow.HeadStyle = 'plain';	
+arrow.HeadWidth = 5;	
+arrow.HeadLength = 5;
+%add text
+x_tex = 2.3;
+X_t = pos(1) + x_tex*(pos(3)/ax.XLim(2));
+dim = [X_t mean(Y)*1.05 .5 .05];
+str = 'H_{s}';
+text = annotation('textbox',dim,'String',str);
+text.EdgeColor = 'none';
+legend([a(1,2) a(2,2) a(3,2) ...
+    a(4,2) a(5,2) a(6,2)], ...
     '1 m RM3 WEC','2 m RM3 WEC','3 m RM3 WEC','4 m RM3 WEC', ...
     '5 m RM3 WEC','6 m RM3 WEC','Location','best')
 grid on
-set(gca,'FontSize',13)
+set(gca,'FontSize',10)
 
-set(gcf, 'Position', [100, 100, 1150, 450])
+%print(wscwr,'../Research/OO-TechEc/paper_figures/wscwr', '-dpng','-r600')
 
