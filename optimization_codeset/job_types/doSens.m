@@ -93,6 +93,12 @@ for i = 1:opt.S
     if isequal(opt.tuned_parameter,'whl')
         wave.house = opt.tuning_array(i);
     end
+    if isequal(opt.tuned_parameter,'hra')
+        wave.Hs_ra = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'tra')
+        wave.Tp_ra = opt.tuning_array(i);
+    end
     [multStruct(i).output,multStruct(i).opt] =  ...
         optRun(pm,opt,data,atmo,batt,econ,uc(c),bc, ...
         inso,turb,wave,dies);

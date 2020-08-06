@@ -1,17 +1,25 @@
 %settings
 opt.alllocuses = 0;
 opt.sens = 0;
-opt.tdsens = 0;
+opt.tdsens = 1;
 opt.senssm = 0;
-opt.bf.m = 20;
-opt.bf.n = 20;
+opt.bf.m = 5;
+opt.bf.n = 5;
 wave.Hs_ra = 5;             %[m], rated wave height
-wave.Tp_ra = 12;            %[s], rated peak period
+wave.Tp_ra = 8;            %[s], rated peak period
 pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
 bc = 2; %battery chemistry 1:AGM 2:LFP
 c = 2;  %use case 1:ST 2:LT
 loc = 'irmSea'; %location
 econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
+opt.tdsens_ta(1,:) = 2:1:7;
+opt.tdsens_ta(2,:) = 6:1:11;
+opt.tdsens_tp{1} = 'hra'; %rated Hs
+opt.tdsens_tp{2} = 'tra'; %rated Tp
+% opt.tuning_array = 2:0.5:7;
+% opt.tuned_parameter = 'hra'; %rated tp
+% % opt.tuning_array = 6:0.5:11;
+% % opt.tuned_parameter = 'tra'; %rated tp
 
 %strings
 opt.locations = {'argBasin';'cosEndurance_wa'; ...
@@ -211,14 +219,14 @@ uc(2).dies.lambda = 1;          %diesel interventions
 % opt.tuned_parameter = 'wcm'; %wave cost multiplier
 % opt.tuning_array = linspace(0,9,50);
 % opt.tuned_parameter = 'wiv'; %wec interventions
-opt.tuning_array = linspace(1/2,2,10);
-opt.tuned_parameter = 'dep'; %depth modifier
+% opt.tuning_array = linspace(1/2,2,10);
+% opt.tuned_parameter = 'dep'; %depth modifier
 
 %opt 2D sens
-opt.tdsens_ta(1,:) = 0.1:0.04:1.7;
-opt.tdsens_ta(2,:) = 40:2:120;
-opt.tdsens_tp{1} = 'btm'; %battery time slope
-opt.tdsens_tp{2} = 'mbt'; %minimum battery for time added
+% opt.tdsens_ta(1,:) = 0.1:0.04:1.7;
+% opt.tdsens_ta(2,:) = 40:2:120;
+% opt.tdsens_tp{1} = 'btm'; %battery time slope
+% opt.tdsens_tp{2} = 'mbt'; %minimum battery for time added
 
 %optimization parameters
 opt.V = 2;

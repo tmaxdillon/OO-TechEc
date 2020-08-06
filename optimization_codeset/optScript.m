@@ -2,31 +2,21 @@
 
 % to do
 % 1 - high proirotuy
-% 2 - second priority (after something)
+% 2 - second priority
 % 3 - third priority
 
-%platform
-
 %wind
-% 2 - wind sensitivity 9 panel
 
 %solar
 
 %battery
-% 3 - find battery housing cost, and update calc
-% 3 - sensitivity to life cycle analysis
-% 3 - make battery optimization module
 
 %wave
-% 2 - need to re consider cut out (ask NREL people)
 
 %dies
 
 %other
-% 3 - integrate all OOI sensor timeserieses + depths
-% 3 - add parabolic distance to port
-% 2 - fix initial coarse grid for NM
-% 3 - remove all non-essential computations out of sim functions
+% 2 - automate all visWaWaWa annotation placements and axis limits
 
 %% run optimization
 
