@@ -1,28 +1,22 @@
 %settings
-opt.alllocuses = 0;
+opt.alllocuses = 1;
+econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
 opt.sens = 0;
-opt.tdsens = 1;
+opt.tdsens = 0;
 opt.senssm = 0;
-opt.bf.m = 5;
-opt.bf.n = 5;
-wave.Hs_ra = 5;             %[m], rated wave height
-wave.Tp_ra = 8;            %[s], rated peak period
+opt.bf.m = 300;
+opt.bf.n = 300;
 pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
 bc = 2; %battery chemistry 1:AGM 2:LFP
 c = 2;  %use case 1:ST 2:LT
 loc = 'irmSea'; %location
-econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
 opt.tdsens_ta(1,:) = 2:1:7;
 opt.tdsens_ta(2,:) = 6:1:11;
 opt.tdsens_tp{1} = 'hra'; %rated Hs
 opt.tdsens_tp{2} = 'tra'; %rated Tp
-% opt.tuning_array = 2:0.5:7;
-% opt.tuned_parameter = 'hra'; %rated tp
-% % opt.tuning_array = 6:0.5:11;
-% % opt.tuned_parameter = 'tra'; %rated tp
 
 %strings
-opt.locations = {'argBasin';'cosEndurance_wa'; ...
+opt.locations = {'argBasin';'cosEndurance_{wa}'; ...
     'cosPioneer';'irmSea';'souOcean'};
 opt.powermodules = {'wind';'inso';'wave';'dies'};
 opt.usecases = {'short term';'long term'};
@@ -113,12 +107,14 @@ inso.shootdebug = false;    %toggle debugging pvci shooter
 inso.cleanstrat = 1;        %panel cleaning strategy 1:NC, 2:CT, 3:CTW
 %inso.nu = 1.01;             %[m/kW]
 %wave energy parameters
-% wave.wsr = 'struct3m_opt';  %wec sim run
-% wave.wsHs = 3;              %[m] wec sim Hs
 wave.method = 2;            %1: divide by B, 2: 3d interpolation
+wave.B_func_n = 1000;       %number of points in B(Gr) function
+wave.Hs_ra = 4;             %[m], rated wave height
+wave.Tp_ra = 9;            %[s], rated peak period
 wave.eta_ct = 0.6;          %[~] wec efficiency
 wave.house = 0.10;          %percent of rated power as house load
-wave.B_func_n = 1000;       %number of points in B(Gr) function
+% wave.wsr = 'struct3m_opt';  %wec sim run
+% wave.wsHs = 3;              %[m] wec sim Hs
 %diesel parameters
 dies.fmax = 800;            %[liters] fuel capacity
 dies.ftmax = 18;            %[m] fuel can sit idle before going "bad"

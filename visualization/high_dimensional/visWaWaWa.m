@@ -73,7 +73,7 @@ cbuff = 10; %cost text buffer
 gbuff = .1; %generation text buffer
 bbuff = 1.5;  %battery text buffer
 cybuff = .7; %battery cycle buffer
-roto = 0; %rotation
+set(0,'defaulttextinterpreter','none')
 
 %colors
 cols = 6;

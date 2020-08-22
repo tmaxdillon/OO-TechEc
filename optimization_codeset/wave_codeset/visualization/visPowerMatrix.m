@@ -17,7 +17,7 @@ efficiency = zeros(ymin+length(y),xmin+length(x));
 wave.method = 2;
 opt = prepWave(data,opt,wave,atmo);
 
-width = 2;
+width = 6;
 
 for i = 1:length(x) %Tp
     for j = 1:length(y) %Hs
@@ -71,7 +71,7 @@ cb = colorbar;
 ylabel(cb,'Power [kW]','Fontsize',14)
 %axis equal
 %axis tight
-title('Power Matrix','Fontsize',20)
+title(['Power Matrix, B = ' num2str(width)],'Fontsize',20)
 ylabel({'Significant', 'Wave Height [m]'},'Fontsize',20)
 xlabel('Peak Period [s]','Fontsize',20)
 set(gca,'Fontsize',14)
