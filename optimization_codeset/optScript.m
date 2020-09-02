@@ -28,7 +28,8 @@ elseif opt.tdsens && ~opt.alllocuses %two dimensional sensitivity analysis
 elseif opt.alllocuses %run all dimensions
     allLocUses = doAllLocUses();
 elseif opt.senssm
-    [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s0] = doSensSM();
+    [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s0] = ...
+        doSensSM();
     if pm == 3 %assign output to descriptive variables
         cwm = s1;
         wiv = s2;
@@ -42,6 +43,10 @@ elseif opt.senssm
         bhc = s10;
         dep = s11;
         dtc = s12;
+        mbl = s13;
+        lft = s14;
+        spv = s15;
+        tmt = s16;
     end
 else %just one simulation
     disp(['Optimization (' char(loc) ', pm: ' num2str(pm), ...

@@ -6,7 +6,7 @@ opt.kW_m = opt.bf.M; %[kW]
 opt.Smax_1 = 1;
 opt.Smax_n = opt.bf.N; %[kWh]
 
-%set sensitivity modifiers to 1 if absent
+%set sensitivity modifiers to 1 if absent and to value if existing
 if ~isfield(wave,'cw_mod')
     wave.cw_mod = 1; %capture width modifier
 end
@@ -15,6 +15,12 @@ if ~isfield(data,'depth_mod')
 end
 if ~isfield(data,'dist_mod')
     data.dist_mod = 1; %capture width modifier
+end
+if isfield(econ.vessel,'tmt_enf') && ...
+        (opt.sens || opt.tdsens || opt.senssm) && ...
+        isequal(opt.tuned_parameter,'tmt')
+    econ.vessel.t_mosv = econ.vessel.tmt_enf; %osv maintenance time
+    econ.vessel.t_ms = econ.vessel.tmt_enf; %spec maintenance time
 end
 
 %set econ scenario

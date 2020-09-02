@@ -1,5 +1,4 @@
-function [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s0] = ...
-    doSensSM()
+function [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s0] = doSensSM()
 
 n = 10; %sensitivity discretization
 f = 2; %factor
@@ -8,7 +7,7 @@ disp(['Sensitivity small multiple beginning. n = ' num2str(n) ])
 tTot = tic;
 optInputs %load inputs
 uc = uc(c);
-opt.S = n; %for command window notification
+opt.S = length(opt.tuning_array); %for command window notification
 if pm == 1 %wind
     nps = 4; %number of power-specific parameters
     tp{1} = 'mzm'; %marinization multiplier
@@ -51,7 +50,7 @@ tp{nps+9} = 'mbl'; %maximum battery life-cycle [BATT]
 ta(nps+9,:) = linspace(batt.lc_max*(2/5),batt.lc_max,n);
 tp{nps+10} = 'lft'; %lifetime [INST]
 ta(nps+10,:) = linspace(uc.lifetime-3,uc.lifetime+3,n);
-tp{nps+11} = 'spv'; %specialized vessel cost [OPEX]
+tp{nps+11} = 'mbl'; %specialized vessel cost [OPEX]
 ta(nps+11,:) = linspace(econ.vessel.speccost/f,econ.vessel.speccost*f,n);
 tp{nps+12} = 'tmt'; %time spent on site for maintenance [OPEX]
 ta(nps+12,:) = linspace(1,24,n);
@@ -70,9 +69,9 @@ if pm == 3
     s11 = doSens(ta(11,:),tp{11});
     s12 = doSens(ta(12,:),tp{12});
     s13 = doSens(ta(13,:),tp{13});
-    s14 = doSens(ta(14,:),tp{14});
-    s15 = doSens(ta(15,:),tp{15});
-    s16 = doSens(ta(16,:),tp{16});
+    s14 = doSens(ta(14,:),tp{13=4});
+    s15 = doSens(ta(15,:),tp{13});
+    s16 = doSens(ta(16,:),tp{13});
 end
 
 %get S0, default results
