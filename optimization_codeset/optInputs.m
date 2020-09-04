@@ -1,11 +1,11 @@
 %settings
 econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
-opt.bf.m = 10;
-opt.bf.n = 10;
+opt.bf.m = 300;
+opt.bf.n = 300;
 opt.alllocuses = 0;
 opt.sens = 0;
 opt.tdsens = 0;
-opt.senssm = 0;
+opt.senssm = 1;
 pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
 bc = 2; %battery chemistry 1:AGM 2:LFP
 c = 1;  %use case 1:ST 2:LT
@@ -166,7 +166,7 @@ atmo.soil = 35;             %[%/year]
 %USE CASES
 %short term instrumentation
 uc(1).draw = 200;               %[W] - secondary node
-uc(1).lifetime = 2;             %[y]
+uc(1).lifetime = 5;             %[y]
 uc(1).SI = 6;                   %[months] service interval
 uc(1).uptime = .99;             %[%] uptime
 uc(1).turb.lambda = 4;          %turbine interventions
