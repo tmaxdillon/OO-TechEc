@@ -93,6 +93,12 @@ for a = 1:size(array,1)
     plot(ta(a,:),CapEx(a,:)/tc,'Color',[255, 105, 97]/256,  ...
         'DisplayName','CapEx','LineWidth',lw)
     hold on
+    grid on
+    gls = get(gca,'GridLineStyle');
+    glc = get(gca,'GridColor');
+    gla = get(gca,'GridAlpha');
+    xl = xline(x0(a),'Color',glc,'Alpha',gla,'LineStyle',gls);
+    hold on
     plot(ta(a,:),OpEx(a,:)/tc,'Color',[70, 190, 234]/256, ...
         'DisplayName','OpEx','LineWidth',lw)
     hold on
@@ -100,6 +106,7 @@ for a = 1:size(array,1)
         'Color','k','DisplayName','Total','LineWidth',lw)
     scatter(x0(a),1,ms,'MarkerFaceColor',[255, 179, 71]/256, ...
         'MarkerEdgeColor','k','LineWidth',lw2,'DisplayName','Baseline')
+    grid on
     xticks([ta(a,1),ta(a,n)]);
     xt = xticks;
     xlim([ta(a,1) ta(a,n)])
@@ -107,7 +114,6 @@ for a = 1:size(array,1)
     yticks([0 1])
     yticklabels({'$0k',['$' num2str(round(tc/1000),3) 'k']})
     set(gca,'FontSize',fs1)
-    grid on
     if a == 1
         t = title('Battery','FontWeight','normal','FontSize',fs3);
         t.Position(2) = t.Position(2)*1.1;

@@ -75,27 +75,35 @@ fs3 = 12;
 
 if s0.c == 1 && isequal(s0.loc,'argBasin')
     ssm_ab_st = figure;
+    figstr = 'ssm_ab_st';
 elseif s0.c == 2 && isequal(s0.loc,'argBasin')
     ssm_ab_lt = figure;
+    figstr = 'ssm_ab_lt';
 elseif s0.c == 1 && isequal(s0.loc,'souOcean')
     ssm_so_st = figure;
+    figstr = 'ssm_so_st';
 elseif s0.c == 1 && isequal(s0.loc,'souOcean')
     ssm_so_lt = figure;
-else
+    figstr = 'ssm_so_lt';
+end
 set(gcf,'Units','inches')
 set(gcf,'Position', [1, 1, 6.5, 5.5])
 for a = 1:size(array,1)
     ax(a) = subplot(4,4,a);
-    plot(ta(a,:),CapEx(a,:)/tc,'r', ...
+    set(gca,'LineWidth',0.9)
+    xl = xline(x0(a));
+    hold on
+    plot(ta(a,:),CapEx(a,:)/tc,'Color',[255, 105, 97]/256,  ...
         'DisplayName','CapEx','LineWidth',lw)
     hold on
-    plot(ta(a,:),OpEx(a,:)/tc,'b', ...
+    plot(ta(a,:),OpEx(a,:)/tc,'Color',[70, 190, 234]/256, ...
         'DisplayName','OpEx','LineWidth',lw)
     hold on
     plot(ta(a,:),(CapEx(a,:)+OpEx(a,:))/tc, ...
         'Color','k','DisplayName','Total','LineWidth',lw)
-    scatter(x0(a),1,ms,'MarkerFaceColor',[1 .5 0], ...
-        'MarkerEdgeColor','k','LineWidth',lw2)
+    scatter(x0(a),1,ms,'MarkerFaceColor',[255, 179, 71]/256, ...
+        'MarkerEdgeColor','k','LineWidth',lw2,'DisplayName','Baseline')
+    grid on
     xticks([ta(a,1),ta(a,n)]);
     xt = xticks;
     xlim([ta(a,1) ta(a,n)])
@@ -103,7 +111,6 @@ for a = 1:size(array,1)
     yticks([0 1])
     yticklabels({'$0k',['$' num2str(round(tc/1000),3) 'k']})
     set(gca,'FontSize',fs1)
-    grid on
     if a == 1
         t = title('Battery','FontWeight','normal','FontSize',fs3);
         t.Position(2) = t.Position(2)*1.1;
@@ -180,8 +187,16 @@ for a = 1:size(array,1)
 %     set(t, 'Units', 'data');
 %     t1 = get(t, 'Position');
 %     xlaby = t1(2);
-    set(gca,'LineWidth',0.6)
+    gls = get(gca,'GridLineStyle');
+    glc = get(gca,'GridColor');
+    gla = get(gca,'GridAlpha');
+    set(xl,'LineStyle',gls,'Color',glc,'Alpha',gla)
 end
 
-print(senssm,'../Research/OO-TechEc/paper_figures/datacomp',  ...
+hL = legend('show','location','southoutside','Orientation','horizontal');
+newPosition = [0.41 .03 0.2 0];
+newUnits = 'normalized';
+set(hL,'Position', newPosition,'Units', newUnits,'FontSize',fs1);
+
+print(gcf,['../Research/OO-TechEc/paper_figures/' figstr],  ...
     '-dpng','-r600')
