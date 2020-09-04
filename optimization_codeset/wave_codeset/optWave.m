@@ -11,10 +11,10 @@ if ~isfield(wave,'cw_mod')
     wave.cw_mod = 1; %capture width modifier
 end
 if isfield(data,'depth_mod')
-    data.depth = data.depth_mod;
+    data.depth = data.depth_mod; %depth modifier
 end
-if ~isfield(data,'dist_mod')
-    data.dist_mod = 1; %dist to coast modifier
+if isfield(data,'dist_mod')
+    data.dist = data.dist_mod; %dist to coast modifier
 end
 if isfield(econ.vessel,'tmt_enf') && ...
         (opt.sens || opt.tdsens || opt.senssm) && ...

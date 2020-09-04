@@ -71,14 +71,25 @@ lw2 = 1;
 ms = 30;
 fs1 = 8;
 fs2 = 7;
-fs3 = 10;
+fs3 = 12;
 
-senssm = figure;
+if s0.c == 1 && isequal(s0.loc,'argBasin')
+    ssm_ab_st = figure;
+    figstr = 'ssm_ab_st';
+elseif s0.c == 2 && isequal(s0.loc,'argBasin')
+    ssm_ab_lt = figure;
+    figstr = 'ssm_ab_lt';
+elseif s0.c == 1 && isequal(s0.loc,'souOcean')
+    ssm_so_st = figure;
+    figstr = 'ssm_so_st';
+elseif s0.c == 1 && isequal(s0.loc,'souOcean')
+    ssm_so_lt = figure;
+    figstr = 'ssm_so_lt';
+end
 set(gcf,'Units','inches')
 set(gcf,'Position', [1, 1, 6.5, 5.5])
 for a = 1:size(array,1)
     ax(a) = subplot(4,4,a);
-    set(ax(a),'LineWidth',1.1)
     plot(ta(a,:),CapEx(a,:)/tc,'r', ...
         'DisplayName','CapEx','LineWidth',lw)
     hold on
@@ -134,11 +145,12 @@ for a = 1:size(array,1)
         xlabel({'Lifetime [yr]'},'FontSize',fs2)
         xticklabels({'2','9'})
     elseif isequal(array(a,1).opt.tuned_parameter,'ild')
-        xlabel(({'Load'}),'FontSize',fs2)
+        xlabel(({'Load [W]'}),'FontSize',fs2)
     elseif isequal(array(a,1).opt.tuned_parameter,'cwm')
         xlabel(({'Capture Width','Multiplier'}),'FontSize',fs2)
     elseif isequal(array(a,1).opt.tuned_parameter,'whl')
         xlabel(({'WEC Hotel','Load'}),'FontSize',fs2)
+        xticklabels({'0%','18%'})
     elseif isequal(array(a,1).opt.tuned_parameter,'wcm')
         xlabel(({'WEC Cost','Multiplier'}),'FontSize',fs2)
     elseif isequal(array(a,1).opt.tuned_parameter,'wiv')
@@ -159,4 +171,21 @@ for a = 1:size(array,1)
     end
     xlab = get(ax(a),'XLabel');
     xlab.Position(2) = 0.6*xlab.Position(2);
+    %need to fix tick overlap eventually:
+    %https://www.mathworks.com/matlabcentral/answers/2318-set-position-of-tick-labels
+%     xtl = xticklabels;
+%     xtickpos = get(gca, 'xtick');
+%     ylimvals = get(gca, 'YLim');
+%     for i = 1:2
+%         t(i) = text(xtickpos(i), ylimvals(i), xtl{i});
+%         set(t(i), 'Units','pixels');
+%         set(t(i), 'Position', get(t(i),'Position')-[0 10 0]);
+%     end
+%     set(t, 'Units', 'data');
+%     t1 = get(t, 'Position');
+%     xlaby = t1(2);
+    set(gca,'LineWidth',0.6)
 end
+
+print(gcf,['../Research/OO-TechEc/paper_figures/' figstr],  ...
+    '-dpng','-r600')
