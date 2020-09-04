@@ -14,7 +14,7 @@ if ~isfield(data,'depth_mod')
     data.depth_mod = 1; %capture width modifier
 end
 if ~isfield(data,'dist_mod')
-    data.dist_mod = 1; %capture width modifier
+    data.dist_mod = data.dist_mod/data.depth; %depth width modifier
 end
 if isfield(econ.vessel,'tmt_enf') && ...
         (opt.sens || opt.tdsens || opt.senssm) && ...

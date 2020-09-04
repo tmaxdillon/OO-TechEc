@@ -1,7 +1,7 @@
 %settings
 econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
-opt.bf.m = 300;
-opt.bf.n = 300;
+opt.bf.m = 3;
+opt.bf.n = 3;
 opt.alllocuses = 0;
 opt.sens = 0;
 opt.tdsens = 0;
