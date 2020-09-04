@@ -1,11 +1,11 @@
 %settings
-opt.alllocuses = 0;
 econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
+opt.bf.m = 10;
+opt.bf.n = 10;
+opt.alllocuses = 0;
 opt.sens = 0;
 opt.tdsens = 0;
-opt.senssm = 1;
-opt.bf.m = 300;
-opt.bf.n = 300;
+opt.senssm = 0;
 pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
 bc = 2; %battery chemistry 1:AGM 2:LFP
 c = 1;  %use case 1:ST 2:LT
@@ -217,6 +217,8 @@ uc(2).dies.lambda = 1;          %diesel interventions
 % opt.tuned_parameter = 'wiv'; %wec interventions
 % opt.tuning_array = linspace(1/2,2,10);
 % opt.tuned_parameter = 'dep'; %depth modifier
+opt.tuning_array = linspace(uc(c).lifetime-3,uc(c).lifetime+3,10); 
+opt.tuned_parameter = 'lft'; %lifetime
 
 %opt 2D sens
 % opt.tdsens_ta(1,:) = 0.1:0.04:1.7;
