@@ -90,16 +90,16 @@ set(gcf,'Units','inches')
 set(gcf,'Position', [1, 1, 6.5, 5.5])
 for a = 1:size(array,1)
     ax(a) = subplot(4,4,a);
-    plot(ta(a,:),CapEx(a,:)/tc,'r', ...
+    plot(ta(a,:),CapEx(a,:)/tc,'Color',[255, 105, 97]/256,  ...
         'DisplayName','CapEx','LineWidth',lw)
     hold on
-    plot(ta(a,:),OpEx(a,:)/tc,'b', ...
+    plot(ta(a,:),OpEx(a,:)/tc,'Color',[70, 190, 234]/256, ...
         'DisplayName','OpEx','LineWidth',lw)
     hold on
     plot(ta(a,:),(CapEx(a,:)+OpEx(a,:))/tc, ...
         'Color','k','DisplayName','Total','LineWidth',lw)
-    scatter(x0(a),1,ms,'MarkerFaceColor',[1 .5 0], ...
-        'MarkerEdgeColor','k','LineWidth',lw2)
+    scatter(x0(a),1,ms,'MarkerFaceColor',[255, 179, 71]/256, ...
+        'MarkerEdgeColor','k','LineWidth',lw2,'DisplayName','Baseline')
     xticks([ta(a,1),ta(a,n)]);
     xt = xticks;
     xlim([ta(a,1) ta(a,n)])
@@ -184,8 +184,13 @@ for a = 1:size(array,1)
 %     set(t, 'Units', 'data');
 %     t1 = get(t, 'Position');
 %     xlaby = t1(2);
-    set(gca,'LineWidth',0.6)
+    set(gca,'LineWidth',0.9)
 end
+
+hL = legend('show','location','southoutside','Orientation','horizontal');
+newPosition = [0.41 .03 0.2 0];
+newUnits = 'normalized';
+set(hL,'Position', newPosition,'Units', newUnits,'FontSize',fs1);
 
 print(gcf,['../Research/OO-TechEc/paper_figures/' figstr],  ...
     '-dpng','-r600')
