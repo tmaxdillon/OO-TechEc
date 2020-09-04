@@ -18,7 +18,7 @@ wavepower = opt.wave.wavepower_ts; %wavepower timeseries
 T = length(opt.wave.wavepower_ts); %total time steps
 dt = 24*(data.wave.time(2) - data.wave.time(1)); %delta time in hours
 dist = data.dist*data.dist_mod; %[m] dist to shore
-depth = data.depth*data.depth_mod; %[m] water depth
+depth = data.depth; %[m] water depth
 
 if wave.method == 1 %divide by B methodology       
     cwr_b = wave.cw_mod.*opt.wave.cwr_b_ts; %[m^-1] eta timeseries (cwr/b)    

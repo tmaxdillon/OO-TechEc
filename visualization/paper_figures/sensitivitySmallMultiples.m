@@ -1,29 +1,56 @@
 clearvars -except sdr bhc mbl nbl dep utp lft ild cwm whl wcm wiv tmt  ...
-    dtc spv osv s0 array
+    dtc spv osv s0
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
 %merge
-if ~exist('array','var')
-    array(1,:) = sdr;
-    array(5,:) = bhc;
-    array(9,:) = mbl;
-    array(13,:) = nbl;
-    array(2,:) = dep;
-    array(6,:) = utp;
-    array(10,:) = lft;
-    array(14,:) = ild;
-    array(3,:) = cwm;
-    array(7,:) = whl;
-    array(11,:) = wcm;
-    array(15,:) = wiv;
-    array(4,:) = tmt;
-    array(8,:) = dtc;
-    array(12,:) = spv;
-    array(16,:) = osv;
+array(1,:) = sdr;
+x0(1) = s0.batt.sdr;
+array(5,:) = bhc;
+x0(5) = s0.econ.batt.enclmult;
+array(9,:) = mbl;
+x0(9) = s0.batt.lc_max;
+array(13,:) = nbl;
+x0(13) = s0.batt.lc_nom;
+array(2,:) = dep;
+x0(2) = s0.data.depth;
+array(6,:) = utp;
+x0(6) = s0.uc.uptime;
+array(10,:) = lft;
+x0(10) = s0.uc.lifetime;
+array(14,:) = ild;
+x0(14) = s0.uc.draw;
+array(3,:) = cwm;
+x0(3) = 1;
+array(7,:) = whl;
+x0(7) = s0.wave.house;
+array(11,:) = wcm;
+if s0.econ.wave.scen == 2 %opt cost
+    x0(11) = s0.econ.wave.costmult_opt;
+else
+    x0(11) = s0.econ.wave.costmult_con;
 end
+array(15,:) = wiv;
+if s0.econ.wave.scen == 3 %opt durability
+    x0(15) = s0.econ.wave.lowfail;
+else
+    x0(15) = s0.econ.wave.highfail;
+end
+array(4,:) = tmt;
+if s0.c == 1 %short term
+    x0(4) = s0.econ.vessel.t_ms;
+elseif s0.c == 2 %long term
+    x0(4) = s0.econ.vessel.t_mosv;
+end
+array(8,:) = dtc;
+x0(8) = s0.data.dist/1000;
+array(12,:) = spv;
+x0(12) = s0.econ.vessel.speccost;
+array(16,:) = osv;
+x0(16) = s0.econ.vessel.osvcost;
+
 
 n = length(sdr(1).opt.tuning_array); %sensitivity discretization
 
@@ -40,10 +67,11 @@ tc = s0.output.min.cost; %total cost of base case
 
 %plot settings
 lw = 2;
-lw2 = 1.2;
+lw2 = 1;
 ms = 30;
 fs1 = 8;
 fs2 = 7;
+fs3 = 10;
 
 senssm = figure;
 set(gcf,'Units','inches')
@@ -58,9 +86,8 @@ for a = 1:size(array,1)
         'DisplayName','OpEx','LineWidth',lw)
     hold on
     plot(ta(a,:),(CapEx(a,:)+OpEx(a,:))/tc, ...
-        'Color','k','DisplayName','Total','LineWidth',lw*1)
-    [~,xdot_ind] = min(abs((CapEx(a,:)+OpEx(a,:)-tc)));
-    scatter(ta(a,xdot_ind),1,ms,'MarkerFaceColor',[1 .5 0], ...
+        'Color','k','DisplayName','Total','LineWidth',lw)
+    scatter(x0(a),1,ms,'MarkerFaceColor',[1 .5 0], ...
         'MarkerEdgeColor','k','LineWidth',lw2)
     xticks([ta(a,1),ta(a,n)]);
     xt = xticks;
@@ -70,16 +97,32 @@ for a = 1:size(array,1)
     yticklabels({'$0k',['$' num2str(round(tc/1000),3) 'k']})
     set(gca,'FontSize',fs1)
     grid on
+    if a == 1
+        t = title('Battery','FontWeight','normal','FontSize',fs3);
+        t.Position(2) = t.Position(2)*1.1;
+    end
+    if a == 2
+        t = title('Instrumentation','FontWeight','normal','FontSize',fs3);
+        t.Position(2) = t.Position(2)*1.1;
+    end
+    if a == 3
+        t = title('WEC','FontWeight','normal','FontSize',fs3);
+        t.Position(2) = t.Position(2)*1.1;
+    end
+    if a == 4
+        t = title('OpEx','FontWeight','normal','FontSize',fs3);
+        t.Position(2) = t.Position(2)*1.1;
+    end
     if isequal(array(a,1).opt.tuned_parameter,'sdr')
         xlabel(({'Self-','Discharge Rate'}),'FontSize',fs2)
         xticklabels({'1.5%','6.0%'})
     elseif isequal(array(a,1).opt.tuned_parameter,'bhc')
         xlabel({'Housing Cost','Multiplier'},'FontSize',fs2)
     elseif isequal(array(a,1).opt.tuned_parameter,'mbl')
-        xlabel({'Maximum Battery','Life-Cycle [mo]'},'FontSize',fs2)
+        xlabel({'Maximum','Battery Life-Cycle [mo]'},'FontSize',fs2)
         xticklabels({'24','60'})
     elseif isequal(array(a,1).opt.tuned_parameter,'nbl')
-        xlabel(({'Nominal Battery','Life-Cycle [mo]',''}),'FontSize',fs2)
+        xlabel(({'Nominal','Battery Life-Cycle [mo]',''}),'FontSize',fs2)
         xticklabels({'9','36'})
     elseif isequal(array(a,1).opt.tuned_parameter,'dep')
         xlabel({'Depth [m]'},'FontSize',fs2)
@@ -103,16 +146,17 @@ for a = 1:size(array,1)
     elseif isequal(array(a,1).opt.tuned_parameter,'tmt')
         xlabel(({'Maintenance','Time [h]'}),'FontSize',fs2)
     elseif isequal(array(a,1).opt.tuned_parameter,'dtc')
-        xlabel(({'Distance to','Coast [m]'}),'FontSize',fs2)
-        tx = round(9.7461e02.*xt,-1);
-        xticklabels({num2str(tx(1)),num2str(tx(2))})
+        xlabel(({'Distance to','Coast [km]'}),'FontSize',fs2)
+        xticklabels({'200','2000'})
     elseif isequal(array(a,1).opt.tuned_parameter,'spv')
         xlabel(({'Specialized','Vessel Cost [$k]'}),'FontSize',fs2)
         tx = xt./1000;
         xticklabels({num2str(tx(1)),num2str(tx(2))})
     elseif isequal(array(a,1).opt.tuned_parameter,'osv')
-        xlabel(({'Offshore Support','Vessel Cost [$k]'}),'FontSize',fs2)
+        xlabel(({'Offshore','Support Vessel Cost [$k]'}),'FontSize',fs2)
         tx = xt./1000;
         xticklabels({num2str(tx(1)),num2str(tx(2))})
     end
+    xlab = get(ax(a),'XLabel');
+    xlab.Position(2) = 0.6*xlab.Position(2);
 end

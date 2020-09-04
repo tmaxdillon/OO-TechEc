@@ -10,10 +10,8 @@ opt.Smax_n = opt.bf.N; %[kWh]
 if ~isfield(wave,'cw_mod')
     wave.cw_mod = 1; %capture width modifier
 end
-if ~isfield(data,'depth_mod')
-    data.depth_mod = 1; %depth modifier
-else
-    data.depth_mod = data.depth_mod/data.depth;
+if isfield(data,'depth_mod')
+    data.depth = data.depth_mod;
 end
 if ~isfield(data,'dist_mod')
     data.dist_mod = 1; %dist to coast modifier
