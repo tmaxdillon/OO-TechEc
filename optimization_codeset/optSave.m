@@ -9,7 +9,8 @@ if exist('s1','var') %save multiple structures
             's8','s9')
     elseif s1(1).pm == 3 %wave
         save([prepath name '.mat'],'cwm','wiv','wcm','whl','ild','osv', ...
-            'nbl','sdr','utp','bhc','dep','dtc','s0','-v7.3')
+            'nbl','sdr','utp','bhc','dep','dtc','mbl','lft','spv', ...
+            'tmt','s0','-v7.3')
     end
 else %save single structure
     if exist('multStruct','var')
