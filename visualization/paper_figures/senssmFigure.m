@@ -38,19 +38,18 @@ if s0.econ.wave.scen == 3 %opt durability
 else
     x0(15) = s0.econ.wave.highfail;
 end
-array(4,:) = tmt;
+array(12,:) = tmt;
 if s0.c == 1 %short term
-    x0(4) = s0.econ.vessel.t_ms;
+    x0(12) = s0.econ.vessel.t_ms;
 elseif s0.c == 2 %long term
-    x0(4) = s0.econ.vessel.t_mosv;
+    x0(12) = s0.econ.vessel.t_mosv;
 end
 array(8,:) = dtc;
-x0(8) = s0.data.dist/1000;
-array(12,:) = spv;
-x0(12) = s0.econ.vessel.speccost;
+x0(8) = s0.data.dist;
+array(4,:) = spv;
+x0(4) = s0.econ.vessel.speccost;
 array(16,:) = osv;
 x0(16) = s0.econ.vessel.osvcost;
-
 
 n = length(sdr(1).opt.tuning_array); %sensitivity discretization
 
@@ -63,15 +62,20 @@ for a = 1:size(array,1) %across all 16 arrays
     ta(a,:) = array(a,1).opt.tuning_array; %tuned array
 end
 
-tc = s0.output.min.cost; %total cost of base case
+t0 = s0.output.min.cost; %total cost of base case
+c0 = s0.output.min.CapEx; %capital cost of base case
+o0 = s0.output.min.OpEx; %operational cost of base case
 
 %plot settings
 lw = 2;
 lw2 = 1;
-ms = 30;
-fs1 = 8;
-fs2 = 7;
+ms = 22;
+fs1 = 7.5;
+fs2 = 7.5;
 fs3 = 12;
+red = [255, 105, 97]/256;
+blue = [70, 190, 234]/256;
+orange = [255, 179, 71]/256;
 
 if s0.c == 1 && isequal(s0.loc,'argBasin')
     ssm_ab_st = figure;
@@ -82,7 +86,7 @@ elseif s0.c == 2 && isequal(s0.loc,'argBasin')
 elseif s0.c == 1 && isequal(s0.loc,'souOcean')
     ssm_so_st = figure;
     figstr = 'ssm_so_st';
-elseif s0.c == 1 && isequal(s0.loc,'souOcean')
+elseif s0.c == 2 && isequal(s0.loc,'souOcean')
     ssm_so_lt = figure;
     figstr = 'ssm_so_lt';
 end
@@ -90,29 +94,30 @@ set(gcf,'Units','inches')
 set(gcf,'Position', [1, 1, 6.5, 5.5])
 for a = 1:size(array,1)
     ax(a) = subplot(4,4,a);
-    plot(ta(a,:),CapEx(a,:)/tc,'Color',[255, 105, 97]/256,  ...
-        'DisplayName','CapEx','LineWidth',lw)
+    total = plot(ta(a,:),(CapEx(a,:)+OpEx(a,:))/t0, ...
+        'Color','k','DisplayName','Total','LineWidth',lw);
     hold on
     grid on
     gls = get(gca,'GridLineStyle');
     glc = get(gca,'GridColor');
     gla = get(gca,'GridAlpha');
     xl = xline(x0(a),'Color',glc,'Alpha',gla,'LineStyle',gls);
-    hold on
-    plot(ta(a,:),OpEx(a,:)/tc,'Color',[70, 190, 234]/256, ...
-        'DisplayName','OpEx','LineWidth',lw)
-    hold on
-    plot(ta(a,:),(CapEx(a,:)+OpEx(a,:))/tc, ...
-        'Color','k','DisplayName','Total','LineWidth',lw)
-    scatter(x0(a),1,ms,'MarkerFaceColor',[255, 179, 71]/256, ...
-        'MarkerEdgeColor','k','LineWidth',lw2,'DisplayName','Baseline')
-    grid on
+    capex = plot(ta(a,:),CapEx(a,:)/t0,'Color',red,  ...
+        'DisplayName','CapEx','LineWidth',lw);
+    opex = plot(ta(a,:),OpEx(a,:)/t0,'Color',blue, ...
+        'DisplayName','OpEx','LineWidth',lw);  
+    blt = scatter(x0(a),1,ms,'MarkerFaceColor',orange, ...
+        'MarkerEdgeColor','k','LineWidth',lw2,'DisplayName','Baseline');
+    scatter(x0(a),c0/t0,ms,'MarkerFaceColor',orange, ...
+        'MarkerEdgeColor','k','LineWidth',lw2,'MarkerEdgeColor',red);
+    scatter(x0(a),o0/t0,ms,'MarkerFaceColor',orange, ...
+            'MarkerEdgeColor','k','LineWidth',lw2,'MarkerEdgeColor',blue);
     xticks([ta(a,1),ta(a,n)]);
     xt = xticks;
     xlim([ta(a,1) ta(a,n)])
-    ylim([0 max(max(CapEx + OpEx))/tc])
+    ylim([0 max(max(CapEx + OpEx))/t0])
     yticks([0 1])
-    yticklabels({'$0k',['$' num2str(round(tc/1000),3) 'k']})
+    yticklabels({'$0k',['$' num2str(round(t0/1000),3) 'k']})
     set(gca,'FontSize',fs1)
     if a == 1
         t = title('Battery','FontWeight','normal','FontSize',fs3);
@@ -151,9 +156,9 @@ for a = 1:size(array,1)
         xlabel({'Lifetime [yr]'},'FontSize',fs2)
         xticklabels({'2','9'})
     elseif isequal(array(a,1).opt.tuned_parameter,'ild')
-        xlabel(({'Load [W]'}),'FontSize',fs2)
+        xlabel(({'Power','Requirement [W]'}),'FontSize',fs2)
     elseif isequal(array(a,1).opt.tuned_parameter,'cwm')
-        xlabel(({'Capture Width','Multiplier'}),'FontSize',fs2)
+        xlabel(({'Capture Width','Ratio Multiplier'}),'FontSize',fs2)
     elseif isequal(array(a,1).opt.tuned_parameter,'whl')
         xlabel(({'WEC Hotel','Load'}),'FontSize',fs2)
         xticklabels({'0%','18%'})
@@ -177,23 +182,21 @@ for a = 1:size(array,1)
     end
     xlab = get(ax(a),'XLabel');
     xlab.Position(2) = 0.6*xlab.Position(2);
-    %need to fix tick overlap eventually:
-    %https://www.mathworks.com/matlabcentral/answers/2318-set-position-of-tick-labels
-%     xtl = xticklabels;
-%     xtickpos = get(gca, 'xtick');
-%     ylimvals = get(gca, 'YLim');
-%     for i = 1:2
-%         t(i) = text(xtickpos(i), ylimvals(i), xtl{i});
-%         set(t(i), 'Units','pixels');
-%         set(t(i), 'Position', get(t(i),'Position')-[0 10 0]);
-%     end
-%     set(t, 'Units', 'data');
-%     t1 = get(t, 'Position');
-%     xlaby = t1(2);
+    %fix x tick overlap
+    xtl = xticklabels;
+    xticklabels([])
+    xtickpos = get(gca, 'xtick');
+    for i = 1:2
+        t(i) = text(xtickpos(i),0, xtl{i}, ... 
+            'FontSize',fs1,'HorizontalAlignment','center');
+         set(t(i), 'Units','pixels');
+         set(t(i), 'Position', get(t(i),'Position')-[0 8 0]);
+    end
     set(gca,'LineWidth',0.9)
 end
 
-hL = legend('show','location','southoutside','Orientation','horizontal');
+hL = legend([capex, opex, total, blt],'CapEx','OpEx','Total Cost', ...
+    'Baseline','location','southoutside','Orientation','horizontal');
 newPosition = [0.41 .03 0.2 0];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits,'FontSize',fs1);

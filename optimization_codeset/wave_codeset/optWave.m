@@ -47,7 +47,7 @@ end
 opt.fmin = false;
 check_s = 0;
 while ~check_s
-    [~,check_s] = simWave(opt.kW_m,opt.Smax_n,opt,data, ...
+    [~,check_s] = simWave(opt.kW_m/2,opt.Smax_n/2,opt,data, ...
         atmo,batt,econ,uc,bc,wave);
     if ~check_s
         opt.kW_m = 2*opt.kW_m;
@@ -89,28 +89,6 @@ output.cost = reshape(C_temp,[m n])'; %return cost to matrix and structure
 output.surv = reshape(S_temp,[m n])'; %return surv to matrix and structure
 X = reshape(X,[m n])'; %return objval X to matrix
 output.tGrid = toc(tGrid);
-
-% %NON PARALLELIZED CODE
-% %preallocate
-% m = opt.bf.m;
-% n = opt.bf.n;
-% opt.kW = linspace(opt.kW_1,opt.kW_m,m);              %[kW]
-% opt.Smax = linspace(opt.Smax_1,opt.Smax_n,n);    %[kWh]
-% output.cost = zeros(m,n);
-% output.surv = zeros(m,n);
-% X = zeros(m,n);
-% for i = 1:m
-%     for j = 1:n
-%         [output.cost(i,j),output.surv(i,j)] = ...
-%             simWave(opt.kW(i),opt.Smax(j),opt,data,atmo,batt,econ,uc, ...
-%             bc,wave);
-%         if output.surv(i,j) == 0
-%             X(i,j) = inf;
-%         else
-%             X(i,j) = output.cost(i,j);
-%         end
-%     end
-% end
 
 disp('Brute forcing global minimum...')
 [I(1),I(2)] = find(X == min(X(:)),1);

@@ -14,13 +14,10 @@ CF = zeros(1,length(multStruct));
 for i = 1:length(multStruct)
     cost(i) = multStruct(i).output.min.cost;
     wecCapEx(i) = multStruct(i).output.min.kWcost + ...
-        multStruct(i).output.min.Icost + ...
-        multStruct(i).output.min.FScost;
-    wecOpEx(i) = multStruct(i).output.min.maint + ...
-        multStruct(i).output.min.wecrepair;
+        multStruct(i).output.min.Icost;
+    wecOpEx(i) = multStruct(i).output.min.wecrepair;
     battCapEx(i) = multStruct(i).output.min.Scost + ...
-        multStruct(i).output.min.battencl + ...
-        multStruct(i).output.min.platform;
+        multStruct(i).output.min.battencl;
     battOpEx(i) = multStruct(i).output.min.battreplace;
     vesselcost(i) = multStruct(i).output.min.vesselcost;
     Smax(i) = multStruct(i).output.min.Smax;

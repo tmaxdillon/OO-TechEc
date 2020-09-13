@@ -59,13 +59,13 @@ for loc = 1:nl
 end
 
 %plotting setup
-hl_results = figure;
+WaWaWa_hl = figure;
 set(gcf,'Units','inches')
 set(gcf, 'Position', [1, 1, 6.5, 7.5])
-fs = 6; %annotation font size
-fs2 = 8; %axis font size
-yaxhpos = -.25; %
-cmult = 1.35; %cost axis multiplier
+fs = 7; %annotation font size
+fs2 = 10; %axis font size
+yaxhpos = -.35; %
+cmult = 1.28; %cost axis multiplier
 gmult = 1.9; %generation axis multiplier
 bmult = 2.1; %battery axis multiplier
 cymult = 1.5; %cycles axis multiplier 
@@ -134,9 +134,9 @@ for c = 1:nu
         if c == 2 && i == np
             leg = legend(h(i,:,c),leg,'Location','northeast');
             leg.FontSize = fs;
-%             leg.Position(1) = .7;
-%             leg.Position(2) = .85;
-%             legpos = leg.Position;
+            leg.Position(1) = .81;
+            leg.Position(2) = .840;
+            legpos = leg.Position;
         end
     end
     hold off;
@@ -240,7 +240,7 @@ for c = 1:nu
     end
     grid on
     ylim([0 bmult*max(stordata(:))])
-    set(gca,'YTick',[0 200 400])
+    set(gca,'YTick',[0 100 200 300 400])
     linkaxes(ax(3,:),'y')
     
     ax(4,c) = subplot(7,nu,10+c);
@@ -329,17 +329,13 @@ for c = 1:nu
 end
 
 %figure adjustment
+set(gcf, 'Position', [1, 1, 7.5, 7.5])
 for c = 1:nc
     for a = 1:5
-        axpos(a,c,1) = axpos(a,c,1) + 15;
         set(ax(a,c),'Position',axpos(a,c,:));        
     end
 end
-% legpos = get(leg,'Position');
-% legpos(1) = 0.78;
-% legpos = 1;
 
-print(hl_results,'../Research/OO-TechEc/pf3/hl_results',  ...
-    '-dpng','-r600')
+set(leg,'Position',legpos)
 
 end

@@ -75,13 +75,6 @@ nbr = ceil((12*uc.lifetime/batt.lc-1)); %number of battery replacements
 
 nvi = econ.wave.lambda + nbr; %vessel interventions
 
-%find added battery maintenance/installation time
-if Smax > batt.t_add_min
-    t_add_batt = batt.t_add_m*Smax-batt.t_add_m*batt.t_add_min;
-else
-    t_add_batt = 0;
-end
-
 %economic modeling
 kWcost = 2*econ.wave.costmult*polyval(opt.p_dev.t,kW); %wec
 Icost = (econ.wind.installed - kWcost/ ...
@@ -129,11 +122,6 @@ CapEx = Pmooring + Pinst + Pmtrl + ...
     battencl + Scost + Icost + kWcost;
 OpEx = battreplace + wecrepair + vesselcost;
 cost = CapEx + OpEx;
-% if opt.fmin && opt.nm.fmindebug
-%     kW
-%     cost
-%     %pause
-% end
 
 if sum(L == uc.draw)/(length(L)) < uc.uptime
     surv = 0;

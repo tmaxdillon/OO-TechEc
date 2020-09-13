@@ -1,4 +1,4 @@
-function [] = visWaWaWa_hl(pm1,pm2,pm3,allStruct)
+clearvars -except allStruct
 
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
@@ -6,14 +6,17 @@ set(0,'DefaultTextFontname', 'calibri')
 set(0,'DefaultAxesFontName', 'calibri')
 
 if ~exist('allStruct','var')
-    allStruct = mergeWaWaWa(pm1,pm2,pm3);
+    load('wave_optd')
+    load('wave_optc')
+    load('wave_cons')
+    allStruct = mergeWaWaWa(wave_optd,wave_optc,wave_cons);
 end
 
 np = 3; %number of power modules
 nc = 2; %number of costs
-nl = size(pm1,1); %number of locations
+nl = size(allStruct,1); %number of locations
 fixer = [1 2 3 4 5];
-nu = size(pm1,2); %number of use cases
+nu = size(allStruct,3); %number of use cases
 
 %initialize/preallocate
 costdata = zeros(nl,np,nc,nu);
@@ -61,9 +64,9 @@ end
 %plotting setup
 hl_results = figure;
 set(gcf,'Units','inches')
-set(gcf, 'Position', [1, 1, 6.5, 7.5])
-fs = 6; %annotation font size
-fs2 = 8; %axis font size
+set(gcf, 'Position', [1, 1, 10, 12])
+fs = 9; %annotation font size
+fs2 = 11; %axis font size
 yaxhpos = -.25; %
 cmult = 1.35; %cost axis multiplier
 gmult = 1.9; %generation axis multiplier
@@ -77,8 +80,9 @@ cybuff = 1.5; %battery cycle text buffer
 cfbuff = .025; %capacity factor text buffer
 
 %titles and labels
-titles = {'Short-Term Instrumentation'; ...
-    'Long-Term Instrumentation'};
+stt = {'Short-Term Instrumentation';'(six month service interval)'};
+ltt = {'Long-Term Instrumentatino';'(no service interval)'};
+titles = {stt,ltt};
 xlab = {'\begin{tabular}{l} Argentine \\ Basin \end{tabular}'; ...
     '\begin{tabular}{l} Coastal \\ Endurance \end{tabular}'; ...
     '\begin{tabular}{l} Coastal \\ Pioneer \end{tabular}'; ...
@@ -133,7 +137,7 @@ for c = 1:nu
         end
         if c == 2 && i == np
             leg = legend(h(i,:,c),leg,'Location','northeast');
-            leg.FontSize = fs;
+            leg.FontSize = fs2;
 %             leg.Position(1) = .7;
 %             leg.Position(2) = .85;
 %             legpos = leg.Position;
@@ -145,9 +149,13 @@ for c = 1:nu
     set(gca,'XTickLabelMode','manual');
     set(gca,'XTickLabel',[]);
     set(gca,'FontSize',fs2)
-    title(titles(c),'FontWeight','normal')
+    if c == 1
+        title(stt,'FontWeight','normal')
+        drawnow
+    else
+        title(ltt,'FontWeight','normal')
+    end
     set(gca,'Units','pixels')
-    axpos(1,c,:) = get(gca,'Position');
     if c == 1
         ylabel({'Total','Estimated','Cost','[$1000s]'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
@@ -188,9 +196,9 @@ for c = 1:nu
     set(gca,'FontSize',fs2)
     xtickangle(45)
     set(gca,'Units','pixels')
-    axpos(2,c,:) = get(gca,'Position');
     if c == 1
-        ylabel({'Generation','Capacity','[kW]'},'FontSize',fs2);
+        ylabel({'Cost-Optimal','Generation','Capacity','[kW]'}, ...
+            'FontSize',fs2);
         ylh = get(gca,'ylabel');
         set(ylh,'Rotation',0,'Units', ...
             'Normalized','Position',[yaxhpos .5 -1], ...
@@ -229,9 +237,9 @@ for c = 1:nu
     set(gca,'FontSize',fs2)
     xtickangle(45)
     set(gca,'Units','pixels')
-    axpos(3,c,:) = get(gca,'Position');
     if c == 1
-        ylabel({'Storage','Capacity','[kWh]'},'FontSize',fs2);
+        ylabel({'Cost-Optimal','Storage','Capacity','[kWh]'}, ...
+            'FontSize',fs2);
         ylh = get(gca,'ylabel');
         set(ylh,'Rotation',0,'Units', ...
             'Normalized','Position',[yaxhpos .5 -1], ...
@@ -313,7 +321,6 @@ for c = 1:nu
 %         'FontName','Calibri');
 %     xtickangle(45)
     set(gca,'Units','pixels')
-    axpos(5,c,:) = get(gca,'Position');
     if c == 1
         ylabel({'Capacity','Factor'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
@@ -329,12 +336,12 @@ for c = 1:nu
 end
 
 %figure adjustment
-for c = 1:nc
-    for a = 1:5
-        axpos(a,c,1) = axpos(a,c,1) + 15;
-        set(ax(a,c),'Position',axpos(a,c,:));        
-    end
-end
+% for c = 1:nc
+%     for a = 1:5
+%         axpos(a,c,1) = axpos(a,c,1) + 15;
+%         set(ax(a,c),'Position',axpos(a,c,:));        
+%     end
+% end
 % legpos = get(leg,'Position');
 % legpos(1) = 0.78;
 % legpos = 1;
@@ -342,4 +349,3 @@ end
 print(hl_results,'../Research/OO-TechEc/pf3/hl_results',  ...
     '-dpng','-r600')
 
-end

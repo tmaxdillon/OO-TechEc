@@ -1,19 +1,18 @@
-function [] = visWaWaWa_hl(pm1,pm2,pm3,allStruct)
-
+clearvars -except wave_optd wave_optc wave_cons allStruct
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'calibri')
 set(0,'DefaultAxesFontName', 'calibri')
 
 if ~exist('allStruct','var')
-    allStruct = mergeWaWaWa(pm1,pm2,pm3);
+    allStruct = mergeWaWaWa(wave_optd,wave_optc,wave_cons);
 end
 
 np = 3; %number of power modules
-nc = 2; %number of costs
-nl = size(pm1,1); %number of locations
-fixer = [1 2 3 4 5];
-nu = size(pm1,2); %number of use cases
+nc = 6; %number of costs
+nl = size(wave_optd,1); %number of locations
+fixer = [1 2 3 4 5]; %select which locations to include 1:1:5 means all
+nu = size(wave_optd,2); %number of use cases
 
 %initialize/preallocate
 costdata = zeros(nl,np,nc,nu);
@@ -29,16 +28,20 @@ opt = allStruct(1,1,1).opt;
 for loc = 1:nl
     for pm = 1:np
         for c = 1:nu
-            costdata(loc,pm,1,c) = ... %capex
+            costdata(loc,pm,1,c) = ... %platform
                 allStruct(fixer(loc),pm,c).output.min.Pinst/1000 + ...
-                allStruct(fixer(loc),pm,c).output.min.Pmooring/1000 + ...
+                allStruct(fixer(loc),pm,c).output.min.Pmooring/1000;
+            costdata(loc,pm,6,c) = ... %vessel
+                allStruct(fixer(loc),pm,c).output.min.vesselcost/1000;
+            costdata(loc,pm,3,c) = ... %storage capex
                 allStruct(fixer(loc),pm,c).output.min.Scost/1000 + ...
-                allStruct(fixer(loc),pm,c).output.min.battencl/1000 + ...
+                allStruct(fixer(loc),pm,c).output.min.battencl/1000;
+            costdata(loc,pm,5,c) = ... %storage opex
+                allStruct(fixer(loc),pm,c).output.min.battreplace/1000;
+            costdata(loc,pm,2,c) = ... %gen capex
                 allStruct(fixer(loc),pm,c).output.min.kWcost/1000 + ...
                 allStruct(fixer(loc),pm,c).output.min.Icost/1000;
-            costdata(loc,pm,2,c) = ... %opex
-                allStruct(fixer(loc),pm,c).output.min.vesselcost/1000 + ...
-                allStruct(fixer(loc),pm,c).output.min.battreplace/1000 + ...
+            costdata(loc,pm,4,c) = ... %gen opex
                 allStruct(fixer(loc),pm,c).output.min.wecrepair/1000;
             gendata(loc,pm,1,c) =  ...
                 allStruct(fixer(loc),pm,c).output.min.kW;
@@ -59,18 +62,18 @@ for loc = 1:nl
 end
 
 %plotting setup
-hl_results = figure;
+results = figure;
 set(gcf,'Units','inches')
 set(gcf, 'Position', [1, 1, 6.5, 7.5])
 fs = 6; %annotation font size
 fs2 = 8; %axis font size
 yaxhpos = -.25; %
-cmult = 1.35; %cost axis multiplier
-gmult = 1.9; %generation axis multiplier
-bmult = 2.1; %battery axis multiplier
-cymult = 1.5; %cycles axis multiplier 
-cfmult = 1.5; %capacity factor axis multiplier
-cbuff = 20; %cost text buffer
+cmult = 1.45; %cost axis multiplier
+gmult = 1.8; %generation axis multiplier
+bmult = 2; %battery axis multiplier
+cymult = 1.4; %cycles axis multiplier 
+cfmult = 1.4; %capacity factor axis multiplier
+cbuff = 10; %cost text buffer
 gbuff = .25; %generation text buffer
 bbuff = 15;  %battery text buffer
 cybuff = 1.5; %battery cycle text buffer
@@ -85,12 +88,17 @@ xlab = {'\begin{tabular}{l} Argentine \\ Basin \end{tabular}'; ...
     '\begin{tabular}{l} Irminger \\ Sea \end{tabular}'; ...
     '\begin{tabular}{l} Southern \\ Ocean \end{tabular}'};
 pms = {'Optimistic Durability','Optimistic Cost','Conservative'};
-leg = {'CapEx','OpEx'};
+leg = {'Mooring','WEC CapEx','Battery CapEx','WEC OpEx', ...
+    'Battery OpEx','Vessel'};
 
 %colors
-cols = 2;
-col(1,:) = [153,153,255]/256; %capex
-col(2,:) = [204 204 255]/256; %opex
+cols = 6;
+col(1,:) = [0,0,51]/256; %platform cost
+col([2 4],:) = flipud(brewermap(2,'purples')); %generation cost
+col([3 5],:) = flipud(brewermap(2,'blues')); %storage cost
+col(6,:) = [238,232,170]/256; %vessel cost
+%gscol(1:5,:) = flipud(brewermap(5,'reds')); %generation capacity
+%gscol(6:10,:) = flipud(brewermap(5,'oranges')); %storage capacity
 orpink(1,:) = [255,170,150];
 orpink(2,:) = [255,170,159];
 orpink(3,:) = [255,170,179];
@@ -134,9 +142,8 @@ for c = 1:nu
         if c == 2 && i == np
             leg = legend(h(i,:,c),leg,'Location','northeast');
             leg.FontSize = fs;
-%             leg.Position(1) = .7;
-%             leg.Position(2) = .85;
-%             legpos = leg.Position;
+            leg.Position(1) = .775;
+            leg.Position(2) = .840;
         end
     end
     hold off;
@@ -145,9 +152,7 @@ for c = 1:nu
     set(gca,'XTickLabelMode','manual');
     set(gca,'XTickLabel',[]);
     set(gca,'FontSize',fs2)
-    title(titles(c),'FontWeight','normal')
-    set(gca,'Units','pixels')
-    axpos(1,c,:) = get(gca,'Position');
+    title(titles(c))
     if c == 1
         ylabel({'Total','Estimated','Cost','[$1000s]'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
@@ -155,6 +160,10 @@ for c = 1:nu
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
+    else
+        text(1.15,.5,'(a)','Units','Normalized', ...
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs2);
     end
     grid on
     ylim([0 cmult*max(max(max(sum(costdata,3))))])
@@ -187,8 +196,6 @@ for c = 1:nu
     %set(gca,'XTickLabel',opt.locations);
     set(gca,'FontSize',fs2)
     xtickangle(45)
-    set(gca,'Units','pixels')
-    axpos(2,c,:) = get(gca,'Position');
     if c == 1
         ylabel({'Generation','Capacity','[kW]'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
@@ -196,6 +203,10 @@ for c = 1:nu
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
+    else
+        text(1.15,.5,'(b)','Units','Normalized', ...
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs2);
     end
     grid on
     ylim([0 gmult*max(gendata(:))])
@@ -228,8 +239,6 @@ for c = 1:nu
     %set(gca,'XTickLabel',opt.locations);
     set(gca,'FontSize',fs2)
     xtickangle(45)
-    set(gca,'Units','pixels')
-    axpos(3,c,:) = get(gca,'Position');
     if c == 1
         ylabel({'Storage','Capacity','[kWh]'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
@@ -237,10 +246,14 @@ for c = 1:nu
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
+    else
+        text(1.15,.5,'(c)','Units','Normalized', ...
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs2);
     end
     grid on
     ylim([0 bmult*max(stordata(:))])
-    set(gca,'YTick',[0 200 400])
+    set(gca,'YTick',[0 100 200 300 400])
     linkaxes(ax(3,:),'y')
     
     ax(4,c) = subplot(7,nu,10+c);
@@ -270,8 +283,6 @@ for c = 1:nu
     set(gca,'FontSize',fs2)
     %set(gca,'XTickLabel',opt.locations);
     xtickangle(45)
-    set(gca,'Units','pixels')
-    axpos(4,c,:) = get(gca,'Position');
     if c == 1
         ylabel({'60%','Discharge','Cycles','per','Month'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
@@ -279,6 +290,10 @@ for c = 1:nu
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
+    else
+        text(1.15,.5,'(d)','Units','Normalized', ...
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs2);
     end
     grid on
     ylim([0 cymult*max(cycdata(:))])
@@ -308,12 +323,9 @@ for c = 1:nu
     set(gca,'XTickMode','manual');
     set(gca,'XTick',1:NumGroupsPerAxis);
     set(gca,'XTickLabelMode','manual');
-%     set(gca,'FontSize',fs2)
-%     set(gca,'XTickLabel',xlab,'TickLabelInterpreter','latex', ...
-%         'FontName','Calibri');
-%     xtickangle(45)
-    set(gca,'Units','pixels')
-    axpos(5,c,:) = get(gca,'Position');
+    set(gca,'FontSize',fs2)
+    set(gca,'XTickLabel',xlab,'TickLabelInterpreter','latex');
+    xtickangle(45)
     if c == 1
         ylabel({'Capacity','Factor'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
@@ -321,6 +333,10 @@ for c = 1:nu
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
+    else
+        text(1.15,.5,'(e)','Units','Normalized', ...
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs2);
     end
     grid on
     ylim([0 cfmult*max(cfdata(:))])
@@ -328,18 +344,5 @@ for c = 1:nu
     
 end
 
-%figure adjustment
-for c = 1:nc
-    for a = 1:5
-        axpos(a,c,1) = axpos(a,c,1) + 15;
-        set(ax(a,c),'Position',axpos(a,c,:));        
-    end
-end
-% legpos = get(leg,'Position');
-% legpos(1) = 0.78;
-% legpos = 1;
-
-print(hl_results,'../Research/OO-TechEc/pf3/hl_results',  ...
+print(results,'../Research/OO-TechEc/paper_figures/results',  ...
     '-dpng','-r600')
-
-end

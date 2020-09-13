@@ -67,12 +67,6 @@ nbr = ceil((12*uc.lifetime/batt.lc-1)); %number of battery replacements
 
 nvi = nbr + uc.turb.lambda; %number of vessel interventions
 
-%find added battery maintenance/installation time
-if Smax > batt.t_add_min
-    t_add_batt = batt.t_add_m*Smax-batt.t_add_m*batt.t_add_min;
-else
-    t_add_batt = 0;
-end
 
 %economic modeling
 kWcost = polyval(opt.p_dev.t,kW)*econ.wind.marinization; %turbine
@@ -121,11 +115,6 @@ battreplace = Scost*nbr; %number of battery replacements
 CapEx = Pmooring + Pinst + Pmtrl + battencl + Scost + Icost + kWcost;
 OpEx = battreplace + turbrepair + vesselcost;
 cost = CapEx + OpEx;
-% if opt.fmin && opt.nm.fmindebug
-%     kW
-%     cost
-%     pause
-% end
 
 %determine if desired uptime was met. if not, output infinite cost.
 if sum(L == uc.draw)/(length(L)) < uc.uptime 

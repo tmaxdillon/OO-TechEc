@@ -133,8 +133,6 @@ agm.lc_max = 12*5;        %maximum months of operation
 agm.sdr = 5;               %[%/month] self discharge rate
 agm.dyn_lc = true;         %toggle dynamic life cycle
 agm.dmax = .2;             %maximum depth of discharge
-agm.t_add_m = 0;           %hours added per kWh of battery
-agm.t_add_min = inf;        %minimum battery size adding time
 %LFP parameters
 lfp.V = 12;                %[V] Voltage
 lfp.se = 8.75;              %[Ah/kg] specific energy factor
@@ -144,8 +142,6 @@ lfp.lc_max = 12*5;        %maximum months of operation
 lfp.sdr = 3;               %[%/month] self discharge rate
 lfp.dyn_lc = true;         %toggle dynamic life cycle
 lfp.dmax = .0;             %maximum depth of discharge
-lfp.t_add_m = 0;           %hours added per kWh of battery
-lfp.t_add_min = inf;        %minimum battery size adding time
 lfp.cost = 580;            %[$/kWh]
 if bc == 1 %agm chemistry
     batt = agm;

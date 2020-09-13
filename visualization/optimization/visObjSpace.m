@@ -65,15 +65,15 @@ hold on
 %     ms,'filled','MarkerEdgeColor','k', ...
 %     'MarkerFaceColor','w');
 view(0,90)
-%xlabel('Storage Capacity [kWh]')
-%ylabel('Rated Power [kW]')
+xlabel('Storage Capacity [kWh]')
+ylabel('Rated Power [kW]')
 xlim([0 inf])
 yticks([0 1 2 3 4])
 ylim([0 inf])
-%xlim([0 140])
-%ylim([0 3])
+xlim([0 inf])
+ylim([0 inf])
 c = colorbar;
-%c.Label.String = '[$] in thousands';
+c.Label.String = '[$] in thousands';
 caxis([0 max(alive(:))]) %to produce cartoon
 lb = (output.min.cost)/max(alive(:));
 AdvancedColormap('bg l w r',8000,[1*lb,lb+.05*(1-lb),lb+0.1*(1-lb),1])

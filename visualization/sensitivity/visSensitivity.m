@@ -4,7 +4,7 @@ function [] = visSensitivity(multStruct)
 if isequal(multStruct(1).opt.tuned_parameter,'utp')
     xlab = 'Percent Uptime';
     xt = fliplr(multStruct(1).opt.tuning_array);
-elseif isequal(multStruct(1).opt.tuned_parameter,'load')
+elseif isequal(multStruct(1).opt.tuned_parameter,'ild')
     xlab = 'Load [W]';
     xt = multStruct(1).opt.tuning_array;
 elseif isequal(multStruct(1).opt.tuned_parameter,'bgd')
