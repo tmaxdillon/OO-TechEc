@@ -50,7 +50,14 @@ eff = (1-((inso.deg/100)/8760)*(1:1:length(swso)));
 d_soil_eff = (atmo.soil/100)/8760; %change in soil deg per hour
 soil_eff = 1; %starting soil efficiency
 
+if inso.debug
+    disp([num2str(kW) ' kW'])
+    disp([num2str(Smax) ' kWh'])
+    pause
+end
+
 cont = 1;
+shoottimer = tic;
 while cont
     %set cleaning interval
     clear clean_ind
@@ -106,6 +113,12 @@ while cont
         disp(['pvci = ' num2str(inso.pvci)])
         disp(['battlc = ' num2str(batt.lc)])
         pause
+    end
+    
+    time = toc(shoottimer);
+    if time > 5
+        error([num2str(kW) ' kW and ' num2str(Smax) ...
+            ' kWh do not converge'])
     end
     
     if uc.SI == 6 || abs(batt.lc - mult*inso.pvci) < tol

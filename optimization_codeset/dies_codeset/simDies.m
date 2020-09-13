@@ -70,13 +70,6 @@ nbr = ceil(12*uc.lifetime/batt.lc-1); %number of battery replacements
 
 nvi = max([nfr noc nbr]) + uc.dies.lambda; %number of vessel interventions
 
-%find added battery maintenance/installation time
-if Smax > batt.t_add_min
-    t_add_batt = batt.t_add_m*Smax-batt.t_add_m*batt.t_add_min;
-else
-    t_add_batt = 0;
-end
-
 %economic modeling
 kWcost = polyval(opt.p_dev.d_cost,kW)*2 + ...
     econ.dies.autostart; %generator (with spare)
@@ -87,7 +80,8 @@ if bc == 1 %lead acid
     if Smax < opt.p_dev.kWhmax %less than linear region
         Scost = polyval(opt.p_dev.b,Smax);
     else %in linear region
-        Scost = polyval(opt.p_dev.b,opt.p_dev.kWhmax)*(Smax/opt.p_dev.kWhmax);
+        Scost = polyval(opt.p_dev.b,opt.p_dev.kWhmax)* ...
+            (Smax/opt.p_dev.kWhmax);
     end
 elseif bc == 2 %lithium phosphate
     Scost = batt.cost*Smax;
@@ -96,7 +90,7 @@ battencl = econ.batt.enclmult*Scost; %battery enclosure cost
 Pmtrl = (1/1000)*econ.platform.wf*econ.platform.steel* ...
     polyval(opt.p_dev.d_mass,kW); %platform material
 Pinst = econ.vessel.speccost* ... 
-    ((econ.platform.t_i+t_add_batt)/24); %platform instllation
+    ((econ.platform.t_i)/24); %platform instllation
 dp = polyval(opt.p_dev.d_size,kW)*dies.bm;
 if dp < 1, dp = 1; end
 if dp < 4 %within bounds, use linear interpolation
@@ -117,18 +111,13 @@ else %long term instrumentation and infrastructure
     t_os = econ.vessel.t_mosv/24; %[d]
     C_v = econ.vessel.osvcost;
 end
-vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr*t_add_batt); %vessel cost
+vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr); %vessel cost
 genrepair = 1/2*kWcost*(uc.dies.lambda-1); %turbine repair cost
 battreplace = Scost*nbr; %number of battery replacements
 CapEx = Pmooring + Pinst + Pmtrl + battencl + Scost + ...
     genencl + kWcost;
 OpEx = fuel + battreplace + genrepair + vesselcost;
 cost = CapEx + OpEx;
-% if opt.fmin && opt.nm.fmindebug
-%     kW
-%     cost
-%     pause
-% end
 
 %determine if desired uptime was met. if not, output infinite cost.
 if sum(L == uc.draw)/(length(L)) < uc.uptime

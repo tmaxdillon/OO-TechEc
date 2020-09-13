@@ -6,19 +6,19 @@ opt.kW_m = dies.kWmax; %max size
 opt.Smax_1 = 1;
 opt.Smax_n = opt.bf.N; %[kWh]
 
-%set sensitivity modifiers to 1 if absent
-if ~isfield(data,'depth_mod')
-    data.depth_mod = 1; %capture width modifier
+%set sensitivity modifiers to value if existing
+if isfield(data,'depth_mod')
+    data.depth = data.depth_mod; %depth modifier
 end
-if ~isfield(data,'dist_mod')
-    data.dist_mod = 1; %capture width modifier
+if isfield(data,'dist_mod')
+    data.dist = data.dist_mod; %dist to coast modifier
 end
 
 %check to make sure coarse mesh will work
 opt.fmin = false;
 check_s = 0;
 while ~check_s
-    [~,check_s] = simDies(opt.kW_m,opt.Smax_n,opt,data, ... 
+    [~,check_s] = simDies(opt.kW_m/2,opt.Smax_n/2,opt,data, ... 
         atmo,batt,econ,uc,bc,dies);
     if ~check_s
         opt.kW_m = 2*opt.kW_m;

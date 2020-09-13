@@ -1,8 +1,8 @@
 %settings
 econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
-opt.bf.m = 3;
-opt.bf.n = 3;
-opt.alllocuses = 1;
+opt.bf.m = 30;
+opt.bf.n = 30;
+opt.alllocuses = 0;
 opt.sens = 0;
 opt.tdsens = 0;
 opt.senssm = 0;
@@ -102,6 +102,7 @@ inso.eff = 0.18;            %[~] from Devin (may trail off when off of MPP)
 inso.deg = 0.5;             %[%/year]
 %inso.pvci = 24;             %[months] cleaning interval
 inso.wf = 60;               %[kg/m^2] weight factor
+inso.debug = false;          %toggle debugging kW/kWh combo for shooter
 inso.shootdebug = false;    %toggle debugging pvci shooter
 %inso.ct_eval = false;       %evaluate/compare trips for cleaning
 inso.cleanstrat = 1;        %panel cleaning strategy 1:NC, 2:CT, 3:CTW
@@ -121,7 +122,7 @@ dies.ftmax = 18;            %[m] fuel can sit idle before going "bad"
 %dies.lph = 2;               %[l/h]
 dies.oilint = 250;          %[hours] maintenance interval
 dies.genon = 0.3;           %battery level generator turns on at
-dies.kWmax = 20;            %maximum power generation
+dies.kWmax = 15;            %maximum power generation
 dies.kWmin = 1;             %minimum power generation
 dies.bm = 2.5;                %barge multiplier
 %AGM parameters
