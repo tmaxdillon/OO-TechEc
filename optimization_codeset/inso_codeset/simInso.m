@@ -137,13 +137,6 @@ pvci = inso.pvci; %pv cleaning interval
 battlc = batt.lc; %battery life cycle
 nbr = ceil((12*uc.lifetime/batt.lc-1)); %number of battery replacements
 
-%find added battery maintenance/installation time
-if Smax > batt.t_add_min
-    t_add_batt = batt.t_add_m*Smax-batt.t_add_m*batt.t_add_min;
-else
-    t_add_batt = 0;
-end
-
 %economic modeling
 Mcost = econ.inso.module*kW*econ.inso.marinization; %module
 Icost = econ.inso.installation*kW; %installation
@@ -153,24 +146,26 @@ if bc == 1 %lead acid
     if Smax < opt.p_dev.kWhmax %less than linear region
         Scost = polyval(opt.p_dev.b,Smax);
     else %in linear region
-        Scost = polyval(opt.p_dev.b,opt.p_dev.kWhmax)*(Smax/opt.p_dev.kWhmax);
+        Scost = polyval(opt.p_dev.b,opt.p_dev.kWhmax)* ...
+            (Smax/opt.p_dev.kWhmax);
     end
 elseif bc == 2 %lithium phosphate
     Scost = batt.cost*Smax;
 end
 battencl = econ.batt.enclmult*Scost; %battery enclosure cost
-if Smax > 8030, battencl = 2085142.66; end %hard coded, can't be negative
 Pmtrl = (1/1000)*econ.platform.wf*econ.platform.steel* ...
     inso.wf*kW/inso.rated; %platform material
 Pinst = econ.vessel.speccost* ... 
-    ((econ.platform.t_i+t_add_batt)/24); %platform instllation
+    ((econ.platform.t_i)/24); %platform instllation
 dp = getInsoDiameter(kW,inso);
 if dp < 1, dp = 1; end
 if dp < 4 %within bounds, use linear interpolation
-    Pmooring = interp2(econ.platform.mdd.diameter,econ.platform.mdd.depth, ...
+    Pmooring = interp2(econ.platform.mdd.diameter, ...
+        econ.platform.mdd.depth, ...
         econ.platform.mdd.cost,dp,depth,'linear'); %mooring cost
 else %not within bounds, use spline extrapolation
-    Pmooring = interp2(econ.platform.mdd.diameter,econ.platform.mdd.depth, ...
+    Pmooring = interp2(econ.platform.mdd.diameter, ...
+        econ.platform.mdd.depth, ...
         econ.platform.mdd.cost,dp,depth,'spline'); %mooring cost
 end
 if inso.cleanstrat == 1
@@ -197,18 +192,13 @@ else %long term instrumentation and infrastructure
     t_os = econ.vessel.t_mosv/24; %[d]
     C_v = econ.vessel.osvcost;
 end
-vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr*t_add_batt); %vessel cost
+vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr); %vessel cost
 battreplace = Scost*(12/batt.lc*uc.lifetime-1);
 if battreplace < 0, battreplace = 0; end
 CapEx = Pmooring + Pinst + Pmtrl + battencl + Scost + Icost + ...
     Mcost + Ecost + Strcost;
 OpEx = battreplace + vesselcost;
 cost = CapEx + OpEx;
-% if opt.fmin && opt.nm.fmindebug
-%     kW
-%     cost
-%     pause
-% end
 
 %evaluate if system requirements were met
 if sum(L == uc.draw)/(length(L)) < uc.uptime
