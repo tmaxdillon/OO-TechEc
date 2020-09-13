@@ -1,6 +1,6 @@
 function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst,Pmooring, ...
     vesselcost,turbrepair,battreplace,battencl, ... 
-    t_add_batt,triptime,nvi,dp,S,P,D,L] =  ...
+    triptime,nvi,dp,S,P,D,L] =  ...
     simWind(kW,Smax,opt,data,atmo,batt,econ,uc,bc,turb)
 
 %if fmin is suggesting a negative input (physically impossible), exit 
@@ -87,7 +87,7 @@ battencl = econ.batt.enclmult*Scost; %battery enclosure cost
 Pmtrl = (1/1000)*econ.platform.wf*econ.platform.steel* ... 
     kW*turb.wf; %platform material
 Pinst = econ.vessel.speccost* ... 
-    ((econ.platform.t_i+t_add_batt)/24); %platform instllation
+    ((econ.platform.t_i)/24); %platform instllation
 dp = getSparDiameter(kW,atmo,turb);
 if dp < 1, dp = 1; end
 if dp < 4 %within bounds, use linear interpolation
@@ -108,7 +108,7 @@ else %long term instrumentation and infrastructures
     t_os = econ.vessel.t_mosv/24; %[d]
     C_v = econ.vessel.osvcost;
 end
-vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr*t_add_batt); %vessel cost
+vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr); %vessel cost
 turbrepair = 1/2*kWcost*(uc.turb.lambda-1); %turbine repair cost
 if turbrepair < 0, turbrepair = 0; end
 battreplace = Scost*nbr; %number of battery replacements

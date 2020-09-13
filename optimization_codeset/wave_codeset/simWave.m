@@ -93,7 +93,7 @@ end
 battencl = econ.batt.enclmult*Scost; %battery enclosure cost
 Pmtrl = 0;
 Pinst = econ.vessel.speccost* ...
-    ((econ.platform.t_i+t_add_batt)/24); %platform instllation
+    ((econ.platform.t_i)/24); %platform instllation
 dp = width;
 if dp < 1, dp = 1; end
 if dp < 4 %within bounds, use linear interpolation
@@ -114,7 +114,7 @@ else
     t_os = econ.vessel.t_mosv/24; %[d]
     C_v = econ.vessel.osvcost;
 end
-vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr*t_add_batt); %vessel cost
+vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr); %vessel cost
 wecrepair = 1/2*kWcost*(nvi-1); %wec repair cost
 if wecrepair < 0, wecrepair = 0; end %if nvi = 0, wec repair must be 0
 battreplace = Scost*nbr; %number of battery replacements

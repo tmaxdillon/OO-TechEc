@@ -2,12 +2,12 @@
 econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
 opt.bf.m = 3;
 opt.bf.n = 3;
-opt.alllocuses = 0;
+opt.alllocuses = 1;
 opt.sens = 0;
 opt.tdsens = 0;
-opt.senssm = 1;
-pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
-bc = 2; %battery chemistry 1:AGM 2:LFP
+opt.senssm = 0;
+pm = 1; %power module, 1:Wi 2:In 3:Wa 4:Di
+bc = 1; %battery chemistry 1:AGM 2:LFP
 c = 2;  %use case 1:ST 2:LT
 loc = 'argBasin'; %location
 opt.tdsens_ta(1,:) = 2:1:7;
