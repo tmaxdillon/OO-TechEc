@@ -3,8 +3,8 @@ function [cost,surv,CapEx,OpEx,Mcost,Scost,Ecost,Icost,Strcost, ...
     triptime,nvi,dp,S,P,D,L,eff_t,pvci,battlc] = ...
     simInso(kW,Smax,opt,data,atmo,batt,econ,uc,bc,inso)
 
-kW = 21.8629;
-Smax = 11.8261;
+% kW = 11.7241;
+% Smax = 18.1724;
 
 %if fmin is suggesting a negative input, block it
 if opt.fmin && Smax < 0 || kW < 0
@@ -152,7 +152,7 @@ while cont
 %         t1 = tic; %reset timer
 %         %I don't think this improves convergence...
 %     end
-    if time2 > 2 && ~inso.shootdebug
+    if time2 > 500 && ~inso.shootdebug
         error([num2str(kW) ' kW and ' num2str(Smax) ...
             ' kWh do not converge'])
     end

@@ -10,9 +10,9 @@ end
 
 np = 3; %number of power modules
 nc = 6; %number of costs
-nl = size(wave_optd,1); %number of locations
+nl = size(allStruct,1); %number of locations
 fixer = [1 2 3 4 5]; %select which locations to include 1:1:5 means all
-nu = size(wave_optd,2); %number of use cases
+nu = size(allStruct,3); %number of use cases
 
 %initialize/preallocate
 costdata = zeros(nl,np,nc,nu);

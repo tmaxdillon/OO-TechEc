@@ -30,7 +30,7 @@ if length(data.met.shortwave_irradiance) < 8760
 end
 
 %extend dataset to lifetime of instrumentation (to examine degradation)
-data.swso = data.met.shortwave_irradiance; %[W/m^2]
+data.swso = fillmissing(data.met.shortwave_irradiance,'linear'); %[W/m^2]
 orig_l = length(data.swso);
 tStart = datevec(data.met.time(1));
 tEnd = tStart;
