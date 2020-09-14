@@ -111,7 +111,7 @@ else %long term instrumentation and infrastructure
     t_os = econ.vessel.t_mosv/24; %[d]
     C_v = econ.vessel.osvcost;
 end
-vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr); %vessel cost
+vesselcost = C_v*(nvi*(2*triptime + t_os)); %vessel cost
 genrepair = 1/2*kWcost*(uc.dies.lambda-1); %turbine repair cost
 battreplace = Scost*nbr; %number of battery replacements
 CapEx = Pmooring + Pinst + Pmtrl + battencl + Scost + ...

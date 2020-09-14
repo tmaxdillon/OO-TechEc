@@ -218,7 +218,7 @@ else %long term instrumentation and infrastructure
     t_os = econ.vessel.t_mosv/24; %[d]
     C_v = econ.vessel.osvcost;
 end
-vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr); %vessel cost
+vesselcost = C_v*(nvi*(2*triptime + t_os)); %vessel cost
 battreplace = Scost*(12/batt.lc*uc.lifetime-1);
 if battreplace < 0, battreplace = 0; end
 CapEx = Pmooring + Pinst + Pmtrl + battencl + Scost + Icost + ...

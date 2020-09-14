@@ -11,15 +11,13 @@ if ~exist('allStruct','var')
     load('inso')
     load('dies')
     allStruct = mergeWiWaDiIn(wind,wave_optc,dies,inso);
+    %rearrange
+    asadj(:,1,:) = allStruct(:,4,:);
+    asadj(:,2,:) = allStruct(:,3,:);
+    asadj(:,3,:) = allStruct(:,2,:);
+    asadj(:,4,:) = allStruct(:,1,:);
+    allStruct = asadj;
 end
-
-%rearrange
-asadj(:,1,:) = allStruct(:,4,:);
-asadj(:,2,:) = allStruct(:,3,:);
-asadj(:,3,:) = allStruct(:,2,:);
-asadj(:,4,:) = allStruct(:,1,:);
-
-allStruct = asadj;
 
 np = 4; %number of power modules
 nc = 6; %number of costs
@@ -83,6 +81,7 @@ for loc = 1:nl
             gendata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.kW;
             stordata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.Smax;
             cycdata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.cyc60;
+            cfdata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.CF;
             massdata(loc,pm,1,c) = ...
                 1000*allStruct(loc,pm,c).output.min.Smax/ ...
                 (allStruct(loc,pm,c).batt.V*allStruct(loc,pm,c).batt.se);
@@ -92,33 +91,34 @@ for loc = 1:nl
 end
 
 %plotting setup
-results = figure;
+allpm_results = figure;
 set(gcf,'Units','inches')
-set(gcf, 'Position', [1, 1, 6.5, 7.5])
-fs = 6; %annotation font size
-fs2 = 8; %axis font size
+set(gcf, 'Position', [1, 1, 10, 12])
+fs = 9; %annotation font size
+fs2 = 11; %axis font size
 yaxhpos = -.25; %
-cmult = 1.45; %cost axis multiplier
+cmult = 1.4; %cost axis multiplier
 gmult = 1.8; %generation axis multiplier
 bmult = 2; %battery axis multiplier
-cymult = 1.4; %cycles axis multiplier 
+cymult = 1.75; %cycles axis multiplier 
 cfmult = 1.4; %capacity factor axis multiplier
-cbuff = 10; %cost text buffer
-gbuff = .25; %generation text buffer
-bbuff = 15;  %battery text buffer
-cybuff = 1.5; %battery cycle text buffer
-cfbuff = .025; %capacity factor text buffer
+cbuff = 5; %cost text buffer
+gbuff = 1.5; %generation text buffer
+bbuff = 12.5;  %battery text buffer
+cybuff = 150; %battery cycle text buffer
+cfbuff = .03; %capacity factor text buffer
 
 %titles and labels
-titles = {'Short-Term Instrumentation'; ...
-    'Long-Term Instrumentation'};
+stt = {'Short-Term Instrumentation';'(six month service interval)'};
+ltt = {'Long-Term Instrumentatino';'(no service interval)'};
+titles = {stt,ltt};
 xlab = {'\begin{tabular}{l} Argentine \\ Basin \end{tabular}'; ...
     '\begin{tabular}{l} Coastal \\ Endurance \end{tabular}'; ...
     '\begin{tabular}{l} Coastal \\ Pioneer \end{tabular}'; ...
     '\begin{tabular}{l} Irminger \\ Sea \end{tabular}'; ...
     '\begin{tabular}{l} Southern \\ Ocean \end{tabular}'};
-pms = {'Optimistic Durability','Optimistic Cost','Conservative'};
-leg = {'Mooring','WEC CapEx','Battery CapEx','WEC OpEx', ...
+pms = {'Solar','Diesel','Wave','Wind'};
+leg = {'Mooring','Gen CapEx','Battery CapEx','Gen OpEx', ...
     'Battery OpEx','Vessel'};
 
 %colors
@@ -172,8 +172,8 @@ for c = 1:nu
         if c == 2 && i == np
             leg = legend(h(i,:,c),leg,'Location','northeast');
             leg.FontSize = fs;
-            leg.Position(1) = .775;
-            leg.Position(2) = .840;
+%             leg.Position(1) = .775;
+%             leg.Position(2) = .840;
         end
     end
     hold off;
@@ -182,7 +182,12 @@ for c = 1:nu
     set(gca,'XTickLabelMode','manual');
     set(gca,'XTickLabel',[]);
     set(gca,'FontSize',fs2)
-    title(titles(c))
+    if c == 1
+        title(stt,'FontWeight','normal')
+        drawnow
+    else
+        title(ltt,'FontWeight','normal')
+    end
     if c == 1
         ylabel({'Total','Estimated','Cost','[$1000s]'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
@@ -190,10 +195,6 @@ for c = 1:nu
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
-    else
-        text(1.15,.5,'(a)','Units','Normalized', ...
-            'VerticalAlignment','middle','FontWeight','normal', ...
-            'FontSize',fs2);
     end
     grid on
     ylim([0 cmult*max(max(max(sum(costdata,3))))])
@@ -233,10 +234,6 @@ for c = 1:nu
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
-    else
-        text(1.15,.5,'(b)','Units','Normalized', ...
-            'VerticalAlignment','middle','FontWeight','normal', ...
-            'FontSize',fs2);
     end
     grid on
     ylim([0 gmult*max(gendata(:))])
@@ -276,10 +273,6 @@ for c = 1:nu
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
-    else
-        text(1.15,.5,'(c)','Units','Normalized', ...
-            'VerticalAlignment','middle','FontWeight','normal', ...
-            'FontSize',fs2);
     end
     grid on
     ylim([0 bmult*max(stordata(:))])
@@ -320,10 +313,6 @@ for c = 1:nu
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
-    else
-        text(1.15,.5,'(d)','Units','Normalized', ...
-            'VerticalAlignment','middle','FontWeight','normal', ...
-            'FontSize',fs2);
     end
     grid on
     ylim([0 cymult*max(cycdata(:))])
@@ -353,9 +342,9 @@ for c = 1:nu
     set(gca,'XTickMode','manual');
     set(gca,'XTick',1:NumGroupsPerAxis);
     set(gca,'XTickLabelMode','manual');
-    set(gca,'FontSize',fs2)
-    set(gca,'XTickLabel',xlab,'TickLabelInterpreter','latex');
-    xtickangle(45)
+%     set(gca,'FontSize',fs2)
+%     set(gca,'XTickLabel',xlab,'TickLabelInterpreter','latex');
+%     xtickangle(45)
     if c == 1
         ylabel({'Capacity','Factor'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
@@ -363,10 +352,6 @@ for c = 1:nu
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
-    else
-        text(1.15,.5,'(e)','Units','Normalized', ...
-            'VerticalAlignment','middle','FontWeight','normal', ...
-            'FontSize',fs2);
     end
     grid on
     ylim([0 cfmult*max(cfdata(:))])
@@ -374,5 +359,5 @@ for c = 1:nu
     
 end
 
-print(results,'../Research/OO-TechEc/paper_figures/results',  ...
-    '-dpng','-r600')
+print(allpm_results,['../Research/OO-TechEc/pf3/' ...
+    'allpm_results'],'-dpng','-r600')

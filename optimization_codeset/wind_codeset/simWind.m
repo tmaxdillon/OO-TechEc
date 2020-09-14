@@ -108,7 +108,7 @@ else %long term instrumentation and infrastructures
     t_os = econ.vessel.t_mosv/24; %[d]
     C_v = econ.vessel.osvcost;
 end
-vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr); %vessel cost
+vesselcost = C_v*(nvi*(2*triptime + t_os)); %vessel cost
 turbrepair = 1/2*kWcost*(uc.turb.lambda-1); %turbine repair cost
 if turbrepair < 0, turbrepair = 0; end
 battreplace = Scost*nbr; %number of battery replacements

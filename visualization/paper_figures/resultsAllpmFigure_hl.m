@@ -11,15 +11,13 @@ if ~exist('allStruct','var')
     load('inso')
     load('dies')
     allStruct = mergeWiWaDiIn(wind,wave_optc,dies,inso);
+    %rearrange
+    asadj(:,1,:) = allStruct(:,4,:);
+    asadj(:,2,:) = allStruct(:,3,:);
+    asadj(:,3,:) = allStruct(:,2,:);
+    asadj(:,4,:) = allStruct(:,1,:);
+    allStruct = asadj;
 end
-
-%rearrange
-asadj(:,1,:) = allStruct(:,4,:);
-asadj(:,2,:) = allStruct(:,3,:);
-asadj(:,3,:) = allStruct(:,2,:);
-asadj(:,4,:) = allStruct(:,1,:);
-
-allStruct = asadj;
 
 np = 4; %number of power modules
 nc = 2; %number of costs
@@ -31,6 +29,7 @@ costdata = zeros(nl,np,nc,nu);
 gendata = zeros(nl,np,1,nu);
 stordata = zeros(nl,np,1,nu);
 cycdata = zeros(nl,np,1,nu);
+cfdata = zeros(nl,np,1,nu);
 massdata = zeros(nl,np,1,nu);
 dpdata = zeros(nl,np,1,nu);
 
@@ -79,6 +78,7 @@ for loc = 1:nl
             gendata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.kW;
             stordata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.Smax;
             cycdata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.cyc60;
+            cfdata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.CF;
             massdata(loc,pm,1,c) = ...
                 1000*allStruct(loc,pm,c).output.min.Smax/ ...
                 (allStruct(loc,pm,c).batt.V*allStruct(loc,pm,c).batt.se);
@@ -94,16 +94,16 @@ set(gcf, 'Position', [1, 1, 10, 12])
 fs = 9; %annotation font size
 fs2 = 11; %axis font size
 yaxhpos = -.25; %
-cmult = 1.35; %cost axis multiplier
-gmult = 1.9; %generation axis multiplier
-bmult = 2.1; %battery axis multiplier
-cymult = 1.5; %cycles axis multiplier 
-cfmult = 1.5; %capacity factor axis multiplier
-cbuff = 20; %cost text buffer
-gbuff = .25; %generation text buffer
-bbuff = 15;  %battery text buffer
-cybuff = 1.5; %battery cycle text buffer
-cfbuff = .025; %capacity factor text buffer
+cmult = 1.15; %cost axis multiplier
+gmult = 1.8; %generation axis multiplier
+bmult = 2; %battery axis multiplier
+cymult = 1.75; %cycles axis multiplier 
+cfmult = 1.4; %capacity factor axis multiplier
+cbuff = 5; %cost text buffer
+gbuff = 1.5; %generation text buffer
+bbuff = 12.5;  %battery text buffer
+cybuff = 150; %battery cycle text buffer
+cfbuff = .03; %capacity factor text buffer
 
 %titles and labels
 stt = {'Short-Term Instrumentation';'(six month service interval)'};
@@ -127,6 +127,10 @@ col(1,:,3) = [153,153,255]/256; %wave capex
 col(2,:,3) = [204 204 255]/256; %wave opex
 col(1,:,4) = [132 235 163]/256; %wind capex
 col(2,:,4) = [204 255 204]/256; %wind opex
+orpink(1,:) = [255,170,150];
+orpink(2,:) = [255,170,159];
+orpink(3,:) = [255,170,179];
+orpink(4,:) = [255,170,195];
 gcol = orpink(1,:);
 bcol = gcol;
 cycol = orpink(4,:);
@@ -161,11 +165,11 @@ for c = 1:nu
         end
         %set colors and legend
         for lay = 1:cols
-            h(i,lay,c).CData = col(lay,:);
+            h(i,lay,c).CData = col(lay,:,i);
         end
         if c == 2 && i == np
-            leg = legend(h(i,:,c),leg,'Location','northeast');
-            leg.FontSize = fs2;
+%             leg = legend(h(i,:,c),leg,'Location','northeast');
+%             leg.FontSize = fs2;
 %             leg.Position(1) = .7;
 %             leg.Position(2) = .85;
 %             legpos = leg.Position;
@@ -363,7 +367,7 @@ for c = 1:nu
     
 end
 
-print(allpm_hl_results,'../Research/OO-TechEc/pf3/hl_results',  ...
+print(allpm_hl_results,'../Research/OO-TechEc/pf3/allpm_hl_results',  ...
     '-dpng','-r600')
 
 

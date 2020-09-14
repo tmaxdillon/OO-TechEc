@@ -114,7 +114,7 @@ else
     t_os = econ.vessel.t_mosv/24; %[d]
     C_v = econ.vessel.osvcost;
 end
-vesselcost = C_v*(nvi*(2*triptime + t_os) + nbr); %vessel cost
+vesselcost = C_v*(nvi*(2*triptime + t_os)); %vessel cost
 wecrepair = 1/2*kWcost*(nvi-1); %wec repair cost
 if wecrepair < 0, wecrepair = 0; end %if nvi = 0, wec repair must be 0
 battreplace = Scost*nbr; %number of battery replacements
