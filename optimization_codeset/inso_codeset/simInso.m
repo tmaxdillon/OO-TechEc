@@ -3,8 +3,8 @@ function [cost,surv,CapEx,OpEx,Mcost,Scost,Ecost,Icost,Strcost, ...
     triptime,nvi,dp,S,P,D,L,eff_t,pvci,battlc] = ...
     simInso(kW,Smax,opt,data,atmo,batt,econ,uc,bc,inso)
 
-% kW = 11.7241;
-% Smax = 18.1724;
+% kW = 17.8829;
+% Smax = 10.1605;
 
 %if fmin is suggesting a negative input, block it
 if opt.fmin && Smax < 0 || kW < 0
@@ -35,7 +35,7 @@ if uc.SI > 6
     inso.pvci = 10; %[months] initial guess
     over = true; %over/under indicator
     dm = 10; %change in pvci
-    tol = 2.5; %tolerance
+    tol = inso.shoottol; %tolerance
     if inso.cleanstrat == 2
         mult = 2;
     else
@@ -126,7 +126,7 @@ while cont
         inso.pvci = inso.pvci - dm;
         if inso.shootdebug
             disp('Decreasing pvci...')
-            pause
+            %pause
         end
         if ~over
             dm = dm/2;
@@ -136,7 +136,7 @@ while cont
         inso.pvci = inso.pvci + dm;
         if inso.shootdebug
             disp('Increasing pvci...')
-            pause
+            %pause
         end
         if over
             dm = dm/2;
@@ -149,10 +149,11 @@ while cont
     time2 = toc(t2);
 %     if time1 > 1
 %         dm = 20; %reset dm if it's taking too long
+%         disp('Resetting dm')
 %         t1 = tic; %reset timer
 %         %I don't think this improves convergence...
 %     end
-    if time2 > 500 && ~inso.shootdebug
+    if time2 > 10 && ~inso.shootdebug
         error([num2str(kW) ' kW and ' num2str(Smax) ...
             ' kWh do not converge'])
     end

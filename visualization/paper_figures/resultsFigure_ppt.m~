@@ -5,9 +5,6 @@ set(0,'DefaultTextFontname', 'calibri')
 set(0,'DefaultAxesFontName', 'calibri')
 
 if ~exist('allStruct','var')
-    load('wave_optd')
-    load('wave_optc')
-    load('wave_cons')
     allStruct = mergeWaWaWa(wave_optd,wave_optc,wave_cons);
 end
 
@@ -65,7 +62,7 @@ for loc = 1:nl
 end
 
 %plotting setup
-full_results = figure;
+hl_results = figure;
 set(gcf,'Units','inches')
 set(gcf, 'Position', [1, 1, 10, 12])
 fs = 9; %annotation font size
@@ -146,8 +143,8 @@ for c = 1:nu
         if c == 2 && i == np
             leg = legend(h(i,:,c),leg,'Location','northeast');
             leg.FontSize = fs;
-            leg.Position(1) = .825;
-            leg.Position(2) = .85;
+%             leg.Position(1) = .775;
+%             leg.Position(2) = .840;
         end
     end
     hold off;
@@ -156,12 +153,7 @@ for c = 1:nu
     set(gca,'XTickLabelMode','manual');
     set(gca,'XTickLabel',[]);
     set(gca,'FontSize',fs2)
-    if c == 1
-        title(stt,'FontWeight','normal')
-        drawnow
-    else
-        title(ltt,'FontWeight','normal')
-    end
+    title(titles(c))
     if c == 1
         ylabel({'Total','Estimated','Cost','[$1000s]'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
@@ -169,6 +161,10 @@ for c = 1:nu
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
+    else
+        text(1.15,.5,'(a)','Units','Normalized', ...
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs2);
     end
     grid on
     ylim([0 cmult*max(max(max(sum(costdata,3))))])
@@ -209,6 +205,10 @@ for c = 1:nu
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
+    else
+        text(1.15,.5,'(b)','Units','Normalized', ...
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs2);
     end
     grid on
     ylim([0 gmult*max(gendata(:))])
@@ -242,13 +242,16 @@ for c = 1:nu
     set(gca,'FontSize',fs2)
     xtickangle(45)
     if c == 1
-        ylabel({'Cost-Optimal','Storage','Capacity','[kWh]'}, ...
-            'FontSize',fs2);
+        ylabel({'Storage','Capacity','[kWh]'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
         set(ylh,'Rotation',0,'Units', ...
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
+    else
+        text(1.15,.5,'(c)','Units','Normalized', ...
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs2);
     end
     grid on
     ylim([0 bmult*max(stordata(:))])
@@ -289,6 +292,10 @@ for c = 1:nu
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
+    else
+        text(1.15,.5,'(d)','Units','Normalized', ...
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs2);
     end
     grid on
     ylim([0 cymult*max(cycdata(:))])
@@ -318,9 +325,9 @@ for c = 1:nu
     set(gca,'XTickMode','manual');
     set(gca,'XTick',1:NumGroupsPerAxis);
     set(gca,'XTickLabelMode','manual');
-%     set(gca,'FontSize',fs2)
-%     set(gca,'XTickLabel',xlab,'TickLabelInterpreter','latex');
-%     xtickangle(45)
+    set(gca,'FontSize',fs2)
+    set(gca,'XTickLabel',xlab,'TickLabelInterpreter','latex');
+    xtickangle(45)
     if c == 1
         ylabel({'Capacity','Factor'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
@@ -328,6 +335,10 @@ for c = 1:nu
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
+    else
+        text(1.15,.5,'(e)','Units','Normalized', ...
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs2);
     end
     grid on
     ylim([0 cfmult*max(cfdata(:))])
@@ -335,5 +346,5 @@ for c = 1:nu
     
 end
 
-print(full_results,'../Research/OO-TechEc/pf3/full_results',  ...
+print(results,'../Research/OO-TechEc/paper_figures/results',  ...
     '-dpng','-r600')

@@ -3,8 +3,8 @@ function [cost,surv,CapEx,OpEx,Mcost,Scost,Ecost,Icost,Strcost, ...
     triptime,nvi,dp,S,P,D,L,eff_t,pvci,battlc] = ...
     simInso(kW,Smax,opt,data,atmo,batt,econ,uc,bc,inso)
 
-kW = 21.8629;
-Smax = 11.8261;
+% kW = 17.8829;
+% Smax = 18.1724;
 
 %if fmin is suggesting a negative input, block it
 if opt.fmin && Smax < 0 || kW < 0
@@ -35,7 +35,7 @@ if uc.SI > 6
     inso.pvci = 10; %[months] initial guess
     over = true; %over/under indicator
     dm = 10; %change in pvci
-    tol = 2; %tolerance
+    tol = 2.5; %tolerance
     if inso.cleanstrat == 2
         mult = 2;
     else
@@ -60,7 +60,7 @@ soil_eff = 1; %starting soil efficiency
 % end
 
 cont = 1;
-t1 = tic;
+%t1 = tic;
 t2 = tic;
 while cont
     %set cleaning interval
@@ -117,7 +117,7 @@ while cont
         disp(['pvci = ' num2str(inso.pvci)])
         disp(['battlc = ' num2str(batt.lc)])
         disp(['dm = ' num2str(dm)])
-        %pause
+        pause
     end   
     
     if uc.SI == 6 || abs(batt.lc - mult*inso.pvci) < tol
@@ -126,7 +126,7 @@ while cont
         inso.pvci = inso.pvci - dm;
         if inso.shootdebug
             disp('Decreasing pvci...')
-            %pause
+            pause
         end
         if ~over
             dm = dm/2;
@@ -136,7 +136,7 @@ while cont
         inso.pvci = inso.pvci + dm;
         if inso.shootdebug
             disp('Increasing pvci...')
-            %pause
+            pause
         end
         if over
             dm = dm/2;
@@ -145,13 +145,14 @@ while cont
     end
     
     %adjust if time is running too long
-    time1 = toc(t1);
+    %time1 = toc(t1);
     time2 = toc(t2);
-    if time1 > 1
-        dm = 20; %reset dm if it's taking too long
-        t1 = tic; %reset timer
-    end
-    if time2 > 20 && ~inso.shootdebug
+%     if time1 > 1
+%         dm = 20; %reset dm if it's taking too long
+%         t1 = tic; %reset timer
+%         %I don't think this improves convergence...
+%     end
+    if time2 > 500 && ~inso.shootdebug
         error([num2str(kW) ' kW and ' num2str(Smax) ...
             ' kWh do not converge'])
     end
