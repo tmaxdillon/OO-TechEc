@@ -222,19 +222,18 @@ for f = 1:2
         set(ax(a),'Units','Inches')
         axesposition(a,:) = get(ax(a),'Position');
     end
-    addbottom = 0.25; %[in]
+    addbottom = 0.75; %[in]
     set(gcf,'Position', [1, 1, 6.5, 5.5+addbottom])
     for a = 1:size(array,1)
         axesposition(a,:) = get(ax(a),'Position');
-        set(ax(a),'Position',[axesposition(a,1) ...
-            axesposition(a,2)+addbottom axesposition(a,3) ...
-            axesposition(a,4)])
+        set(ax(a),'Position',axesposition(a,1) ...
+            axesposition(a,2)+addbottom
     end
     hL = legend([locs, blt],'Argentine Basin','Coastal Endurance', ...
         'Coastal Pioneer','Irminger Sea','Southern Ocean', ...
         'Baseline','location','southoutside', ...
         'Orientation','horizontal','NumColumns',3);
-    newPosition = [0.41 0.05 0.2 0];
+    newPosition = [0.41 0.01 0.2 0];
     newUnits = 'normalized';
     set(hL,'Position', newPosition,'Units', newUnits,'FontSize',fs1);
     print(gcf,['../Research/OO-TechEc/paper_figures/' figstr],  ...

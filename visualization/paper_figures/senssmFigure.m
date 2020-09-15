@@ -5,6 +5,8 @@ set(0,'defaulttextinterpreter','none')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
+%must load ssm output of interest manually
+
 %merge
 array(1,:) = sdr;
 x0(1) = s0.batt.sdr;
@@ -156,7 +158,7 @@ for a = 1:size(array,1)
         xlabel({'Lifetime [yr]'},'FontSize',fs2)
         xticklabels({'2','9'})
     elseif isequal(array(a,1).opt.tuned_parameter,'ild')
-        xlabel(({'Power','Requirement [W]'}),'FontSize',fs2)
+        xlabel(({'Power','Draw [W]'}),'FontSize',fs2)
     elseif isequal(array(a,1).opt.tuned_parameter,'cwm')
         xlabel(({'Capture Width','Ratio Multiplier'}),'FontSize',fs2)
     elseif isequal(array(a,1).opt.tuned_parameter,'whl')
