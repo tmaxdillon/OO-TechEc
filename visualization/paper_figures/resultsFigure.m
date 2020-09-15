@@ -1,25 +1,17 @@
-clearvars -except allStruct
-
+clearvars -except wave_optd wave_optc wave_cons allStruct
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
-set(0,'DefaultTextFontname', 'calibri')
-set(0,'DefaultAxesFontName', 'calibri')
+set(0,'DefaultTextFontname', 'cmr10')
+set(0,'DefaultAxesFontName', 'cmr10')
 
 if ~exist('allStruct','var')
-    load('wind')
+    load('wave_optd')
     load('wave_optc')
-    load('inso')
-    load('dies')
-    allStruct = mergeWiWaDiIn(wind,wave_optc,dies,inso);
-    %rearrange
-    asadj(:,1,:) = allStruct(:,4,:);
-    asadj(:,2,:) = allStruct(:,3,:);
-    asadj(:,3,:) = allStruct(:,2,:);
-    asadj(:,4,:) = allStruct(:,1,:);
-    allStruct = asadj;
+    load('wave_cons')
+    allStruct = mergeWaWaWa(wave_optd,wave_optc,wave_cons);
 end
 
-np = 4; %number of power modules
+np = 3; %number of power modules
 nc = 6; %number of costs
 nl = size(allStruct,1); %number of locations
 fixer = [1 2 3 4 5]; %select which locations to include 1:1:5 means all
@@ -40,85 +32,67 @@ for loc = 1:nl
     for pm = 1:np
         for c = 1:nu
             costdata(loc,pm,1,c) = ... %platform
-                allStruct(loc,pm,c).output.min.Pinst/1000 + ...
-                allStruct(loc,pm,c).output.min.Pmooring/1000;
+                allStruct(fixer(loc),pm,c).output.min.Pinst/1000 + ...
+                allStruct(fixer(loc),pm,c).output.min.Pmooring/1000;
             costdata(loc,pm,6,c) = ... %vessel
-                allStruct(loc,pm,c).output.min.vesselcost/1000;
+                allStruct(fixer(loc),pm,c).output.min.vesselcost/1000;
             costdata(loc,pm,3,c) = ... %storage capex
-                allStruct(loc,pm,c).output.min.Scost/1000 + ...
-                allStruct(loc,pm,c).output.min.battencl/1000;
+                allStruct(fixer(loc),pm,c).output.min.Scost/1000 + ...
+                allStruct(fixer(loc),pm,c).output.min.battencl/1000;
             costdata(loc,pm,5,c) = ... %storage opex
-                allStruct(loc,pm,c).output.min.battreplace/1000;
-            if pm == 4 %wind-specific
-                costdata(loc,pm,2,c) = ... %gen capex
-                    allStruct(loc,pm,c).output.min.kWcost/1000 + ...
-                    allStruct(loc,pm,c).output.min.Icost/1000;
-                costdata(loc,pm,4,c) = ... %gen opex
-                    allStruct(loc,pm,c).output.min.turbrepair/1000;            
-            end
-            if pm == 1 %inso-specific
-                costdata(loc,pm,2,c) = ... %gen capex
-                    allStruct(loc,pm,c).output.min.Mcost/1000 + ...
-                    allStruct(loc,pm,c).output.min.Ecost/1000 + ...
-                    allStruct(loc,pm,c).output.min.Icost/1000 + ...
-                    allStruct(loc,pm,c).output.min.Strcost/1000;
-            end
-            if pm == 3 %wave-specific
-                costdata(loc,pm,2,c) = ... %gen capex
-                    allStruct(loc,pm,c).output.min.kWcost/1000 + ...
-                    allStruct(loc,pm,c).output.min.Icost/1000;
-                costdata(loc,pm,4,c) = ... %gen opex
-                    allStruct(loc,pm,c).output.min.wecrepair/1000;
-            end
-            if pm == 2 %dies-specific 
-                costdata(loc,pm,2,c) = ... %gen capex
-                    allStruct(loc,pm,c).output.min.kWcost/1000 + ...
-                    allStruct(loc,pm,c).output.min.genencl/1000;
-                costdata(loc,pm,4,c) = ... %gen opex
-                    allStruct(loc,pm,c).output.min.genrepair/1000 + ...
-                    allStruct(loc,pm,c).output.min.fuel/1000;
-            end
-            gendata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.kW;
-            stordata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.Smax;
-            cycdata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.cyc60;
-            cfdata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.CF;
+                allStruct(fixer(loc),pm,c).output.min.battreplace/1000;
+            costdata(loc,pm,2,c) = ... %gen capex
+                allStruct(fixer(loc),pm,c).output.min.kWcost/1000 + ...
+                allStruct(fixer(loc),pm,c).output.min.Icost/1000;
+            costdata(loc,pm,4,c) = ... %gen opex
+                allStruct(fixer(loc),pm,c).output.min.wecrepair/1000;
+            gendata(loc,pm,1,c) =  ...
+                allStruct(fixer(loc),pm,c).output.min.kW;
+            stordata(loc,pm,1,c) = ...
+                allStruct(fixer(loc),pm,c).output.min.Smax;
+            cycdata(loc,pm,1,c) = ...
+                allStruct(fixer(loc),pm,c).output.min.cyc60*(1/7)*(365/12);
+            cfdata(loc,pm,1,c) = ...
+                allStruct(fixer(loc),pm,c).output.min.CF;
             massdata(loc,pm,1,c) = ...
-                1000*allStruct(loc,pm,c).output.min.Smax/ ...
-                (allStruct(loc,pm,c).batt.V*allStruct(loc,pm,c).batt.se);
-            dpdata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.dp;
+                1000*allStruct(fixer(loc),pm,c).output.min.Smax/ ...
+                (allStruct(fixer(loc),pm,c).batt.V* ...
+                allStruct(fixer(loc),pm,c).batt.se);
+            dpdata(loc,pm,1,c) =  ...
+                allStruct(fixer(loc),pm,c).output.min.width;
         end
     end
 end
 
 %plotting setup
-allpm_results = figure;
+results = figure;
 set(gcf,'Units','inches')
-set(gcf, 'Position', [1, 1, 10, 12])
-fs = 9; %annotation font size
-fs2 = 11; %axis font size
+set(gcf, 'Position', [1, 1, 6.5, 7])
+fs = 6; %annotation font size
+fs2 = 8; %axis font size
 yaxhpos = -.25; %
-cmult = 1.4; %cost axis multiplier
-gmult = 1.8; %generation axis multiplier
-bmult = 2; %battery axis multiplier
-cymult = 1.75; %cycles axis multiplier 
-cfmult = 1.4; %capacity factor axis multiplier
-cbuff = 5; %cost text buffer
-gbuff = 1.5; %generation text buffer
-bbuff = 12.5;  %battery text buffer
-cybuff = 150; %battery cycle text buffer
-cfbuff = .03; %capacity factor text buffer
+cmult = 1.6; %cost axis multiplier
+gmult = 1.9; %generation axis multiplier
+bmult = 2.1; %battery axis multiplier
+cymult = 1.5; %cycles axis multiplier 
+cfmult = 1.5; %capacity factor axis multiplier
+cbuff = 20; %cost text buffer
+gbuff = .26; %generation text buffer
+bbuff = 15;  %battery text buffer
+cybuff = 2; %battery cycle text buffer
+cfbuff = .05; %capacity factor text buffer
 
 %titles and labels
-stt = {'Short-Term Instrumentation';'(six month service interval)'};
-ltt = {'Long-Term Instrumentatino';'(no service interval)'};
+stt = {'Short-Term Instrumentation'};
+ltt = {'Long-Term Instrumentation'};
 titles = {stt,ltt};
 xlab = {'\begin{tabular}{l} Argentine \\ Basin \end{tabular}'; ...
     '\begin{tabular}{l} Coastal \\ Endurance \end{tabular}'; ...
     '\begin{tabular}{l} Coastal \\ Pioneer \end{tabular}'; ...
     '\begin{tabular}{l} Irminger \\ Sea \end{tabular}'; ...
     '\begin{tabular}{l} Southern \\ Ocean \end{tabular}'};
-pms = {'Solar','Diesel','Wave','Wind'};
-leg = {'Mooring','Gen CapEx','Battery CapEx','Gen OpEx', ...
+pms = {'Optimistic Durability','Optimistic Cost','Conservative'};
+leg = {'Mooring','WEC CapEx','Battery CapEx','WEC OpEx', ...
     'Battery OpEx','Vessel'};
 
 %colors
@@ -172,8 +146,8 @@ for c = 1:nu
         if c == 2 && i == np
             leg = legend(h(i,:,c),leg,'Location','northeast');
             leg.FontSize = fs;
-%             leg.Position(1) = .775;
-%             leg.Position(2) = .840;
+            leg.Position(1) = .77;
+            leg.Position(2) = .835;
         end
     end
     hold off;
@@ -195,6 +169,10 @@ for c = 1:nu
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
+    else
+        text(1.15,.5,'(a)','Units','Normalized', ...
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs2);
     end
     grid on
     ylim([0 cmult*max(max(max(sum(costdata,3))))])
@@ -228,12 +206,17 @@ for c = 1:nu
     set(gca,'FontSize',fs2)
     xtickangle(45)
     if c == 1
-        ylabel({'Generation','Capacity','[kW]'},'FontSize',fs2);
+        ylabel({'Cost-','Optimal','Generation','Capacity','[kW]'}, ...
+            'FontSize',fs2);
         ylh = get(gca,'ylabel');
         set(ylh,'Rotation',0,'Units', ...
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
+    else
+        text(1.15,.5,'(b)','Units','Normalized', ...
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs2);
     end
     grid on
     ylim([0 gmult*max(gendata(:))])
@@ -267,16 +250,21 @@ for c = 1:nu
     set(gca,'FontSize',fs2)
     xtickangle(45)
     if c == 1
-        ylabel({'Storage','Capacity','[kWh]'},'FontSize',fs2);
+        ylabel({'Cost-','Optimal','Storage','Capacity','[kWh]'}, ...
+            'FontSize',fs2);
         ylh = get(gca,'ylabel');
         set(ylh,'Rotation',0,'Units', ...
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
+    else
+        text(1.15,.5,'(c)','Units','Normalized', ...
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs2);
     end
     grid on
     ylim([0 bmult*max(stordata(:))])
-    set(gca,'YTick',[0 100 200 300 400])
+    %set(gca,'YTick',[0 100 200 300 400])
     linkaxes(ax(3,:),'y')
     
     ax(4,c) = subplot(7,nu,10+c);
@@ -307,15 +295,20 @@ for c = 1:nu
     %set(gca,'XTickLabel',opt.locations);
     xtickangle(45)
     if c == 1
-        ylabel({'60%','Discharge','Cycles','per','Month'},'FontSize',fs2);
+        ylabel({'60%-','Discharge','Cycles','per','Month'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
         set(ylh,'Rotation',0,'Units', ...
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
+    else
+        text(1.15,.5,'(d)','Units','Normalized', ...
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs2);
     end
     grid on
     ylim([0 cymult*max(cycdata(:))])
+    %set(gca,'YTick',[0 10 20 30 40])
     linkaxes(ax(4,:),'y')
     
     ax(5,c) = subplot(7,nu,12+c);
@@ -342,9 +335,9 @@ for c = 1:nu
     set(gca,'XTickMode','manual');
     set(gca,'XTick',1:NumGroupsPerAxis);
     set(gca,'XTickLabelMode','manual');
-%     set(gca,'FontSize',fs2)
-%     set(gca,'XTickLabel',xlab,'TickLabelInterpreter','latex');
-%     xtickangle(45)
+    set(gca,'FontSize',fs2)
+    set(gca,'XTickLabel',xlab,'TickLabelInterpreter','latex');
+    xtickangle(45)
     if c == 1
         ylabel({'Capacity','Factor'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
@@ -352,6 +345,10 @@ for c = 1:nu
             'Normalized','Position',[yaxhpos .5 -1], ...
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
+    else
+        text(1.15,.5,'(e)','Units','Normalized', ...
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs2);
     end
     grid on
     ylim([0 cfmult*max(cfdata(:))])
@@ -359,5 +356,5 @@ for c = 1:nu
     
 end
 
-print(allpm_results,['../Research/OO-TechEc/pf3/' ...
-    'allpm_results'],'-dpng','-r600')
+print(results,'../Research/OO-TechEc/paper_figures/results',  ...
+    '-dpng','-r600')

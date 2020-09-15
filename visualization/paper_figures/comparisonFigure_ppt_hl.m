@@ -88,7 +88,7 @@ for loc = 1:nl
 end
 
 %plotting setup
-allpm_hl_results = figure;
+comparison_results_hl = figure;
 set(gcf,'Units','inches')
 set(gcf, 'Position', [1, 1, 10, 12])
 fs = 9; %annotation font size
@@ -229,7 +229,7 @@ for c = 1:nu
     xtickangle(45)
     set(gca,'Units','pixels')
     if c == 1
-        ylabel({'Cost-Optimal','Generation','Capacity','[kW]'}, ...
+        ylabel({'Cost-','Optimal','Generation','Capacity','[kW]'}, ...
             'FontSize',fs2);
         ylh = get(gca,'ylabel');
         set(ylh,'Rotation',0,'Units', ...
@@ -270,7 +270,7 @@ for c = 1:nu
     xtickangle(45)
     set(gca,'Units','pixels')
     if c == 1
-        ylabel({'Cost-Optimal','Storage','Capacity','[kWh]'}, ...
+        ylabel({'Cost-','Optimal','Storage','Capacity','[kWh]'}, ...
             'FontSize',fs2);
         ylh = get(gca,'ylabel');
         set(ylh,'Rotation',0,'Units', ...
@@ -313,7 +313,7 @@ for c = 1:nu
     set(gca,'Units','pixels')
     axpos(4,c,:) = get(gca,'Position');
     if c == 1
-        ylabel({'60%','Discharge','Cycles','per','Month'},'FontSize',fs2);
+        ylabel({'60%-','Discharge','Cycles','per','Month'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
         set(ylh,'Rotation',0,'Units', ...
             'Normalized','Position',[yaxhpos .5 -1], ...
@@ -367,7 +367,7 @@ for c = 1:nu
     
 end
 
-print(allpm_hl_results,'../Research/OO-TechEc/pf3/allpm_hl_results',  ...
+print(comparison_results_hl,'../Research/OO-TechEc/pf3/comparison_results_hl',  ...
     '-dpng','-r600')
 
 

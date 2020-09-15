@@ -27,7 +27,7 @@ elseif pm == 3 %wave
     tp{2} = 'wiv'; %wec interventions [WEC]
     ta(2,:) = linspace(0,9,n);
     tp{3} = 'wcm'; %wec cost multiplier [WEC]
-    ta(3,:) = linspace(1,10,n);
+    ta(3,:) = linspace(2,14,n);
     tp{4} = 'whl'; %wec hotel load [WEC]
     ta(4,:) = linspace(0,.18,n);
 end
