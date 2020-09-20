@@ -91,6 +91,9 @@ elseif s0.c == 1 && isequal(s0.loc,'souOcean')
 elseif s0.c == 2 && isequal(s0.loc,'souOcean')
     ssm_so_lt = figure;
     figstr = 'ssm_so_lt';
+else
+    X_loc_c = figure;
+    figstr = 'X_loc_c';
 end
 set(gcf,'Units','inches')
 set(gcf,'Position', [1, 1, 6.5, 5.5])

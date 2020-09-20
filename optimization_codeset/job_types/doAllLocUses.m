@@ -8,7 +8,6 @@ elseif bc == 2 %lfp chemistry
 end
 data = load(loc,loc);
 data = data.(loc);
-%opt.S = length(opt.tuning_array); %do I need this? delete if not
 %initialize outputs
 allLocUses(length(opt.locations),length(opt.usecases)) = struct();
 for loc_n = 1:length(opt.locations)

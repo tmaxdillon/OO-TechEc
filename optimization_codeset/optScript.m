@@ -25,8 +25,10 @@ if opt.sens && ~opt.alllocuses %multiple simulations, sensitivity
     multStruct = doSens();
 elseif opt.tdsens && ~opt.alllocuses %two dimensional sensitivity analysis
     multStruct = doTdSens();
-elseif opt.alllocuses %run all dimensions
+elseif opt.alllocuses %run all dimensions for a power module / scenario
     allLocUses = doAllLocUses();
+elseif opt.allscenuses %run all dimensions for a location
+    allLocUses = doAllScenUses();
 elseif opt.senssm
     [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s0] = ...
         doSensSM();

@@ -107,7 +107,7 @@ cfbuff = .03; %capacity factor text buffer
 
 %titles and labels
 stt = {'Short-Term Instrumentation';'(six month service interval)'};
-ltt = {'Long-Term Instrumentatino';'(no service interval)'};
+ltt = {'Long-Term Instrumentation';'(no service interval)'};
 titles = {stt,ltt};
 xlab = {'\begin{tabular}{l} Argentine \\ Basin \end{tabular}'; ...
     '\begin{tabular}{l} Coastal \\ Endurance \end{tabular}'; ...

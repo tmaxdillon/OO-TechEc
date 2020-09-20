@@ -69,10 +69,10 @@ fs = 9; %annotation font size
 fs2 = 11; %axis font size
 yaxhpos = -.25; %
 cmult = 1.35; %cost axis multiplier
-gmult = 1.9; %generation axis multiplier
-bmult = 2.1; %battery axis multiplier
-cymult = 1.5; %cycles axis multiplier 
-cfmult = 1.5; %capacity factor axis multiplier
+gmult = 1; %generation axis multiplier
+bmult = 1; %battery axis multiplier
+cymult = 1; %cycles axis multiplier 
+cfmult = 1; %capacity factor axis multiplier
 cbuff = 20; %cost text buffer
 gbuff = .25; %generation text buffer
 bbuff = 15;  %battery text buffer
@@ -81,7 +81,7 @@ cfbuff = .025; %capacity factor text buffer
 
 %titles and labels
 stt = {'Short-Term Instrumentation';'(six month service interval)'};
-ltt = {'Long-Term Instrumentatino';'(no service interval)'};
+ltt = {'Long-Term Instrumentation';'(no service interval)'};
 titles = {stt,ltt};
 xlab = {'\begin{tabular}{l} Argentine \\ Basin \end{tabular}'; ...
     '\begin{tabular}{l} Coastal \\ Endurance \end{tabular}'; ...
@@ -180,12 +180,12 @@ for c = 1:nu
         h2(i,c).CData = gcol/256;
         x = get(h2(i,c),'XData');
         for j = 1:length(Y)
-            tx = dpdata(j,i,1,c);
-            text(x(j),Y(j)+gbuff,[ num2str(tx,3) ' m'], ...
-                'Rotation',90, ...
-                'HorizontalAlignment','left', ...
-                'verticalAlignment','middle', ...
-                'FontSize',fs)
+%             tx = dpdata(j,i,1,c);
+%             text(x(j),Y(j)+gbuff,[ num2str(tx,3) ' m'], ...
+%                 'Rotation',90, ...
+%                 'HorizontalAlignment','left', ...
+%                 'verticalAlignment','middle', ...
+%                 'FontSize',fs)
         end
     end
     hold off;
@@ -197,7 +197,7 @@ for c = 1:nu
     xtickangle(45)
     set(gca,'Units','pixels')
     if c == 1
-        ylabel({'Cost-','Optimal','Generation','Capacity','[kW]'}, ...
+        ylabel({'WEC','Capacity','[kW]'}, ...
             'FontSize',fs2);
         ylh = get(gca,'ylabel');
         set(ylh,'Rotation',0,'Units', ...
@@ -206,7 +206,9 @@ for c = 1:nu
             'HorizontalAlignment','center')
     end
     grid on
-    ylim([0 gmult*max(gendata(:))])
+    %ylim([0 gmult*max(gendata(:))])
+    ylim([0 4.5])
+    set(gca,'YTick',[0 1 2 3 4 5])
     linkaxes(ax(2,:),'y')
     
     ax(3,c) = subplot(7,nu,8+c);
@@ -221,12 +223,12 @@ for c = 1:nu
         h3(i,c).CData = bcol/256;
         x = get(h3(i,c),'XData');
         for j = 1:length(Y)
-            tx = round(massdata(j,i,1,c));
-            text(x(j),Y(j)+bbuff,[ num2str(tx,'%i') ' kg'], ...
-                'Rotation',90, ...
-                'HorizontalAlignment','left', ...
-                'verticalAlignment','middle', ...
-                'FontSize',fs)
+%             tx = round(massdata(j,i,1,c));
+%             text(x(j),Y(j)+bbuff,[ num2str(tx,'%i') ' kg'], ...
+%                 'Rotation',90, ...
+%                 'HorizontalAlignment','left', ...
+%                 'verticalAlignment','middle', ...
+%                 'FontSize',fs)
         end
     end
     hold off;
@@ -238,7 +240,7 @@ for c = 1:nu
     xtickangle(45)
     set(gca,'Units','pixels')
     if c == 1
-        ylabel({'Cost-','Optimal','Storage','Capacity','[kWh]'}, ...
+        ylabel({'Battery','Capacity','[kWh]'}, ...
             'FontSize',fs2);
         ylh = get(gca,'ylabel');
         set(ylh,'Rotation',0,'Units', ...
@@ -247,8 +249,9 @@ for c = 1:nu
             'HorizontalAlignment','center')
     end
     grid on
-    ylim([0 bmult*max(stordata(:))])
-    set(gca,'YTick',[0 200 400])
+    %ylim([0 bmult*max(stordata(:))])
+    ylim([0 300])
+    %set(gca,'YTick',[0 100 200 300 400])
     linkaxes(ax(3,:),'y')
     
     ax(4,c) = subplot(7,nu,10+c);
@@ -263,12 +266,12 @@ for c = 1:nu
         h4(i,c).CData = cycol/256;
         x = get(h4(i,c),'XData');
         for j = 1:length(Y)
-            tx = round(Y(j),1);
-            text(x(j),Y(j)+cybuff,num2str(tx), ...
-                'Rotation',90, ...
-                'HorizontalAlignment','left', ...
-                'verticalAlignment','middle', ...
-                'FontSize',fs)
+%             tx = round(Y(j),1);
+%             text(x(j),Y(j)+cybuff,num2str(tx), ...
+%                 'Rotation',90, ...
+%                 'HorizontalAlignment','left', ...
+%                 'verticalAlignment','middle', ...
+%                 'FontSize',fs)
         end
     end
     hold off;
@@ -304,12 +307,12 @@ for c = 1:nu
         h5(i,c).CData = cfcol/256;
         x = get(h5(i,c),'XData');
         for j = 1:length(Y)
-            tx = round(Y(j),2);
-            text(x(j),Y(j)+cfbuff,num2str(tx), ...
-                'Rotation',90, ...
-                'HorizontalAlignment','left', ...
-                'verticalAlignment','middle', ...
-                'FontSize',fs)
+%             tx = round(Y(j),2);
+%             text(x(j),Y(j)+cfbuff,num2str(tx), ...
+%                 'Rotation',90, ...
+%                 'HorizontalAlignment','left', ...
+%                 'verticalAlignment','middle', ...
+%                 'FontSize',fs)
         end
     end
     hold off;

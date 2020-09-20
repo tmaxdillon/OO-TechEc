@@ -1,12 +1,13 @@
 %settings
 econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
-opt.bf.m = 30;
-opt.bf.n = 30;
+opt.bf.m = 5;
+opt.bf.n = 5;
+opt.allscenuses = 1;
 opt.alllocuses = 0;
 opt.sens = 0;
 opt.tdsens = 0;
 opt.senssm = 0;
-pm = 2; %power module, 1:Wi 2:In 3:Wa 4:Di
+pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
 bc = 2; %battery chemistry 1:AGM 2:LFP
 c = 2;  %use case 1:ST 2:LT
 loc = 'cosPioneer'; %location
@@ -226,9 +227,9 @@ opt.tuned_parameter = 'lft'; %lifetime
 
 %optimization parameters
 opt.V = 2;
-opt.bf.M = 4; %[kW] max kW in grid
-opt.bf.N = 250; %[kWh] max Smax in grid
-opt.bf.maxworkers = 36*3; %maximum cores
+opt.bf.M = 8; %[kW] max kW in grid
+opt.bf.N = 500; %[kWh] max Smax in grid
+opt.bf.maxworkers = 36; %maximum cores
 % opt.nm.m = 5; %input grid resolution for rated power
 % opt.nm.n = 5; %input grid resolution for storage
 % opt.nm.many = false; %seed many initial points into nelder

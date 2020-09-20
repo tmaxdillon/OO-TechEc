@@ -17,6 +17,8 @@ else %save single structure
         stru.(name) = multStruct;
     elseif exist('allLocUses','var')
         stru.(name) = allLocUses;
+    elseif exit('allScenUses','var')
+        stru.(name) = allScenUses;
     else
         stru.(name) = optStruct;
     end

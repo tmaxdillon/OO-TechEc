@@ -84,7 +84,7 @@ cfbuff = .025; %capacity factor text buffer
 
 %titles and labels
 stt = {'Short-Term Instrumentation';'(six month service interval)'};
-ltt = {'Long-Term Instrumentatino';'(no service interval)'};
+ltt = {'Long-Term Instrumentation';'(no service interval)'};
 titles = {stt,ltt};
 xlab = {'\begin{tabular}{l} Argentine \\ Basin \end{tabular}'; ...
     '\begin{tabular}{l} Coastal \\ Endurance \end{tabular}'; ...
@@ -318,9 +318,9 @@ for c = 1:nu
     set(gca,'XTickMode','manual');
     set(gca,'XTick',1:NumGroupsPerAxis);
     set(gca,'XTickLabelMode','manual');
-%     set(gca,'FontSize',fs2)
-%     set(gca,'XTickLabel',xlab,'TickLabelInterpreter','latex');
-%     xtickangle(45)
+    set(gca,'FontSize',fs2)
+    set(gca,'XTickLabel',xlab,'TickLabelInterpreter','latex');
+    xtickangle(45)
     if c == 1
         ylabel({'Capacity','Factor'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
