@@ -35,7 +35,7 @@ c.Label.String = '[$] in thousands';
 caxis([0 max(a_sat(:))]) %to produce cartoon
 lb = (output.min.cost)/max(a_sat(:));
 AdvancedColormap('bg l w r',8000,[1*lb,lb+.05*(1-lb),lb+0.1*(1-lb),1])
-hold onopo
+hold on
 set(gca,'FontSize',fs)
 set(gca,'LineWidth',lw)
 grid on
