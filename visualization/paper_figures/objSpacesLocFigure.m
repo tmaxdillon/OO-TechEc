@@ -9,19 +9,24 @@ if ~exist('multStruct','var')
 end
 clearvars -except multStruct
 
+multStruct_c = multStruct;
+multStruct_c(3) = multStruct_c(2);
+
 %plot setup
 objSpacesLoc = figure;
 set(gcf,'Units','inches')
 set(gcf,'Position', [0.1, 1, 3, 8])
 lw = 1.1;
 fs = 10;
-Sm_max = 300; %[kWh]
-Gr_max = 4; %[kW]
+Sm_max = [250 300 350 125 200]; %[kWh]
+Gr_max = [2 4 5 1 2]; %[kW]
 C_max = 1500;
-rshift = .1; %shift axis right
+rshift = 20; %shift axis right
 xshrink = .9; %shrink size of x axis
 ygrow = 1.2; %expand size of y axis
-dshift = .012; %shift axes down
+dshift = 5; %shift axes down
+
+ann = {'(a)','(b)','(c)','(d)','(e)'};
 
 for i = 1:length(multStruct)
     
@@ -46,6 +51,11 @@ for i = 1:length(multStruct)
     sa.EdgeColor = 'none';
     sa.FaceColor = 'flat';
     view(0,90)
+    hold on
+    text(.02,.04,ann{i},'Units','Normalized', ...
+            'VerticalAlignment','bottom','FontWeight','normal', ...
+            'HorizontalAlignment','left','FontSize',fs, ...
+            'Color','w');
     if i == 5
         xlabel('S_m [kWh]','interpreter','tex')
     end
@@ -54,14 +64,16 @@ for i = 1:length(multStruct)
     set(hYLabel,'rotation',0,'VerticalAlignment','middle', ...
         'HorizontalAlignment','center','Units','Normalized')
     ylabpos = get(hYLabel,'Position');
-    ylabpos(1) = -.25;
+    ylabpos(1) = -.3;
     set(hYLabel,'Position',ylabpos)
-    ylim([-inf Gr_max])
-    xlim([-inf Sm_max])
+    axis manual
+    ylim([-inf Gr_max(i)])
+    xlim([-inf Sm_max(i)])
     set(gca,'FontSize',fs)
     set(gca,'LineWidth',lw)
     
     %get axespositions for adjustmet later
+    set(ax(i),'Units','pixels');
     axpos(:,i) = get(ax(i),'Position');
     axpos(1,i) = axpos(1,i)+rshift;
     axpos(3,i) = xshrink*axpos(3,i);
@@ -71,22 +83,43 @@ for i = 1:length(multStruct)
     
     %find maximums and minimum for colorbar
     a_max(i) = max(a_sat(:)); %actual max
-    p_max(i) = max(max(sb.ZData(sb.YData(:,1) < Gr_max, ... 
-        sb.XData(1,:) < Sm_max))); %plot max
+    p_max(i) = max(max(sb.ZData(sb.YData(:,1) < Gr_max(i), ... 
+        sb.XData(1,:) < Sm_max(i)))); %plot max
     a_min(i) = min(a_sat(:));
+end
+drawnow
+
+%reposition figures
+for i=1:length(multStruct)
+    set(ax(i),'Position',axpos(:,i))
 end
 
 %final adjustments
-for i=1:length(multStruct)    
-    set(ax(i),'Position',axpos(:,i))
+for i=1:length(multStruct)        
     lb(i) = a_min(i)/p_max(i);
     colormap(ax(i),AdvancedColormap('bg l w r',1000, ...
         [lb(i),lb(i)+.05*(1-lb(i)),lb(i)+0.15*(1-lb(i)),1]));
     c(i) = colorbar(ax(i));
-    set(c(i).Label,'String','[$k]','Rotation',0,'Units','Normalized') 
+    set(c(i).Label,'String','[$k]','Rotation',0,'Units','Pixels') 
+    clabrspot = 44;
+    clpos = get(c(i).Label,'Position');
+    clpos(1) = clabrspot;
+    set(c(i).Label,'Position',clpos)
     set(ax(i),'CLim',[-inf p_max(i)])
-    set(c(i),'Limits',[0 max(p_max)])
+    %set(c(i),'Limits',[0 pmax(i)])
 end
+
+%fix third subplot colorbar
+set(c(3),'Units','Pixels')
+set(c(2),'Units','Pixels')
+cpos3 = get(c(3),'Position');
+cpos2 = get(c(2),'Position');
+cpos3(1) = cpos2(1);
+set(c(3),'Position',cpos3);
+pos3 = get(ax(3),'Position');
+pos2 = get(ax(2),'Position');
+pos3(3) = pos2(3);
+set(ax(3),'Position',pos3);
 
 print(objSpacesLoc,'../Research/OO-TechEc/paper_figures/objspaces', ...
     '-dpng','-r600')

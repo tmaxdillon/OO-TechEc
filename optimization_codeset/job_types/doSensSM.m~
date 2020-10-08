@@ -23,7 +23,7 @@ if pm == 1 %wind
 elseif pm == 3 %wave
     nps = 4; %number of power-specific parameters
     tp{1} = 'cwm'; %capture width multiplier [WEC]
-    ta(1,:) = linspace(0.5,5,n);
+    ta(1,:) = linspace(1/f,f,n);
     tp{2} = 'wiv'; %wec interventions [WEC]
     ta(2,:) = linspace(0,9,n);
     tp{3} = 'wcm'; %wec cost multiplier [WEC]
@@ -34,25 +34,25 @@ end
 tp{nps+1} = 'ild'; %instrumentation load [INST]
 ta(nps+1,:) = linspace(uc.draw/f,uc.draw*f,n);
 tp{nps+2} = 'osv'; %osv cost [OPEX]
-ta(nps+2,:) = linspace(2.5,40,n);
+ta(nps+2,:) = linspace(econ.vessel.osvcost/f,econ.vessel.osvcost*f,n);
 tp{nps+3} = 'nbl'; %nominal battery life-cycle [BATT]
-ta(nps+3,:) = linspace(9,batt.lc_nom*f,n);
+ta(nps+3,:) = linspace(batt.lc_nom/f,batt.lc_nom*f,n);
 tp{nps+4} = 'sdr'; %battery self discharge rate [BATT]
-ta(nps+4,:) = linspace(0,15,n);
+ta(nps+4,:) = linspace(0,10,n);
 tp{nps+5} = 'utp'; %uptime percent [INST]
 ta(nps+5,:) = linspace(.80,1,n);
 tp{nps+6} = 'bhc'; %battery housing cost [BATT]
-ta(nps+6,:) = linspace(0.25,3,n);
+ta(nps+6,:) = linspace(econ.batt.enclmult/f,econ.batt.enclmult*f,n);
 tp{nps+7} = 'dep'; %depth modifier [INST]
-ta(nps+7,:) = linspace(120,5500,n); %watch MDD bounds!
+ta(nps+7,:) = linspace(200,5500,n); %watch MDD bounds!
 tp{nps+8} = 'dtc'; %distance to coast [OPEX]
-ta(nps+8,:) = linspace(10,3000,n)*1000;
+ta(nps+8,:) = linspace(200,2000,n)*1000;
 tp{nps+9} = 'mbl'; %maximum battery life-cycle [BATT]
 ta(nps+9,:) = linspace(batt.lc_max*(2/5),batt.lc_max,n);
 tp{nps+10} = 'lft'; %lifetime [INST]
 ta(nps+10,:) = linspace(1,10,n);
 tp{nps+11} = 'spv'; %specialized vessel cost [OPEX]
-ta(nps+11,:) = linspace(35,150,n);
+ta(nps+11,:) = linspace(econ.vessel.speccost/f,econ.vessel.speccost*f,n);
 tp{nps+12} = 'tmt'; %time spent on site for maintenance [OPEX]
 ta(nps+12,:) = linspace(1,12,n);
 

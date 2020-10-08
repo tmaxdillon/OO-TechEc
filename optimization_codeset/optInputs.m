@@ -1,16 +1,16 @@
 %settings
 econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
-opt.bf.m = 5;
-opt.bf.n = 5;
-opt.allscenuses = 1;
+opt.bf.m = 500;
+opt.bf.n = 500;
+opt.allscenuses = 0;
 opt.alllocuses = 0;
 opt.sens = 0;
 opt.tdsens = 0;
-opt.senssm = 0;
+opt.senssm = 1;
 pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
 bc = 2; %battery chemistry 1:AGM 2:LFP
-c = 2;  %use case 1:ST 2:LT
-loc = 'cosPioneer'; %location
+c = 1;  %use case 1:ST 2:LT
+loc = 'argBasin'; %location
 opt.tdsens_ta(1,:) = 2:1:7;
 opt.tdsens_ta(2,:) = 6:1:11;
 opt.tdsens_tp{1} = 'hra'; %rated Hs
@@ -57,7 +57,7 @@ econ.vessel.osvcost = 15000;        %[$/day]
 econ.vessel.speed = 10;             %[kts]
 econ.vessel.t_mosv = 6;             %[h] time on site for maint (osv)
 econ.vessel.speccost = 70000;       %[$/day] 
-econ.vessel.t_ms = 1;               %[h] time on site for maint (spec)
+econ.vessel.t_ms = 2;               %[h] time on site for maint (spec)
 %battery 
 % econ.batt.encl.sf = .5;             %scaling factor
 % econ.batt.encl.cost = 5000;         %[$], WAMP

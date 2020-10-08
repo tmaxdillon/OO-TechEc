@@ -16,6 +16,9 @@ fs = 18;
 a_sat = output.cost; %availability satisfied
 a_sat(output.surv == 0) = nan;
 
+%find minimum
+[m,m_ind] = min(a_sat(:));
+
 figure
 s = surf(Smaxgrid,kWgrid,output.cost,zeros(length(Smaxgrid), ... 
     length(kWgrid),3)); %black
@@ -25,6 +28,8 @@ hold on
 s = surf(Smaxgrid,kWgrid,a_sat);
 s.EdgeColor = 'none';
 s.FaceColor = 'flat';
+hold on
+scatter3(Smaxgrid(m_ind),kWgrid(m_ind),m*2,'m','filled')
 view(0,90)
 xlabel('Storage Capacity [kWh]')
 ylabel('Rated Power [kW]')

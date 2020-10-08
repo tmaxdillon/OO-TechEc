@@ -15,8 +15,6 @@ load('struct6m_opt')
 %constants
 rho = 1020; %[kg/m^3]
 g = 9.81;   %[m/s^2]
-lw1 = 3;
-lw2 = .8;
 
 %extract Tps and Hs
 Tp_1 = unique(struct1m_opt.T);
@@ -95,6 +93,19 @@ cwr_int(2,:,6) = interp1(Tp_6, ...
     ((1/(64*pi))*rho*g^2*Hs_6(end)^2.*Tp_6.*struct6m_opt.B), ...
     linspace(min(Tp_6),max(Tp_6),Tp_res),'spline');
 
+%find inflection points
+for i = 1:6
+    [~,inflex_ind(i)] = min(abs(cwr_int(1,2:end-1,i) - ...
+        cwr_int(2,2:end-1,i)));
+end
+
+%plot setup
+lw1 = 3;
+lw2 = .5;
+lw3 = .5;
+ms = 4;
+fs = 10;
+
 %colors
 c = 7;
 col1 = brewermap(10,'reds'); col(1,:) = col1(c,:);
@@ -105,6 +116,8 @@ col5 = brewermap(10,'purples'); col(5,:) = col5(c,:);
 col6 = brewermap(10,'greys'); col(6,:) = col6(c,:);
 
 wscwr = figure;
+set(gcf,'Units','inches')
+set(gcf, 'Position', [1, 1, 7, 2.25])
 for i = size(cwr_int,3):-1:1
     a(i,:) = area(Tp_all(:,i)', ...
         [cwr_int(2,:,i);cwr_int(1,:,i)-cwr_int(2,:,i)]');
@@ -112,20 +125,21 @@ for i = size(cwr_int,3):-1:1
     a(i,2).FaceColor = col(i,:);
     a(i,2).FaceAlpha = 0.2;
     a(i,1).FaceAlpha = 0;
+    plot(Tp_all(inflex_ind(i),i),mean([cwr_int(1,inflex_ind(i),i) ...
+        cwr_int(2,inflex_ind(i),i)]),'ko','MarkerSize',ms, ...
+        'LineWidth',lw3)
 end
 a(1,1).EdgeColor = 'none';
-
-set(gcf,'Units','inches')
-set(gcf, 'Position', [1, 1, 7.5, 3])
 ax = gca;
-ax.YLabel.String = 'CWR';
-ax.XLabel.String = 'T_{p} [s]';
-ax.XLabel.Interpreter = 'tex';
+ax.YLabel.String = '$CWR$';
+ax.YLabel.Interpreter = 'latex';
+ax.XLabel.String = '$T_{p}$ [s]';
+ax.XLabel.Interpreter = 'latex';
 hYLabel = get(gca,'YLabel');
 set(hYLabel,'rotation',0,'VerticalAlignment','middle', ...
     'HorizontalAlignment','right')
 xlim([0 15])
-ylim([0 .3])
+ylim([0 .275])
 xticks(1:1:15)
 yticks(0:.1:.3)
 %add arrow
@@ -142,15 +156,14 @@ arrow.HeadLength = 5;
 x_tex = 2.3;
 X_t = pos(1) + x_tex*(pos(3)/ax.XLim(2));
 dim = [X_t mean(Y)*1.05 .5 .05];
-str = 'H_{s}';
-text = annotation('textbox',dim,'String',str);
+text = annotation('textbox',dim,'String','$H_{s}$','Interpreter','latex');
 text.EdgeColor = 'none';
 legend([a(1,2) a(2,2) a(3,2) ...
     a(4,2) a(5,2) a(6,2)], ...
-    '1 m RM3 WEC','2 m RM3 WEC','3 m RM3 WEC','4 m RM3 WEC', ...
-    '5 m RM3 WEC','6 m RM3 WEC','Location','best')
+    'B = 1 m','B = 2 m','B = 3 m','B = 4 m', ...
+    'B = 5 m','B = 6 m','Location','northeast')
 grid on
-set(gca,'FontSize',10)
+set(gca,'FontSize',fs,'LineWidth',lw2)
 
-%print(wscwr,'../Research/OO-TechEc/paper_figures/wscwr', '-dpng','-r600')
+print(wscwr,'../Research/OO-TechEc/paper_figures/wscwr', '-dpng','-r600')
 

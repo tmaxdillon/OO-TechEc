@@ -111,17 +111,17 @@ for f = 1:2
     set(gcf,'Units','inches')
     set(gcf,'Position', [1, 1, 6.5, 5.5])
     for a = 1:size(array,1)
-%         ax(a) = subplot(10,4,floor(a/4.1)*4+a+[0 4]);
         ax(a) = subplot(4,4,a);
+        drawnow
         for i = 1:5
             %x0(8,l(i)) = x0(8,l(i))/1000;
-            locs(i) = plot(ta(a,:,i),cost(a,:,l(i)), ...
+            locs(i) = plot(ta(a,:,i),cost(a,:,l(i))/t0(l(i)), ...
                 'Color',col(i,:),'DisplayName',titles{i},'LineWidth',lw);
             hold on
             grid on            
         end
         for i = 1:5
-            blt = scatter(x0(a,l(i)),t0(l(i)),ms, ...
+            blt = scatter(x0(a,l(i)),t0(l(i))/t0(l(i)),ms, ...
                 'MarkerFaceColor',orange, ...
                 'MarkerEdgeColor','k','LineWidth',lw2, ...
                 'DisplayName','Baseline');
@@ -137,24 +137,26 @@ for f = 1:2
         xticks([ta(a,1,i),ta(a,n,i)]);
         xt = xticks;
         xlim([ta(a,1,i) ta(a,n,i)])
-%         if f == 1
-%             ylim([0 max(squeeze(max(cost(:,:,1:5),[],1:2))./t0(l(1:5))')])
-%         else
-%             ylim([0 max(cost(:,:,6:end)./t0(l(6:end)))])
-%         end
-%         yticks([0 1])
-%         yticklabels({'$0k','Total Cost'})
-        ylim([0 max(cost(:))])
-        yticks([0 500000])
-        yticklabels({'$0k',['$' num2str(round(500000/1000),3) 'k']})
+        if f == 1
+            ylim([0 max(squeeze(max(cost(:,:,l),[],1:2))./t0(l)')])
+        else
+            ylim([0 max(squeeze(max(cost(:,:,l),[],1:2))./t0(l)')])
+        end
+        yticks([0 1])
+        %yticklabels({'$0k',''});
+        YTickString{1} = ['0k'];
+        YTickString{2} = ['$$\begin{array}{c} \mathrm{Total} \\' ...
+            '\mathrm{Cost} \\ \end{array}$$'];
+        set(gca,'YTickLabel',YTickString,'TickLabelInterpreter','latex');
+        %         yticks([0 500000])
+        %         yticklabels({'$0k',['$' num2str(round(500000/1000),3) 'k']})
         set(gca,'FontSize',fs1)
         if a == 1
             t = title('Battery','FontWeight','normal','FontSize',fs3);
             t.Position(2) = t.Position(2)*1.1;
         end
         if a == 2
-            t = title('Instrumentation','FontWeight','normal', ...
-                'FontSize',fs3);
+            t = title('Instrumentation','FontWeight','normal','FontSize',fs3);
             t.Position(2) = t.Position(2)*1.1;
         end
         if a == 3
@@ -174,7 +176,8 @@ for f = 1:2
             xlabel({'Maximum','Battery Life-Cycle [mo]'},'FontSize',fs2)
             xticklabels({'24','60'})
         elseif isequal(array(a,1).opt.tuned_parameter,'nbl')
-            xlabel(({'Nominal','Battery Life-Cycle [mo]',''}),'FontSize',fs2)
+            xlabel(({'Nominal','Battery Life-Cycle [mo]',''}), ...
+                'FontSize',fs2)
             xticklabels({'9','36'})
         elseif isequal(array(a,1).opt.tuned_parameter,'dep')
             xlabel({'Depth [m]'},'FontSize',fs2)
@@ -202,18 +205,19 @@ for f = 1:2
             xlabel(({'Distance to','Coast [km]'}),'FontSize',fs2)
             xticklabels({'200','2000'})
         elseif isequal(array(a,1).opt.tuned_parameter,'spv')
-            xlabel(({'Specialized','Vessel Cost [$k]'}),'FontSize',fs2)
+            xlabel(({'Specialized','Vessel Cost [$k/d]'}),'FontSize',fs2)
             tx = xt./1000;
             xticklabels({num2str(tx(1)),num2str(tx(2))})
         elseif isequal(array(a,1).opt.tuned_parameter,'osv')
-            xlabel(({'Offshore','Support Vessel Cost [$k]'}),'FontSize',fs2)
+            xlabel(({'Offshore','Support Vessel Cost [$k/d]'}), ...
+                'FontSize',fs2)
             tx = xt./1000;
             xticklabels({num2str(tx(1)),num2str(tx(2))})
         end
         set(ax(a).XLabel,'units','normalized')
         pos = get(ax(a).XLabel,'Position');
         pos(2) = -.11;
-        set(ax(a).XLabel,'Position',pos,'VerticalAlignment','Top')
+        set(ax(a).XLabel,'Position',pos,'VerticalAlignment','Top', ...
         xlab = get(ax(a),'XLabel');
         xlab.Position(2) = 0.6*xlab.Position(2);
         %fix x tick overlap
