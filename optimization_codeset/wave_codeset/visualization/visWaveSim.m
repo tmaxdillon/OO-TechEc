@@ -13,7 +13,8 @@ plot(datetime(data.wave.time,'ConvertFrom','datenum'), ...
     'DisplayName','Battery Storage','LineWidth',2)
 legend('show')
 ylabel('[kWh]')
-ylim([min(output.min.S(1:end-1)/1000) inf])
+%ylim([min(output.min.S(1:end-1)/1000) inf]) %for convo with mike
+ylim([0 inf])
 %set(gca,'XTickLabel',[]);
 set(gca,'FontSize',16)
 set(gca,'LineWidth',2)

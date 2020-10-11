@@ -1,5 +1,6 @@
-function [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s0] = ...
-    doSensSM()
+function [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s17, ...
+    s0] = ...
+    doSensSM(batchtype,scen,loc,c)
 
 n = 10; %sensitivity discretization
 f = 2; %factor
@@ -55,6 +56,8 @@ tp{nps+11} = 'spv'; %specialized vessel cost [OPEX]
 ta(nps+11,:) = linspace(35,150,n);
 tp{nps+12} = 'tmt'; %time spent on site for maintenance [OPEX]
 ta(nps+12,:) = linspace(1,12,n);
+tp{nps+13} = 'bcc'; %battery cell cost [BATT]
+ta(nps+13,:) = linspace(120,1500,n);
 
 if pm == 3
     s1 = doSens(ta(1,:),tp{1});
@@ -73,6 +76,7 @@ if pm == 3
     s14 = doSens(ta(14,:),tp{14});
     s15 = doSens(ta(15,:),tp{15});
     s16 = doSens(ta(16,:),tp{16});
+    s17 = doSens(ta(17,:),tp{14});
 end
 
 %get S0, default results

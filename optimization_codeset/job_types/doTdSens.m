@@ -1,4 +1,4 @@
-function [multStruct] = doTdSens()
+function [multStruct] = doTdSens(batchtype,scen,loc,c)
 tTot = tic;
 optInputs %load inputs
 data = load(loc,loc);

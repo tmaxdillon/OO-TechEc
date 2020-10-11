@@ -216,7 +216,7 @@ for f = 1:2
         end
         set(ax(a).XLabel,'units','normalized')
         pos = get(ax(a).XLabel,'Position');
-        pos(2) = -.65;
+        pos(2) = -.35;
         set(ax(a).XLabel,'Position',pos,'VerticalAlignment','Middle')
         xlab = get(ax(a),'XLabel');
         xlab.Position(2) = 0.6*xlab.Position(2);

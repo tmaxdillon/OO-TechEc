@@ -2,9 +2,14 @@ function [output,opt] = optWave(opt,data,atmo,batt,econ,uc,bc,wave)
 
 %set kW and Smax mesh
 opt.kW_1 = 0.15;
-opt.kW_m = opt.bf.M; %[kW]
 opt.Smax_1 = 1;
-opt.Smax_n = opt.bf.N; %[kWh]
+if ~opt.highresobj
+    opt.kW_m = opt.bf.M; %[kW]
+    opt.Smax_n = opt.bf.N; %[kWh]
+else
+    opt.kW_m = opt.bf.M(opt.loc_ind);
+    opt.Smax_n = opt.bf.N(opt.loc_ind);
+end
 
 %set sensitivity modifiers to 1 if absent and to value if existing
 if ~isfield(wave,'cw_mod')
