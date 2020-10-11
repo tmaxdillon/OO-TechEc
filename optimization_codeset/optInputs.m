@@ -1,8 +1,8 @@
 %simulation settings
 %interactive job
 econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
-opt.bf.m = 5;
-opt.bf.n = 5;
+opt.bf.m = 500;
+opt.bf.n = 500;
 opt.allscenuses = 0;
 opt.alllocuses = 0;
 opt.sens = 0;
@@ -15,9 +15,9 @@ loc = 'argBasin'; %location
 %batch = false;
 
 if isequal('batchtype','ssm')
-    econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
-    opt.bf.m = 5;
-    opt.bf.n = 5;
+    econ.wave.scen = scen; %scenario indicator 1:C,2:OC,3:OD
+    opt.bf.m = 500;
+    opt.bf.n = 500;
     opt.allscenuses = 0;
     opt.alllocuses = 0;
     opt.sens = 0;
