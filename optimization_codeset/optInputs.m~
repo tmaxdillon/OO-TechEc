@@ -14,8 +14,8 @@ c = 1;  %use case 1:ST 2:LT
 loc = 'argBasin'; %location
 %batch = false;
 
-if isequal('batchtype','ssm')
-    econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
+if isequal(batchtype,'ssm')
+    econ.wave.scen = batchscen; %scenario indicator 1:C,2:OC,3:OD
     opt.bf.m = 5;
     opt.bf.n = 5;
     opt.allscenuses = 0;
@@ -25,11 +25,11 @@ if isequal('batchtype','ssm')
     opt.senssm = 1;
     opt.highresobj = 0;
     pm = 3;
-    c = c;
-    loc = loc;
+    c = batchc;
+    loc = batchloc;
     %batch = true;
-elseif isequal('batchtype','alllocuses')
-    econ.wave.scen = scen; 
+elseif isequal(batchtype,'alllocuses')
+    econ.wave.scen = batchscen; 
     opt.bf.m = 5;
     opt.bf.n = 5;
     opt.allscenuses = 0;
@@ -42,7 +42,7 @@ elseif isequal('batchtype','alllocuses')
     c = [];
     loc = [];
     %batch = true;
-elseif isequal('batchtype','hros')
+elseif isequal(batchtype,'hros')
     econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
     opt.bf.m = 7;
     opt.bf.n = 7;
@@ -53,8 +53,8 @@ elseif isequal('batchtype','hros')
     opt.senssm = 0;
     opt.highresobj = 1;
     pm = 3;
-    c = c;
-    loc = loc;
+    c = batchc;
+    loc = batchloc;
     %batch = true;
 else
     batchtype = [];

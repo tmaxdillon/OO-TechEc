@@ -6,32 +6,32 @@ optInputs
 T = tic;
 if opt.sens && ~opt.alllocuses %multiple simulations, sensitivity
     disp('Two dimensional sensitivity beginning now.')
-    multStruct = doSens([],[]);
+    multStruct = doSens([],[],batchtype,batchscen,batchloc,batchc);
     disp(['Sensitivity complete after ' ...
         num2str(round(toc(T)/60,2)) ' minutes.'])
 elseif opt.tdsens && ~opt.alllocuses %two dimensional sensitivity analysis
     disp('Two dimensional sensitivity beginning now.')
-    multStruct = doTdSens(batchtype,scen,loc,c);
+    multStruct = doTdSens(batchtype,batchscen,batchloc,batchc);
     disp(['Two dimensional sensitivity complete after ' ...
         num2str(round(toc(T)/60,2)) ' minutes.'])
 elseif opt.alllocuses %run all dimensions for a power module / scenario
     disp(['All locations and use cases for the '  ...
         loc ' scenario beginning now.'])
-    allLocUses = doAllLocUses(batchtype,scen,loc,c);
+    allLocUses = doAllLocUses(batchtype,batchscen,batchloc,batchc);
     disp(['All locations and use cases for the ' loc ...
         ' scenario complete after' num2str(round(toc(T)/60,2)) ... 
         ' minutes.'])
 elseif opt.allscenuses %run all dimensions for a location
     disp(['All scenaios and use cases for the ' ...
         char(opt.wavescnes(econ.wave.scen)) ' location beginning now.'])
-    allLocUses = doAllScenUses(batchtype,scen,loc,c);
+    allLocUses = doAllScenUses(batchtype,batchscen,batchloc,batchc);
     disp(['All scenarios and use cases for the ' ...
         char(opt.wavescnes(econ.wave.scen)) ...
         ' scenario complete after' num2str(round(toc(T)/60,2)) ...
         ' minutes.'])
 elseif opt.senssm
     [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s17,s0] = ...
-        doSensSM(batchtype,scen,loc,c);
+        doSensSM(batchtype,batchscen,batchloc,batchc);
     if pm == 3 %assign output to descriptive variables
         cwm = s1;
         wiv = s2;

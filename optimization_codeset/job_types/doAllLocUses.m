@@ -1,4 +1,4 @@
-function [allLocUses] = doAllLocUses(batchtype,scen,loc,c)
+function [allLocUses] = doAllLocUses(batchtype,batchscen,batchloc,batchc)
 tTot = tic;
 optInputs %load inputs
 if bc == 1 %agm chemistry

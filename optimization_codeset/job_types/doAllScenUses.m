@@ -1,4 +1,4 @@
-function [allScenUses] = doAllScenUses(batchtype,scen,loc,c)
+function [allScenUses] = doAllScenUses(batchtype,batchscen,batchloc,batchc)
 tTot = tic;
 optInputs %load inputs
 if bc == 1 %agm chemistry

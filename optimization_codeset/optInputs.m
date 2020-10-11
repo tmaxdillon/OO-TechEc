@@ -13,9 +13,8 @@ pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
 c = 1;  %use case 1:ST 2:LT
 loc = 'argBasin'; %location
 %batch = false;
-
-if isequal('batchtype','ssm')
-    econ.wave.scen = scen; %scenario indicator 1:C,2:OC,3:OD
+if isequal(batchtype,'ssm')
+    econ.wave.scen = batchscen; %scenario indicator 1:C,2:OC,3:OD
     opt.bf.m = 500;
     opt.bf.n = 500;
     opt.allscenuses = 0;
@@ -25,13 +24,13 @@ if isequal('batchtype','ssm')
     opt.senssm = 1;
     opt.highresobj = 0;
     pm = 3;
-    c = c;
-    loc = loc;
+    c = batchc;
+    loc = batchloc;
     %batch = true;
-elseif isequal('batchtype','alllocuses')
-    econ.wave.scen = scen; 
-    opt.bf.m = 5;
-    opt.bf.n = 5;
+elseif isequal(batchtype,'alllocuses')
+    econ.wave.scen = batchscen; 
+    opt.bf.m = 500;
+    opt.bf.n = 500;
     opt.allscenuses = 0;
     opt.alllocuses = 1;
     opt.sens = 0;
@@ -42,10 +41,10 @@ elseif isequal('batchtype','alllocuses')
     c = [];
     loc = [];
     %batch = true;
-elseif isequal('batchtype','hros')
+elseif isequal(batchtype,'hros')
     econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
-    opt.bf.m = 7;
-    opt.bf.n = 7;
+    opt.bf.m = 750;
+    opt.bf.n = 750;
     opt.allscenuses = 0;
     opt.alllocuses = 1;
     opt.sens = 0;
@@ -53,12 +52,20 @@ elseif isequal('batchtype','hros')
     opt.senssm = 0;
     opt.highresobj = 1;
     pm = 3;
-    c = c;
-    loc = loc;
+    c = batchc;
+    loc = batchloc;
     %batch = true;
 else
     batchtype = [];
-    scen = [];
+    batchscen = [];
+    batchloc = [];
+    batchc =[];
+end
+
+%check to see if HPC
+if feature('numcores') < 36
+    opt.bf.n = 10;
+    opt.bf.m = 10;
 end
 
 %strings

@@ -6,21 +6,20 @@ optInputs
 T = tic;
 if opt.sens && ~opt.alllocuses %multiple simulations, sensitivity
     disp('Two dimensional sensitivity beginning now.')
-    multStruct = doSens(batchtype,scen,loc,c);
+    multStruct = doSens([],[]);
     disp(['Sensitivity complete after ' ...
         num2str(round(toc(T)/60,2)) ' minutes.'])
 elseif opt.tdsens && ~opt.alllocuses %two dimensional sensitivity analysis
     disp('Two dimensional sensitivity beginning now.')
-    multStruct = doTdSens(batchtype,scen,loc,c);
+    multStruct = doTdSens(batchtype,batchscen,batchloc,batchc);
     disp(['Two dimensional sensitivity complete after ' ...
         num2str(round(toc(T)/60,2)) ' minutes.'])
 elseif opt.alllocuses %run all dimensions for a power module / scenario
     disp(['All locations and use cases for the '  ...
-        char(opt.locations(loc)) ' scenario beginning now.'])
-    allLocUses = doAllLocUses(batchtype,scen,loc,c);
-    disp(['All locations and use cases for the ' ...
-        char(opt.locations(loc)) ...
-        ' scenario complete after' num2str(round(toc(T)/60,2)) ...
+        loc ' scenario beginning now.'])
+    allLocUses = doAllLocUses(batchtype,batchscen,loc,c);
+    disp(['All locations and use cases for the ' loc ...
+        ' scenario complete after' num2str(round(toc(T)/60,2)) ... 
         ' minutes.'])
 elseif opt.allscenuses %run all dimensions for a location
     disp(['All scenaios and use cases for the ' ...
@@ -31,7 +30,7 @@ elseif opt.allscenuses %run all dimensions for a location
         ' scenario complete after' num2str(round(toc(T)/60,2)) ...
         ' minutes.'])
 elseif opt.senssm
-    [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s0] = ...
+    [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s17,s0] = ...
         doSensSM(batchtype,scen,loc,c);
     if pm == 3 %assign output to descriptive variables
         cwm = s1;
@@ -50,6 +49,7 @@ elseif opt.senssm
         lft = s14;
         spv = s15;
         tmt = s16;
+        bcc = s17;
     end
 else %just one simulation
     disp(['Optimization (' char(loc) ', pm: ' num2str(pm), ...

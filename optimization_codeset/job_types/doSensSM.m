@@ -1,6 +1,6 @@
 function [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s17, ...
     s0] = ...
-    doSensSM(batchtype,scen,loc,c)
+    doSensSM(batchtype,batchscen,batchloc,batchc)
 
 n = 10; %sensitivity discretization
 f = 2; %factor
@@ -60,23 +60,23 @@ tp{nps+13} = 'bcc'; %battery cell cost [BATT]
 ta(nps+13,:) = linspace(120,1500,n);
 
 if pm == 3
-    s1 = doSens(ta(1,:),tp{1});
-    s2 = doSens(ta(2,:),tp{2});
-    s3 = doSens(ta(3,:),tp{3});
-    s4 = doSens(ta(4,:),tp{4});
-    s5 = doSens(ta(5,:),tp{5});
-    s6 = doSens(ta(6,:),tp{6});
-    s7 = doSens(ta(7,:),tp{7});
-    s8 = doSens(ta(8,:),tp{8});
-    s9 = doSens(ta(9,:),tp{9});
-    s10 = doSens(ta(10,:),tp{10});
-    s11 = doSens(ta(11,:),tp{11});
-    s12 = doSens(ta(12,:),tp{12});
-    s13 = doSens(ta(13,:),tp{13});
-    s14 = doSens(ta(14,:),tp{14});
-    s15 = doSens(ta(15,:),tp{15});
-    s16 = doSens(ta(16,:),tp{16});
-    s17 = doSens(ta(17,:),tp{14});
+    s1 = doSens(ta(1,:),tp{1},batchtype,batchscen,batchloc,batchc);
+    s2 = doSens(ta(2,:),tp{2},batchtype,batchscen,batchloc,batchc);
+    s3 = doSens(ta(3,:),tp{3},batchtype,batchscen,batchloc,batchc);
+    s4 = doSens(ta(4,:),tp{4},batchtype,batchscen,batchloc,batchc);
+    s5 = doSens(ta(5,:),tp{5},batchtype,batchscen,batchloc,batchc);
+    s6 = doSens(ta(6,:),tp{6},batchtype,batchscen,batchloc,batchc);
+    s7 = doSens(ta(7,:),tp{7},batchtype,batchscen,batchloc,batchc);
+    s8 = doSens(ta(8,:),tp{8},batchtype,batchscen,batchloc,batchc);
+    s9 = doSens(ta(9,:),tp{9},batchtype,batchscen,batchloc,batchc);
+    s10 = doSens(ta(10,:),tp{10},batchtype,batchscen,batchloc,batchc);
+    s11 = doSens(ta(11,:),tp{11},batchtype,batchscen,batchloc,batchc);
+    s12 = doSens(ta(12,:),tp{12},batchtype,batchscen,batchloc,batchc);
+    s13 = doSens(ta(13,:),tp{13},batchtype,batchscen,batchloc,batchc);
+    s14 = doSens(ta(14,:),tp{14},batchtype,batchscen,batchloc,batchc);
+    s15 = doSens(ta(15,:),tp{15},batchtype,batchscen,batchloc,batchc);
+    s16 = doSens(ta(16,:),tp{16},batchtype,batchscen,batchloc,batchc);
+    s17 = doSens(ta(17,:),tp{17},batchtype,batchscen,batchloc,batchc);
 end
 
 %get S0, default results
