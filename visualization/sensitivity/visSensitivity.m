@@ -61,6 +61,9 @@ elseif isequal(multStruct(1).opt.tuned_parameter,'btm')
 elseif isequal(multStruct(1).opt.tuned_parameter,'mbt')
     xlab = 'Minimum Battery Size for Added Time';
     xt = multStruct(1).opt.tuning_array;
+elseif isequal(multStruct(1).opt.tuned_parameter,'dtc')
+    xlab = 'Distance to Coast [km]';
+    xt = multStruct(1).opt.tuning_array;
 end
 
 if ~exist('xscale','var')

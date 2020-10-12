@@ -2,7 +2,7 @@ function [multStruct] = doSens(ta,tp,batchtype,batchscen,batchloc,batchc)
 
 tTot = tic;
 optInputs %load inputs
-if ~isempty('ta') && ~isempty('tp')
+if ~isempty(ta) && ~isempty(tp)
     opt.tuned_parameter = tp;
     opt.tuning_array = ta;
 end

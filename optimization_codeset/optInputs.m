@@ -55,11 +55,20 @@ elseif isequal(batchtype,'hros')
     c = batchc;
     loc = batchloc;
     %batch = true;
-else
-    batchtype = [];
-    batchscen = [];
-    batchloc = [];
-    batchc =[];
+elseif isequal(batchtype,'sens')
+    econ.wave.scen = batchscen; 
+    opt.bf.m = 500;
+    opt.bf.n = 500;
+    opt.allscenuses = 0;
+    opt.alllocuses = 0;
+    opt.sens = 1;
+    opt.tdsens = 0;
+    opt.senssm = 0;
+    opt.highresobj = 0;
+    pm = 3;
+    c = batchc;
+    loc = batchloc;
+    %batch = true;
 end
 
 %check to see if HPC
@@ -269,8 +278,10 @@ uc(2).dies.lambda = 1;          %diesel interventions
 % opt.tuned_parameter = 'wiv'; %wec interventions
 % opt.tuning_array = linspace(1/2,2,10);
 % opt.tuned_parameter = 'dep'; %depth modifier
-opt.tuning_array = linspace(uc(c).lifetime-3,uc(c).lifetime+3,10); 
-opt.tuned_parameter = 'lft'; %lifetime
+% opt.tuning_array = linspace(uc(c).lifetime-3,uc(c).lifetime+3,10); 
+% opt.tuned_parameter = 'lft'; %lifetime
+opt.tuning_array = linspace(10,1400,10)*1000;
+opt.tuned_parameter = 'dtc'; %distance to coast [OPEX]
 
 %opt 2D sens
 % opt.tdsens_ta(1,:) = 0.1:0.04:1.7;
