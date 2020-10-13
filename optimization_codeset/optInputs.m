@@ -13,6 +13,12 @@ pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
 c = 1;  %use case 1:ST 2:LT
 loc = 'argBasin'; %location
 %batch = false;
+if ~exist('batchtype','var')
+    batchtype = [];
+    batchscen = [];
+    batchloc = [];
+    batchc = [];
+end
 if isequal(batchtype,'ssm')
     econ.wave.scen = batchscen; %scenario indicator 1:C,2:OC,3:OD
     opt.bf.m = 500;
@@ -73,8 +79,8 @@ end
 
 %check to see if HPC
 if feature('numcores') < 36
-    opt.bf.n = 10;
-    opt.bf.m = 10;
+    opt.bf.n = 1;
+    opt.bf.m = 1;
 end
 
 %strings

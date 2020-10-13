@@ -167,7 +167,7 @@ for a = 1:size(array,1)
 %         '\mathrm{Cost} \\ \end{array}$$'];
     %show zero on y axis
     xt_yadj = 8;
-    ylim([0 max(squeeze(max(cost(:,:,:),[],1:2))./t0(:))])
+    ylim([0 mean([max(squeeze(max(cost(:,:,:),[],1:2))./t0(:)) 1])])
     yticks([0 1])
     YTickString{1} = ['\$0k'];
     YTickString{2} = ['$$\begin{array}{c} \mathrm{Total} \\' ...
