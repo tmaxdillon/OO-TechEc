@@ -62,6 +62,8 @@ elseif isequal(batchtype,'hros')
     loc = batchloc;
     %batch = true;
 elseif isequal(batchtype,'sens')
+    opt.tuning_array = linspace(12,60,10);
+    opt.tuned_parameter = 'mbl';
     econ.wave.scen = batchscen; 
     opt.bf.m = 500;
     opt.bf.n = 500;
@@ -79,8 +81,8 @@ end
 
 %check to see if HPC
 if feature('numcores') < 36
-    opt.bf.n = 1;
-    opt.bf.m = 1;
+    opt.bf.n = 10;
+    opt.bf.m = 10;
 end
 
 %strings
@@ -254,6 +256,7 @@ uc(2).dies.lambda = 1;          %diesel interventions
 % uc(3).dies.lambda = 5;          %diesel interventions
 
 %sensitivity analaysis
+if ~isfield(opt,'tuning_array') && ~isfield(opt,'tuned_parameter')
 % opt.tuning_array = [100 95 90 85 80 75 70];
 % opt.tuned_parameter = 'wcp'; %wave cutout percentile
 % opt.tuning_array = [1 2 3 4 5 6 7 8 9 10];
@@ -284,10 +287,11 @@ uc(2).dies.lambda = 1;          %diesel interventions
 % opt.tuned_parameter = 'wiv'; %wec interventions
 % opt.tuning_array = linspace(1/2,2,10);
 % opt.tuned_parameter = 'dep'; %depth modifier
-% opt.tuning_array = linspace(uc(c).lifetime-3,uc(c).lifetime+3,10); 
+% opt.tuning_array = linspace(uc(c).lifetime-3,uc(c).lifetime+3,10);
 % opt.tuned_parameter = 'lft'; %lifetime
-opt.tuning_array = linspace(10,1400,10)*1000;
-opt.tuned_parameter = 'dtc'; %distance to coast [OPEX]
+    opt.tuning_array = linspace(10,1400,10)*1000;
+    opt.tuned_parameter = 'dtc'; %distance to coast [OPEX]
+end
 
 %opt 2D sens
 % opt.tdsens_ta(1,:) = 0.1:0.04:1.7;
