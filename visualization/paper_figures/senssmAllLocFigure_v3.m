@@ -196,7 +196,7 @@ for a = 1:size(array,1)
         xlabel(({'Self-','Discharge Rate'}),'FontSize',fs2)
         xticklabels({'1.5%','6.0%'})
     elseif isequal(array(a,1).opt.tuned_parameter,'bhc')
-        xlabel({'Housing Cost','Multiplier'},'FontSize',fs2)
+        xlabel({'Housing','Cost Multiplier'},'FontSize',fs2)
     elseif isequal(array(a,1).opt.tuned_parameter,'mbl')
         xlabel({'Maximum','Battery Life-Cycle [mo]'},'FontSize',fs2)
         xticklabels({'24','60'})
@@ -242,9 +242,10 @@ for a = 1:size(array,1)
         xlabel(({'Battery','Cell Cost [$/kWh]'}), ...
             'FontSize',fs2)
     end
+    %set x asis to a consistent position
     set(ax(a).XLabel,'units','normalized')
     pos = get(ax(a).XLabel,'Position');
-    pos(2) = -.15;
+    pos(2) = -.125;
     set(ax(a).XLabel,'Position',pos,'VerticalAlignment','Top')
     xlab = get(ax(a),'XLabel');
     xlab.Position(2) = 0.6*xlab.Position(2);
