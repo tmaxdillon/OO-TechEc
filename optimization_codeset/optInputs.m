@@ -82,7 +82,7 @@ end
 %check to see if HPC
 if feature('numcores') < 36
     opt.bf.n = 10;
-    opt.bf.m = 1-;
+    opt.bf.m = 10;
 end
 
 %strings
