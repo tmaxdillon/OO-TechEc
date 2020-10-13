@@ -64,6 +64,9 @@ elseif isequal(multStruct(1).opt.tuned_parameter,'mbt')
 elseif isequal(multStruct(1).opt.tuned_parameter,'dtc')
     xlab = 'Distance to Coast [km]';
     xt = multStruct(1).opt.tuning_array;
+elseif isequal(multStruct(1).opt.tuned_parameter,'mbl')
+    xlab = 'Maximum Battery Life Cycle [mo]';
+    xt = multStruct(1).opt.tuning_array;
 end
 
 if ~exist('xscale','var')

@@ -21,8 +21,10 @@ if ~exist('array','var')
         tic
         load([path loadcell{i}])
         %merge
-        array(1,:,i) = sdr;
-        x0(1,i) = s0.batt.sdr;
+        %         array(1,:,i) = sdr;
+        %         x0(1,i) = s0.batt.sdr;
+        array(1,:,i) = bcc;
+        x0(1,i) = s0.batt.bcc;
         array(5,:,i) = bhc;
         x0(5,i) = s0.econ.batt.enclmult;
         array(9,:,i) = mbl;
@@ -104,7 +106,7 @@ titles = {'Argentine Basin: Short-Term', ...
     'Coastal Pioneer: Long-Term', ...
     'Irminger Sea: Short-Term', ...
     'Irminger Sea: Long-Term', ...
-    'Southern Ocean: Short-Term'... 
+    'Southern Ocean: Short-Term'...
     'Southern Ocean: Long-Term'};
 
 ssm_allscen = figure;
@@ -138,15 +140,15 @@ for a = 1:size(array,1)
         grid on
         set(gca,'GridAlpha',.3);
     end
-%     for i = 1:10
-        [baselines_x,baselines_ind] = unique(x0(a,:));
-        blt = scatter(baselines_x, ...
-            t0(baselines_ind)./t0(baselines_ind),ms, ...
-            'MarkerFaceColor',orange, ...
-            'MarkerEdgeColor','k','LineWidth',lw2, ...
-            'MarkerFaceAlpha',alpha2,'MarkerEdgeAlpha',alpha3, ...
-            'DisplayName','Baseline');
-%     end
+    %     for i = 1:10
+    [baselines_x,baselines_ind] = unique(x0(a,:));
+    blt = scatter(baselines_x, ...
+        t0(baselines_ind)./t0(baselines_ind),ms, ...
+        'MarkerFaceColor',orange, ...
+        'MarkerEdgeColor','k','LineWidth',lw2, ...
+        'MarkerFaceAlpha',alpha2,'MarkerEdgeAlpha',alpha3, ...
+        'DisplayName','Baseline');
+    %     end
     %draw vertical gridlines
     gls = get(gca,'GridLineStyle');
     glc = get(gca,'GridColor');
@@ -159,12 +161,12 @@ for a = 1:size(array,1)
     xt = xticks;
     xlim([ta(a,1,i) ta(a,n,i)])
     %don't show zero on y axis
-%     xt_yadj = 4.5;
-%     ylim([min(squeeze(min(cost(:,:,:),[],1:2))./t0(:)) ...
-%         max(squeeze(max(cost(:,:,:),[],1:2))./t0(:))])
-%     yticks([1])
-%     YTickString{1} = ['$$\begin{array}{c} \mathrm{Total} \\' ...
-%         '\mathrm{Cost} \\ \end{array}$$'];
+    %     xt_yadj = 4.5;
+    %     ylim([min(squeeze(min(cost(:,:,:),[],1:2))./t0(:)) ...
+    %         max(squeeze(max(cost(:,:,:),[],1:2))./t0(:))])
+    %     yticks([1])
+    %     YTickString{1} = ['$$\begin{array}{c} \mathrm{Total} \\' ...
+    %         '\mathrm{Cost} \\ \end{array}$$'];
     %show zero on y axis
     xt_yadj = 8;
     ylim([0 mean([max(squeeze(max(cost(:,:,:),[],1:2))./t0(:)) 1])])
@@ -257,7 +259,7 @@ for a = 1:size(array,1)
         set(t(i), 'Position', get(t(i),'Position')-[0 xt_yadj 0]);
     end
     set(gca,'LineWidth',lw3)
-%     set(gca,'TickLength',[0.05 0.1])
+    %     set(gca,'TickLength',[0.05 0.1])
 end
 set(gcf,'Color','w');
 %make room at bottom for legend
