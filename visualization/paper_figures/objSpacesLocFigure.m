@@ -5,12 +5,12 @@ set(0,'DefaultAxesFontName', 'cmr10')
 
 %load multStruct
 if ~exist('multStruct','var')
-    multStruct = wavecons_bigos(:,1);
+    multStruct = hros_alu(:,1);
 end
 clearvars -except multStruct
 
 multStruct_c = multStruct;
-multStruct_c(3) = multStruct_c(2);
+%multStruct_c(3) = multStruct_c(2);
 
 %plot setup
 objSpacesLoc = figure;

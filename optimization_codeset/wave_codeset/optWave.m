@@ -7,8 +7,10 @@ if ~opt.highresobj
     opt.kW_m = opt.bf.M; %[kW]
     opt.Smax_n = opt.bf.N; %[kWh]
 else
-    opt.kW_m = opt.bf.M(opt.bf.loc_ind);
-    opt.Smax_n = opt.bf.N(opt.bf.loc_ind);
+    opt.bf.loc_ind = find(contains(opt.locations,data.loc, ...
+        'IgnoreCase',false));
+    opt.kW_m = opt.bf.M_hros(opt.bf.loc_ind);
+    opt.Smax_n = opt.bf.N_hros(opt.bf.loc_ind);
 end
 
 %set sensitivity modifiers to 1 if absent and to value if existing

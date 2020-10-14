@@ -307,12 +307,8 @@ opt.tdsens_tp{2} = 'tra'; %rated Tp
 opt.V = 2;
 opt.bf.M = 8; %[kW] max kW in grid
 opt.bf.N = 500; %[kWh] max Smax in grid
-if opt.highresobj
-    opt.bf.N = [250 300 350 125 200]; %[kWh]
-    opt.bf.M = [2 4 5 1 2]; %[kW]
-    opt.bf.loc_ind = find(contains(opt.locations,loc, ...
-        'IgnoreCase',false));
-end
+opt.bf.M_hros = [2 4 5 1 1.75]; %[kW], high res os
+opt.bf.N_hros = [250 300 400 120 175]; %[kWh], high res os
 opt.bf.maxworkers = 36; %maximum cores
 % opt.nm.m = 5; %input grid resolution for rated power
 % opt.nm.n = 5; %input grid resolution for storage
