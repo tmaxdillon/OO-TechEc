@@ -35,7 +35,7 @@ end
 tp{nps+1} = 'ild'; %instrumentation load [INST]
 ta(nps+1,:) = linspace(uc.draw/f,uc.draw*f,n);
 tp{nps+2} = 'osv'; %osv cost [OPEX]
-ta(nps+2,:) = linspace(2.5,40,n);
+ta(nps+2,:) = linspace(2500,40000,n);
 tp{nps+3} = 'nbl'; %nominal battery life-cycle [BATT]
 ta(nps+3,:) = linspace(9,batt.lc_nom*f,n);
 tp{nps+4} = 'sdr'; %battery self discharge rate [BATT]
@@ -53,7 +53,7 @@ ta(nps+9,:) = linspace(batt.lc_max*(1/5),batt.lc_max,n);
 tp{nps+10} = 'lft'; %lifetime [INST]
 ta(nps+10,:) = linspace(1,10,n);
 tp{nps+11} = 'spv'; %specialized vessel cost [OPEX]
-ta(nps+11,:) = linspace(35,150,n);
+ta(nps+11,:) = linspace(35000,150000,n);
 tp{nps+12} = 'tmt'; %time spent on site for maintenance [OPEX]
 ta(nps+12,:) = linspace(1,12,n);
 tp{nps+13} = 'bcc'; %battery cell cost [BATT]

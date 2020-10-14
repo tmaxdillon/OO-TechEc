@@ -24,7 +24,7 @@ if ~exist('array','var')
         %         array(1,:,i) = sdr;
         %         x0(1,i) = s0.batt.sdr;
         array(1,:,i) = bcc;
-        x0(1,i) = s0.batt.bcc;
+        x0(1,i) = s0.batt.cost;
         array(5,:,i) = bhc;
         x0(5,i) = s0.econ.batt.enclmult;
         array(9,:,i) = mbl;
