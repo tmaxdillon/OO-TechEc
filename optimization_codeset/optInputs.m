@@ -62,8 +62,8 @@ elseif isequal(batchtype,'hros')
     loc = batchloc;
     %batch = true;
 elseif isequal(batchtype,'sens')
-    opt.tuning_array = linspace(2500,40000,10);
-    opt.tuned_parameter = 'osv';
+    opt.tuning_array = linspace(35000,150000,n);
+    opt.tuned_parameter = 'spv';
     econ.wave.scen = batchscen; 
     opt.bf.m = 500;
     opt.bf.n = 500;
