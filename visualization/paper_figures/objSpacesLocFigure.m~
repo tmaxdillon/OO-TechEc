@@ -26,7 +26,7 @@ rshift = 20; %shift axis right
 xshrink = .9; %shrink size of x axis
 ygrow = 1.2; %expand size of y axis
 dshift = 5; %shift axes down
-xlabdshift = .1; %shift xlabel down
+xlabdshift = 
 
 ann = {'(a)','(b)','(c)','(d)','(e)'};
 
@@ -60,6 +60,7 @@ for i = 1:length(multStruct)
             'Color','w');
     if i == 5
         xl = xlabel('S_m [kWh]','interpreter','tex');
+        get(xl,'Position');
     end
     ylabel({'G_r','[kW]'},'interpreter','tex')
     hYLabel = get(gca,'YLabel');
@@ -84,6 +85,7 @@ for i = 1:length(multStruct)
     axpos(4,i) = ygrow*axpos(4,i);
     axpos(2,i) = axpos(2,i)-dshift*(i-1);
         
+    
     %find maximums and minimum for colorbar
     a_max(i) = max(a_sat(:)); %actual max
     p_max(i) = max(max(sb.ZData(sb.YData(:,1) < Gr_max(i), ... 
@@ -104,7 +106,7 @@ for i=1:length(multStruct)
         [lb(i),lb(i)+.05*(1-lb(i)),lb(i)+0.15*(1-lb(i)),1]));
     c(i) = colorbar(ax(i));
     set(c(i).Label,'String','[$k]','Rotation',0,'Units','Pixels') 
-    clabrspot = 38;
+    clabrspot = 34;
     clpos = get(c(i).Label,'Position');
     clpos(1) = clabrspot;
     set(c(i).Label,'Position',clpos)
@@ -123,11 +125,6 @@ pos3 = get(ax(3),'Position');
 pos2 = get(ax(2),'Position');
 pos3(3) = pos2(3);
 set(ax(3),'Position',pos3);
-
-%reposition x axis
-xlpos = get(xl,'Position');
-xlpos(2) = xlpos(2) - xlabdshift;
-set(xl,'Position',xlpos)
 
 print(objSpacesLoc,['~/Dropbox (MREL)/Research/OO-TechEc/' ...
     'paper_figures/objspaces'],'-dpng','-r600')

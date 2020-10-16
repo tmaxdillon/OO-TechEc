@@ -21,12 +21,12 @@ if ~exist('array','var')
         tic
         load([path loadcell{i}])
         %merge
-        %         array(1,:,i) = sdr;
-        %         x0(1,i) = s0.batt.sdr;
-        array(1,:,i) = bcc;
-        x0(1,i) = s0.batt.cost;
-        array(5,:,i) = bhc;
-        x0(5,i) = s0.econ.batt.enclmult;
+        array(1,:,i) = sdr;
+        x0(1,i) = s0.batt.sdr;
+        array(5,:,i) = bcc;
+        x0(5,i) = s0.batt.cost;
+        array(3,:,i) = bhc;
+        x0(3,i) = s0.econ.batt.enclmult;
         array(9,:,i) = mbl;
         x0(9,i) = s0.batt.lc_max;
         array(13,:,i) = nbl;
@@ -39,8 +39,8 @@ if ~exist('array','var')
         x0(10,i) = s0.uc.lifetime;
         array(14,:,i) = ild;
         x0(14,i) = s0.uc.draw;
-        array(3,:,i) = cwm;
-        x0(3,i) = 1;
+%         array(3,:,i) = cwm;
+%         x0(3,i) = 1;
         array(7,:,i) = whl;
         x0(7,i) = s0.wave.house;
         array(11,:,i) = wcm;
@@ -55,18 +55,18 @@ if ~exist('array','var')
         else
             x0(15,i) = s0.econ.wave.highfail;
         end
-        array(12,:,i) = tmt;
+        array(8,:,i) = tmt;
         if s0.c == 1 %short term
-            x0(12,i) = s0.econ.vessel.t_ms;
+            x0(8,i) = s0.econ.vessel.t_ms;
         elseif s0.c == 2 %long term
-            x0(12,i) = s0.econ.vessel.t_mosv;
+            x0(8,i) = s0.econ.vessel.t_mosv;
         end
         array(16,:,i) = dtc;
         x0(16,i) = s0.data.dist;
         array(4,:,i) = spv;
         x0(4,i) = s0.econ.vessel.speccost;
-        array(8,:,i) = osv;
-        x0(8,i) = s0.econ.vessel.osvcost;
+        array(12,:,i) = osv;
+        x0(12,i) = s0.econ.vessel.osvcost;
         t0(i) = s0.output.min.cost; %total cost of base case
         for a = 1:16 %across all 16 arrays
             for r = 1:10 %across all 10 runs in an array
@@ -108,6 +108,9 @@ titles = {'Argentine Basin: Short-Term', ...
     'Irminger Sea: Long-Term', ...
     'Southern Ocean: Short-Term'...
     'Southern Ocean: Long-Term'};
+ann = {'(a)','(b)','(c)','(d)','(e)','(f)','(g)','(h)','(i)','(j)', ...
+    '(k)','(l)','(m)','(n)','(o)','(p)'};
+
 
 ssm_allscen = figure;
 set(gcf,'Units','inches')
@@ -168,14 +171,31 @@ for a = 1:size(array,1)
     %     YTickString{1} = ['$$\begin{array}{c} \mathrm{Total} \\' ...
     %         '\mathrm{Cost} \\ \end{array}$$'];
     %show zero on y axis
-    xt_yadj = 8;
-    ylim([0 mean([max(squeeze(max(cost(:,:,:),[],1:2))./t0(:)) 1])])
-    yticks([0 1])
-    YTickString{1} = ['\$0k'];
-    YTickString{2} = ['$$\begin{array}{c} \mathrm{Total} \\' ...
-        '\mathrm{Cost} \\ \end{array}$$'];
-    set(gca,'YTickLabel',YTickString,'TickLabelInterpreter','latex');
+%     xt_yadj = 8;
+%     ylim([0 mean([max(squeeze(max(cost(:,:,:),[],1:2))./t0(:)) 1])])
+%     yticks([0 1])
+%     YTickString{1} = ['\$0k'];
+%     YTickString{2} = ['$$\begin{array}{c} \mathrm{Total} \\' ...
+%         '\mathrm{Cost} \\ \end{array}$$'];
+      %percent tick labels
+    xt_yadj = -6;
+    ylim([.25 mean([max(squeeze(max(cost(:,:,:),[],1:2))./t0(:)) 1])])
+    yticks([0 0.5 1])
+    YTickString{1} = '0%';
+    YTickString{2} = '50%';
+    YTickString{3} = '100%';
+    set(gca,'YTickLabel',YTickString);
     set(gca,'FontSize',fs1)
+    %ylabels
+    if a == 1 || a == 5 || a == 9 || a == 13
+        ylabel_lshift = 0.3;
+        hYLabel = ylabel('Cost');
+        set(hYLabel,'rotation',0,'VerticalAlignment','middle', ...
+        'HorizontalAlignment','center','Units','Normalized')
+        ylabpos = get(hYLabel,'Position');
+                ylabpos(1) = ylabpos(1) - ylabel_lshift;
+        set(hYLabel,'Position',ylabpos,'FontSize',fs3)
+    end
     if a == 1
         t = title('Battery','FontWeight','normal','FontSize',fs3);
         t.Position(2) = t.Position(2)*1.1;
@@ -194,25 +214,25 @@ for a = 1:size(array,1)
     end
     if isequal(array(a,1).opt.tuned_parameter,'sdr')
         xlabel(({'Self-','Discharge Rate'}),'FontSize',fs2)
-        xticklabels({'1.5%','6.0%'})
+        xticklabels({'0%','15%'})
     elseif isequal(array(a,1).opt.tuned_parameter,'bhc')
-        xlabel({'Housing','Cost Multiplier'},'FontSize',fs2)
+        xlabel({'Battery','Housing Cost Multiplier'},'FontSize',fs2)
     elseif isequal(array(a,1).opt.tuned_parameter,'mbl')
-        xlabel({'Maximum','Battery Life-Cycle [mo]'},'FontSize',fs2)
-        xticklabels({'24','60'})
+        xlabel({'Maximum','Battery Lifetime [mo]'},'FontSize',fs2)
+        xticklabels({'12','60'})
     elseif isequal(array(a,1).opt.tuned_parameter,'nbl')
-        xlabel(({'Nominal','Battery Life-Cycle [mo]',''}), ...
+        xlabel(({'Nominal','Battery Lifetime [mo]',''}), ...
             'FontSize',fs2)
         xticklabels({'9','36'})
     elseif isequal(array(a,1).opt.tuned_parameter,'dep')
         xlabel({'Depth [m]'},'FontSize',fs2)
-        xticklabels({'200','5500'})
+        xticklabels({'120','5500'})
     elseif isequal(array(a,1).opt.tuned_parameter,'utp')
         xlabel({'Availability'},'FontSize',fs2)
         xticklabels({'80%','100%'})
     elseif isequal(array(a,1).opt.tuned_parameter,'lft')
         xlabel({'Lifetime [yr]'},'FontSize',fs2)
-        xticklabels({'2','9'})
+        xticklabels({'1','10'})
     elseif isequal(array(a,1).opt.tuned_parameter,'ild')
         xlabel(({'Power','Draw [W]'}),'FontSize',fs2)
     elseif isequal(array(a,1).opt.tuned_parameter,'cwm')
@@ -227,8 +247,8 @@ for a = 1:size(array,1)
     elseif isequal(array(a,1).opt.tuned_parameter,'tmt')
         xlabel(({'Maintenance','Time [h]'}),'FontSize',fs2)
     elseif isequal(array(a,1).opt.tuned_parameter,'dtc')
-        xlabel(({'Distance to','Coast [km]'}),'FontSize',fs2)
-        xticklabels({'200','2000'})
+        xlabel(({'Distance','to Coast [km]'}),'FontSize',fs2)
+        xticklabels({'10','1400'})
     elseif isequal(array(a,1).opt.tuned_parameter,'spv')
         xlabel(({'Specialized','Vessel Cost [$k/d]'}),'FontSize',fs2)
         tx = xt./1000;
@@ -242,23 +262,13 @@ for a = 1:size(array,1)
         xlabel(({'Battery','Cell Cost [$/kWh]'}), ...
             'FontSize',fs2)
     end
-    %set x asis to a consistent position
+    %set x axis label to a consistent position
     set(ax(a).XLabel,'units','normalized')
     pos = get(ax(a).XLabel,'Position');
     pos(2) = -.125;
     set(ax(a).XLabel,'Position',pos,'VerticalAlignment','Top')
     xlab = get(ax(a),'XLabel');
     xlab.Position(2) = 0.6*xlab.Position(2);
-    %fix x tick overlap
-    xtl = xticklabels;
-    xticklabels([])
-    xtickpos = get(gca, 'xtick');
-    for i = 1:2
-        t(i) = text(xtickpos(i),0, xtl{i}, ...
-            'FontSize',fs1,'HorizontalAlignment','center');
-        set(t(i), 'Units','pixels');
-        set(t(i), 'Position', get(t(i),'Position')-[0 xt_yadj 0]);
-    end
     set(gca,'LineWidth',lw3)
     %     set(gca,'TickLength',[0.05 0.1])
 end
@@ -278,39 +288,29 @@ for a = 1:size(array,1)
         axesposition(a,2)+addbottom axesposition(a,3) ...
         axesposition(a,4)])
 end
-% hL = legend([locs, blt],'Argentine Basin\newline Short Term', ...
-%     'Coastal Endurance\newline Short Term', ...
-%     'Coastal Pioneer\newline Short Term', ...
-%     'Irminger Sea\newline Short Term', ...
-%     'Southern Ocean\newline Short Term', ...
-%     'Argentine Basin\newline Long Term', ...
-%     'Coastal Endurance\newline Long Term', ...
-%     'Coastal Pioneer\newline Long Term', ...
-%     'Irminger Sea\newline Long Term', ....
-%     'Southern Ocean\newline Long Term', ...
-%     'Baseline','location','eastoutside', ...
-%     'Orientation','vertical','NumColumns',1);
-% hL = legend(locs,'Argentine Basin: Short-Term', ...
-%     'Argentine Basin: Long-Term', ...
-%     'Coastal Pioneer: Short Term','Irminger Sea: Short Term', ...
-%     'Southern Ocean: Short Term','Argentine Basin: Long Term', ...
-%     'Coastal Endurance: Long Term','Coastal Pioneer: Long Term', ...
-%     'Irminger Sea: Long Term','Southern Ocean: Long Term', ...
-%     'location','eastoutside','Box','off', ...
-%     'Orientation','horizontal','NumColumns',2,'FontSize',fs4);
+%fix x tick label overlap and add annotation
+for a = 1:size(array,1)
+    axes(ax(a))
+    xtl = ax(a).XTickLabel;
+    xticklabels([])
+    xtickpos = get(ax(a), 'xtick');
+    for i = 1:2
+        t(i) = text(xtickpos(i),0, xtl{i}, ...
+            'FontSize',fs1,'HorizontalAlignment','center');
+        set(t(i), 'Units','pixels');
+        set(t(i), 'Position', get(t(i),'Position')-[0 xt_yadj 0]);
+    end
+    text(.975,.04,ann{a},'Units','Normalized', ...
+        'VerticalAlignment','bottom','FontWeight','normal', ...
+        'HorizontalAlignment','right','FontSize',fs1, ...
+        'Color',[.25 .25 .25]);
+end
+
 hL = legend(locs,'location','eastoutside','Box','off', ...
     'Orientation','horizontal','NumColumns',2,'FontSize',fs4);
-% hL = legend([locs, blt],{'Argentine Basin','Short Term'}, ...
-%     {'Coastal Endurance','Short Term'}, ...
-%     {'Coastal Pioneer','Short Term'},{'Irminger Sea','Short Term'}, ...
-%     {'Southern Ocean','Short Term'},{'Argentine Basin','Long Term'}, ...
-%     {'Coastal Endurance','Long Term'},{'Coastal Pioneer','Long Term'}, ...
-%     {'Irminger Sea','Long Term'},{'Southern Ocean','Long Term'}, ...
-%     'Baseline','location','eastoutside', ...
-%     'Orientation','vertical','NumColumns',1);
 newPosition = [0.25 0.075 0.5 0];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits,'FontSize',fs1);
-print(gcf,'~/Dropbox (MREL)/Research/OO-TechEc/paper_figures/ssm_allscen',  ...
-    '-dpng','-r600')
+print(gcf,['~/Dropbox (MREL)/Research/OO-TechEc/paper_figures/' ...
+    'ssm_allscen'],'-dpng','-r600')
 
