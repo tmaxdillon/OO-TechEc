@@ -5,9 +5,9 @@ set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
 if ~exist('allStruct','var')
-    load('wave_optd')
-    load('wave_optc')
-    load('wave_cons')
+    load('waveoptd')
+    load('waveoptc')
+    load('wavecons')
     allStruct = mergeWaWaWa(wave_optd,wave_optc,wave_cons);
 end
 

@@ -65,10 +65,13 @@ set(gcf,'Units','inches')
 set(gcf,'Position', [1, 1, 6.5, 3.25])
 set(gcf,'Color','w')
 col = colormap(brewermap(l,'Pastel1')); %colors
+
+%col = [col10(2,:); col10(4,:); col10(6,:); col10(8,:); col10(10,:);];
 ms = 5; %marker size
 mlw = .5; %marker line width
 fs = 6; %font size
 fs2 = 8; %map font size
+fs3 = 8; %annotation font size
 lw = 1.5; %line width
 bw_adj = .8; %bar width adjustment
 ah_adj = .8; %axis height adjustment
@@ -121,7 +124,7 @@ pos(1,4) = pos(1,4)*ah_adj;
 set(gca,'position',pos(1,:));
 text(1.05,.5,'(a)','Units','Normalized', ...
     'VerticalAlignment','middle','FontWeight','normal', ...
-    'FontSize',fs);
+    'FontSize',fs3);
 xl.Units = 'normalized';
 xlpos = get(xl,'Position');
 xlpos(2) = xl_adj*xlpos(2);
@@ -143,7 +146,7 @@ pos(2,4) = pos(2,4)*ah_adj;
 set(gca,'position',pos(2,:));
 txann = text(1.05,.5,'(b)','Units','Normalized', ...
     'VerticalAlignment','middle','FontWeight','normal', ...
-    'FontSize',fs);
+    'FontSize',fs3);
 xl.Units = 'normalized';
 xlpos = get(xl,'Position');
 xlpos(2) = xl_adj*xlpos(2);
@@ -193,7 +196,7 @@ set(hL,'Position',Lpos)
 txann.Units = 'inches';
 text(txann.Position(1),txann.Position(2),'(c)','Units','inches', ...
     'VerticalAlignment','middle','FontWeight','normal', ...
-    'FontSize',fs)
+    'FontSize',fs3)
 %adjust xlabel
 xl.Units = 'normalized';
 xlpos = get(xl,'Position');
@@ -225,7 +228,7 @@ pos(4,4) = pos(4,4)*ah_adj;
 set(gca,'position',pos(4,:));
 txann = text(1.05,.5,'(d)','Units','Normalized', ...
     'VerticalAlignment','middle','FontWeight','normal', ...
-    'FontSize',fs);
+    'FontSize',fs3);
 xl.Units = 'normalized';
 xlpos = get(xl,'Position');
 xlpos(2) = xl_adj*xlpos(2);

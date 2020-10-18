@@ -63,7 +63,7 @@ ax(2).XLabel.String = 'Time';
 pos = get(ax(2).XLabel,'Position');
 pos(2) = pos(2)+.05;
 set(ax(2).XLabel,'Position',pos)
-ax(2).XTick = [0 x(end)];
+ax(2).XTick = [100 x(end-100)];
 ax(2).XTickLabel = {'$t$ = 0','$t = N$'};
 ax(2).TickLabelInterpreter = 'latex';
 % ax.YLabel.String = '$S$ [kWh]';

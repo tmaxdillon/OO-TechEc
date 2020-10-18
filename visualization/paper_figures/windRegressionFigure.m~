@@ -134,6 +134,8 @@ set(ylh, 'Rotation',0, 'Position',ylp, 'VerticalAlignment','middle', ...
 ylabpos = get(ylh,'Position');
 ylabpos(1) = -.225;
 set(ylh,'Position',ylabpos)
+leg = legend(h);
+set(leg,'Position',[.55 .3 .8 .2])
 ylim([0 inf])
 xlim([0 15])
 set(gca,'FontSize',fs)
@@ -145,8 +147,6 @@ axpos(3) = xshrink*axpos(3);
 set(gca,'Position',axpos)
 % set(gca,'xticklabel',num2str(get(gca,'xtick')','%.1f'))
 % set(gca,'yticklabel',num2str(get(gca,'ytick')','%d'))
-leg = legend(h);
-set(leg,'Position',[.725 .35 .01 .01])
 grid on
 
 print(windreg,['../Research/OO-TechEc/paper_figures/windreg'],  ...
