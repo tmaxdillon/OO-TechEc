@@ -5,6 +5,7 @@ set(0,'DefaultAxesFontName', 'cmr10')
 
 %load multStruct
 if ~exist('multStruct','var')
+    load('hros_alu')
     multStruct = hros_alu(:,1);
 end
 clearvars -except multStruct
@@ -17,8 +18,9 @@ objSpacesLoc = figure;
 set(gcf,'Units','inches')
 set(gcf,'Position', [0.1, 1, 3, 8])
 lw = 1.1;
-fs = 10;
-fs2 = 9;
+fs = 10; %axis labels
+fs2 = 9; %axis
+fs3 = 8; %annotations
 Sm_max = [250 300 400 100 150]; %[kWh]
 Gr_max = [2 4 5 1 1.75]; %[kW]
 C_max = 1500;
@@ -28,7 +30,8 @@ ygrow = 1.2; %expand size of y axis
 dshift = 5; %shift axes down
 xlabdshift = .1; %shift xlabel down
 
-ann = {'(a)','(b)','(c)','(d)','(e)'};
+ann = {'Argentine Basin','Coastal Endurance','Coastal Pioneer', ...
+    'Irminger Sea','Southern Ocean'};
 
 for i = 1:length(multStruct)
     
@@ -56,7 +59,7 @@ for i = 1:length(multStruct)
     hold on
     text(.02,.04,ann{i},'Units','Normalized', ...
             'VerticalAlignment','bottom','FontWeight','normal', ...
-            'HorizontalAlignment','left','FontSize',fs, ...
+            'HorizontalAlignment','left','FontSize',fs3, ...
             'Color','w');
     if i == 5
         xl = xlabel('S_m [kWh]','interpreter','tex');

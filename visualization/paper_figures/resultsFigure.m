@@ -8,7 +8,7 @@ if ~exist('allStruct','var')
     load('waveoptd')
     load('waveoptc')
     load('wavecons')
-    allStruct = mergeWaWaWa(wave_optd,wave_optc,wave_cons);
+    allStruct = mergeWaWaWa(waveoptd,waveoptc,wavecons);
 end
 
 np = 3; %number of power modules

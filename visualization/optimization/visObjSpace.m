@@ -3,6 +3,10 @@ function [] = visObjSpace(optStruct)
 opt = optStruct.opt;
 output = optStruct.output;
 
+%plot settings
+Sm_max = 500; %[kWh]
+Gr_max = 8; %[kW]
+
 %adjust cost to thousands
 output.cost = output.cost/1000;
 output.min.cost = output.min.cost/1000;
@@ -20,7 +24,7 @@ a_sat(output.surv == 0) = nan;
 [m,m_ind] = min(a_sat(:));
 
 figure
-s = surf(Smaxgrid,kWgrid,output.cost,zeros(length(Smaxgrid), ... 
+s = surf(Smaxgrid,kWgrid,output.cost,ones(length(Smaxgrid), ... 
     length(kWgrid),3)); %black
 s.EdgeColor = 'none';
 s.FaceColor = 'flat';
@@ -33,8 +37,8 @@ scatter3(Smaxgrid(m_ind),kWgrid(m_ind),m*2,'m','filled')
 view(0,90)
 xlabel('Storage Capacity [kWh]')
 ylabel('Rated Power [kW]')
-ylim([0 inf])
-xlim([0 inf])
+ylim([-inf Gr_max])
+xlim([-inf Sm_max])
 c = colorbar;
 c.Label.String = '[$] in thousands';
 caxis([0 max(a_sat(:))]) %to produce cartoon

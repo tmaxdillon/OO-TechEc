@@ -72,6 +72,7 @@ ax(2).YLabel.Interpreter = 'tex';
 ax(2).YTick = [0 1];
 ax(2).YTickLabel = {'0','$S_{m}$'};
 ax(2).TickLabelInterpreter = 'latex';
+ax(2).TickLength = [0 0];
 hYLabel = get(gca,'YLabel');
 set(hYLabel,'rotation',0,'VerticalAlignment','middle', ... 
     'HorizontalAlignment','right')

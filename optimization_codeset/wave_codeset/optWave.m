@@ -75,7 +75,7 @@ S_temp = zeros(m*n,1);
 X = zeros(m*n,1);
 %set number of cores
 if isempty(gcp('nocreate')) %no parallel pool running
-    cores = feature('numcores'); %find number of cofes
+    cores = feature('numcores'); %find number of cores
     if cores > 2 %only start if using HPC
         parpool(cores);
     end
