@@ -105,33 +105,33 @@ for i = 1:length(array)
             'HorizontalAlignment','left','FontSize',fs, ...
             'Color','k','Interpreter','latex');
     end
-    if i > 25
-        if rem(i,nl) == 3
-%             xl = xlabel('Battery Storage Capacity [kWh]','FontSize',fs3);
-%             xlpos = get(xl,'Position');    
-%             xlpos(2) = xlpos(2) - xlabdshift;
-%             set(xl,'Position',xlpos)
-        end
-%         set(gca,'XTick',[10 460])
-%         set(gca,'XTickLabels',{'1','500'})
-    end
-    if rem(i,nl) == 1
-        if i == 11
-%             yl = ylabel({'WEC Rated Power [kW]'},'FontSize',fs3);
-%             ylpos = get(yl,'Position');    
-%             ylpos(2) = ylpos(2) - ylabdshift;
-%             ylpos(1) = ylpos(1) - ylablshift;
-%             set(yl,'Position',ylpos)
-        end
-%         set(gca,'YTick',ytpos)
-        %set(gca,'YTickLabels',{'0.15','8'})
-%         t = text([0 0],ytpos, ytl, ...
-%             'FontSize',fs2,'HorizontalAlignment','right');
-%         for ti = 1:length(t)
-%             set(t(ti), 'Units','pixels');
-%             set(t(ti), 'Position', get(t(ti),'Position')-[7.5 0 0]);
+%     if i > 25
+%         if rem(i,nl) == 3
+% %             xl = xlabel('Battery Storage Capacity [kWh]','FontSize',fs3);
+% %             xlpos = get(xl,'Position');    
+% %             xlpos(2) = xlpos(2) - xlabdshift;
+% %             set(xl,'Position',xlpos)
 %         end
-    end
+% %         set(gca,'XTick',[10 460])
+% %         set(gca,'XTickLabels',{'1','500'})
+%     end
+%     if rem(i,nl) == 1
+%         if i == 11
+% %             yl = ylabel({'WEC Rated Power [kW]'},'FontSize',fs3);
+% %             ylpos = get(yl,'Position');    
+% %             ylpos(2) = ylpos(2) - ylabdshift;
+% %             ylpos(1) = ylpos(1) - ylablshift;
+% %             set(yl,'Position',ylpos)
+%         end
+% %         set(gca,'YTick',ytpos)
+%         %set(gca,'YTickLabels',{'0.15','8'})
+% %         t = text([0 0],ytpos, ytl, ...
+% %             'FontSize',fs2,'HorizontalAlignment','right');
+% %         for ti = 1:length(t)
+% %             set(t(ti), 'Units','pixels');
+% %             set(t(ti), 'Position', get(t(ti),'Position')-[7.5 0 0]);
+% %         end
+%     end
     axis manual
     
     set(gca,'LineWidth',lw)
@@ -231,6 +231,7 @@ yl = text(0,0,ylab);
 set(yl,'Units','inches','Position',ylabdim, ...
     'HorizontalAlignment','center','FontSize',fs, ... 
     'Rotation',90);
+
 print(objSpacesSM,['~/Dropbox (MREL)/Research/OO-TechEc/' ...
     'paper_figures/objspacessm'],'-dpng','-r600')
 

@@ -81,9 +81,9 @@ if ~exist('array','var')
     ta(4,:,:) = ta(4,:,:)./1000;
 end
 
-units = fliplr({' % month^{-1}',' $k Wh^{-1}',' months',' months',' meters',' %', ...
-    ' year',' watts',' multiples',' %',' multiples',' failure',' $k day^{-1}',' hours', ...
-    ' $k day^{-1}',' kilometers'});
+units = fliplr({' % month^{-1}',' $k Wh^{-1}',' months',' months', ...
+    ' meters',' %',' year',' watts',' multiples',' %',' multiples', ...
+    ' failure',' $k day^{-1}',' hours',' $k day^{-1}',' kilometers'});
 
 rval = fliplr([1, -1, 1, 1, -1, 2, 0, 0, 2, 2, 1, 0, 0, 1, 1, -1]);
 %rval = 3*ones(1,16);
@@ -168,13 +168,19 @@ t = text(zeros(1,16)',ytickpos',dx,'FontSize',fs2, ...
     'HorizontalAlignment','left','Interpreter','tex');
 for i = 1:length(t)
     set(t(i),'Units','normalized');
-    set(t(i),'Position', get(t(i),'Position')+[1.125 0 0]);
+    set(t(i),'Position', get(t(i),'Position')+[1.13 0 0]);
 end
 posdel1 = get(t(end),'Position');
 posdel2 = get(t(end-1),'Position');
 t = text(posdel1(1)+0.01,posdel1(2)+abs(posdel1(2)-posdel2(2)), ...
     '\underline{Unit Step}','interpreter','latex','Units','normalized', ...
     'HorizontalAlignment','left','FontSize',fs3);
+
+xoff = 1.85; %[in]
+yoff = 0.35; %[in]
+xdist = 3.5; %[in]
+ydist = 4; %[in]
+set(gca,'Units','Inches','Position',[xoff yoff xdist ydist])
 
 print(gcf,['~/Dropbox (MREL)/Research/OO-TechEc/paper_figures/' ...
     'senstable_pr'],'-dpng','-r600')
