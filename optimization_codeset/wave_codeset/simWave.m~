@@ -3,8 +3,6 @@ function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst,Pmooring, ...
     triptime,nvi,batt_L,batt_lft,dp,width,cw,S,P,D,L] =  ...
     simWave(kW,Smax,opt,data,atmo,batt,econ,uc,bc,wave)
 
-%disp([num2str(kW) ' ' num2str(Smax)])
-
 %if fmin is suggesting a negative input, block it
 if opt.fmin && Smax < 0 || kW < 0
     surv = 0;
@@ -67,8 +65,8 @@ P = P*1000; %convert to watts
 
 % battery degradation model
 if batt.lcm == 1 %bolun's model
-    [batt_L,batt_lft] =  irregularDegradation(S/(Smax*1000), ...
-        data.wave.time',uc.lifetime,batt);
+    [batt_L,batt_lft] =  ...
+        irregularDegradation(S,data.wave.time',uc.lifetime,batt);
 elseif batt.lcm == 2 %dyanmic (old) model
     opt.phi = Smax/(Smax - (min(S)/1000)); %extra depth
     batt_lft = batt.lc_nom*opt.phi^(batt.beta); %new lifetime

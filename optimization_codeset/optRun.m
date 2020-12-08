@@ -55,7 +55,7 @@ results.CapEx = output.min.CapEx;
 results.OpEx = output.min.OpEx;
 results.nvi = output.min.nvi;
 results.CF = output.min.CF;
-results.cyc60 = output.min.cyc60;
+results.batt_L = output.min.batt_L;
 results
 
 end
