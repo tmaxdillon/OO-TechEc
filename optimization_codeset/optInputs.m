@@ -218,6 +218,7 @@ lfp.cost = 580;            %[$/kWh]
 lfp.lcm = 1;    %battery life cycle model, 1:bolun 2:dyn_lc 3:fixed_lc
 lfp.T = 15;                %[C] temperature
 lfp.EoL = 0.2;             %battery end of life
+lfp.rf_os = true;           %toggle using open source rainflow
 bc = 2; %battery chemistry 1:AGM 2:LFP
 if bc == 1 %agm chemistry
     batt = agm;

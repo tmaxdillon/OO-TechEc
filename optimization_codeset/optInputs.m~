@@ -1,10 +1,10 @@
 %simulation settings
 %interactive job
-econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
+econ.wave.scen = 2; %scenario indicator 1:C,2:OC,3:OD
 opt.bf.m = 500;
 opt.bf.n = 500;
 opt.allscenuses = 0;
-opt.alllocuses = 0;
+opt.alllocuses = 1;
 opt.sens = 0;
 opt.tdsens = 0;
 opt.senssm = 0;
@@ -81,8 +81,8 @@ end
 
 %check to see if HPC
 if feature('numcores') < 36
-    opt.bf.n = 1;
-    opt.bf.m = 1;
+    opt.bf.n = 10;
+    opt.bf.m = 10;
 end
 
 %strings
@@ -215,15 +215,16 @@ lfp.sdr = 3;               %[%/month] self discharge rate
 %lfp.dyn_lc = true;         %toggle dynamic life cycle
 lfp.dmax = .0;             %maximum depth of discharge
 lfp.cost = 580;            %[$/kWh]
+lfp.lcm = 1;    %battery life cycle model, 1:bolun 2:dyn_lc 3:fixed_lc
+lfp.T = 15;                %[C] temperature
+lfp.EoL = 0.2;             %battery end of life
+lfp.rf_os = true
 bc = 2; %battery chemistry 1:AGM 2:LFP
 if bc == 1 %agm chemistry
     batt = agm;
 elseif bc == 2 %lfp chemistry
     batt = lfp;
 end
-batt.lcm = 1;    %battery life cycle model, 1:bolun 2:dyn_lc 3:fixed_lc
-batt.T = 15;    %[C] temperature
-batt.EoL = 0.2; %battery end of life
 
 %atmospheric parameters
 atmo.rho_a = 1.225;         %[kg/m^3] density of air

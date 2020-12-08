@@ -1,4 +1,5 @@
 function [L,lft] = irregularDegradation(s_in,time_in,sys_lft,batt)
+
 if length(s_in) < 8760 %if less than a year, extend to a year
     tStart = datevec(time_in(1));
     tEnd = tStart; tEnd(1) = tStart(1) + 1;
@@ -39,9 +40,9 @@ for i = orig_l+1:length(s_ext)
 end
 %compute degradation
 ts = 60*60*24*(time_in(2) - time_in(1)); %[s]
-T_ext = batt.T*ones(1,length(s_ext)); %[C]
 t_tot_ext = 3600*length(s_ext); %[s]
-L = batDegModel(s_ext,ts,T_ext,t_tot_ext);
+L = batDegModel(s_ext,ts,batt.T,t_tot_ext,batt.rf_os);
 lft = batt.EoL/L*t_tot_ext*12/(3600*8760); %[mo]
+
 end
 

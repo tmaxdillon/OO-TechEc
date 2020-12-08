@@ -11,7 +11,7 @@ function [L, d] = batDegModel(s, ts, T, t_tot,toggle_os)
 % Input:
 %   s - SoC profile since battery start, in dec percentage
 %   ts - sampling time of the profile, in seconds
-%   T - battery temperature profile, in Celsius, must be singular
+%   T - battery temperature profile, in Celsius
 %   t - total operation time of the battery, in seconds
 % Output:
 %   L - the nonlinear capacity degradation since a fresh battery
@@ -39,6 +39,10 @@ if ~toggle_os %using signal processing toolbox
     DoD = rf(:,2); %depth of discharge, not multiplied by 2? [dec %]
     SoC = rf(:,3); %mean state of charge [dec %]
     t = ts * (rf(:,5) - rf(:,4)); % duration [s]
+    if length(T) > 1
+        T = T(ceil((rf(:,4) + (rf(:,5)-rf(:,4)))/2)); % medium temperature
+        T = mean(T(rf(:,4):rf(:,5))); % mean temperature
+    end
 else %using open source code (HPC friendly)
     [tp,exttime] = sig2ext(s); %calculate turning points
     rf = rainflow_os(tp,exttime); %run rainflow algorithm
@@ -51,6 +55,10 @@ else %using open source code (HPC friendly)
     DoD = rf(1,:)'; %depth of discharge, not multiplied by 2? [dec %]
     SoC = rf(2,:)'; %mean state of charge [dec %]
     t = ts * rf(5,:)'; %duration [s]
+    if length(T) > 1
+        T = T(ceil((rf(4,:) + rf(5,:))/2)); % medium temperature
+        T = mean(T(rf(4,:):rf(4,:)+rf(5,:))); % mean temperature
+    end
 end
 
 
