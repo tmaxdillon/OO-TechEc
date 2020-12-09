@@ -16,7 +16,7 @@ elseif pm == 2 %SOLAR
     data = prepInso(data,inso,uc);
     [output,opt] = optInso(opt,data,atmo,batt,econ,uc,bc,inso);
 elseif pm == 3 %WAVE
-    opt = prepWave(data,opt,wave,atmo);
+    opt = prepWave(data,opt,wave,atmo,uc);
     if opt.V == 1 %optimization version 1: nelder-mead
         if opt.nm.many
             opt.C = length(opt.nm.bgd_array);
@@ -55,7 +55,7 @@ results.CapEx = output.min.CapEx;
 results.OpEx = output.min.OpEx;
 results.nvi = output.min.nvi;
 results.CF = output.min.CF;
-results.batt_L = output.min.batt_L;
+results.batt_L_max = max(output.min.batt_L);
 results
 
 end

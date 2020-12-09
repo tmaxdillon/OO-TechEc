@@ -1,17 +1,17 @@
 %simulation settings
 %interactive job
-econ.wave.scen = 2; %scenario indicator 1:C,2:OC,3:OD
+econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
 opt.bf.m = 500;
 opt.bf.n = 500;
 opt.allscenuses = 0;
-opt.alllocuses = 1;
+opt.alllocuses = 0;
 opt.sens = 0;
 opt.tdsens = 0;
 opt.senssm = 0;
 opt.highresobj = 0;
 pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
-c = 1;  %use case 1:ST 2:LT
-loc = 'argBasin'; %location
+c = 2;  %use case 1:ST 2:LT
+loc = 'cosPioneer'; %location
 %batch = false;
 if ~exist('batchtype','var')
     batchtype = [];
@@ -185,6 +185,7 @@ wave.Hs_ra = 4;             %[m], rated wave height
 wave.Tp_ra = 9;            %[s], rated peak period
 wave.eta_ct = 0.6;          %[~] wec efficiency
 wave.house = 0.10;          %percent of rated power as house load
+wave.kW_max = 17;           %[kW] maximum limit for wec-sim output
 % wave.wsr = 'struct3m_opt';  %wec sim run
 % wave.wsHs = 3;              %[m] wec sim Hs
 %diesel parameters
@@ -206,19 +207,20 @@ agm.sdr = 5;               %[%/month] self discharge rate
 %agm.dyn_lc = true;         %toggle dynamic life cycle
 agm.dmax = .2;             %maximum depth of discharge
 %LFP parameters
-lfp.V = 12;                %[V] Voltage
+lfp.V = 12;                 %[V] Voltage
 lfp.se = 8.75;              %[Ah/kg] specific energy factor
-lfp.lc_nom = 18;           %[months] nominal life cycle
-lfp.beta = 1;              %decay exponential for life cycle
-lfp.lc_max = 12*5;        %maximum months of operation
-lfp.sdr = 3;               %[%/month] self discharge rate
+lfp.lc_nom = 18;            %[months] nominal life cycle
+lfp.beta = 1;               %decay exponential for life cycle
+lfp.lc_max = 12*5;          %maximum months of operation
+lfp.sdr = 3;                %[%/month] self discharge rate
 %lfp.dyn_lc = true;         %toggle dynamic life cycle
-lfp.dmax = .0;             %maximum depth of discharge
-lfp.cost = 580;            %[$/kWh]
-lfp.lcm = 1;    %battery life cycle model, 1:bolun 2:dyn_lc 3:fixed_lc
-lfp.T = 15;                %[C] temperature
-lfp.EoL = 0.2;             %battery end of life
-lfp.rf_os = true;           %toggle using open source rainflow
+lfp.dmax = .0;              %maximum depth of discharge
+lfp.cost = 580;             %[$/kWh]
+lfp.lcm = 1;%battery life cycle model, 1:bolun 2:dyn_lc 3:fixed_lc
+lfp.T = 15;                 %[C] temperature
+lfp.EoL = 0.2;              %battery end of life
+lfp.rf_os = true;           %toggle using open source  rainflow
+lfp.bdi = 1000;              %battery degradation evaluation interaval
 bc = 2; %battery chemistry 1:AGM 2:LFP
 if bc == 1 %agm chemistry
     batt = agm;
@@ -228,7 +230,7 @@ end
 
 %atmospheric parameters
 atmo.rho_a = 1.225;         %[kg/m^3] density of air
-atmo.rho_w = 1020;          %[kg/m^3] density of water
+atmo.rho_w = 1025;          %[kg/m^3] density of water
 atmo.g = 9.81;              %[m/s^2]
 atmo.h = 4;                 %[m]
 atmo.zo = 0.02;             %[mm]

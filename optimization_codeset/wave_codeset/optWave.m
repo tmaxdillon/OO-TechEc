@@ -59,6 +59,9 @@ while ~check_s
     if ~check_s
         opt.kW_m = 2*opt.kW_m;
         opt.Smax_n = 2*opt.Smax_n;
+        if opt.kW_m > wave.kW_max %no larger than max wec-sim value
+            opt.kW_m = wave.kW_max;
+        end
     end
 end
 

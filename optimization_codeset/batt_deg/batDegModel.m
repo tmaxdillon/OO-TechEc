@@ -41,6 +41,11 @@ if ~toggle_os %using signal processing toolbox
     t = ts * (rf(:,5) - rf(:,4)); % duration [s]
 else %using open source code (HPC friendly)
     [tp,exttime] = sig2ext(s); %calculate turning points
+    if length(tp) < 3 %needs three cycles to evaluate
+        d = 0;
+        L = 0;
+        return
+    end
     rf = rainflow_os(tp,exttime); %run rainflow algorithm
     % rf(1,:) cycle range
     % rf(2,:) cycle mean value

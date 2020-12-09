@@ -3,7 +3,10 @@ function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst,Pmooring, ...
     triptime,nvi,batt_L,batt_lft,dp,width,cw,S,P,D,L] =  ...
     simWave(kW,Smax,opt,data,atmo,batt,econ,uc,bc,wave)
 
+%for debug
 %disp([num2str(kW) ' ' num2str(Smax)])
+% kW = 0.215;
+% Smax = 500;
 
 %if fmin is suggesting a negative input, block it
 if opt.fmin && Smax < 0 || kW < 0
@@ -31,8 +34,8 @@ if wave.method == 1 %divide by B methodology
     cw = cwr_b.*width^2; %[m] capture width timeseries
 elseif wave.method == 2 %3d interpolation methodology
     %extract data
-    Hs = data.wave.significant_wave_height; %Hs timeseries
-    Tp = data.wave.peak_wave_period; %Tp timeseries
+    Hs = opt.wave.Hs; %Hs timeseries
+    Tp = opt.wave.Tp; %Tp timeseries
     %find width through rated power conditions
     width = interp1(opt.wave.B_func(2,:),opt.wave.B_func(1,:),kW); %[m], B
     cw = width.*opt.wave.F(Tp,Hs,width*ones(length(Tp),1)); %[m] cw ts
@@ -48,15 +51,31 @@ S = zeros(1,T); %battery level timeseries
 S(1) = Smax*1000; %assume battery begins fully charged
 D = zeros(1,T); %power dumped timeseries
 L = ones(1,T)*uc.draw; %power put to sensing timeseries
+batt_L = zeros(1,T); %battery L (degradation) timeseries
+fbi = 1; %fresh battery index
 surv = 1;
 
 %run simulation
 for t = 1:T
+    if t < fbi + batt.bdi - 1 %less than first interval after fresh batt
+        batt_L(t) = 0;
+    elseif rem(t,batt.bdi) == 0 %evaluate degradation on interval
+        batt_L(t:t+batt.bdi) = batDegModel(S(fbi:t)/(1000*Smax), ...
+            dt*3600,batt.T,3600*t,batt.rf_os);
+        if batt_L > batt.EoL %new battery
+            fbi = t+1;
+            S(t) = Smax*1000; 
+            if ~exist('batt_lft','var')
+                batt_lft = t*dt*(1/8760)*(12); %[mo[ battery lifetime
+            end
+        end
+    end
+    cf = batt_L(t)*Smax*1000; %[Wh] capacity fading
     sd = S(t)*(batt.sdr/100)*(1/(30*24))*dt; %[Wh] self discharge
     S(t+1) = dt*(P(t)*1000 - uc.draw) + S(t) - sd; %[Wh]
-    if S(t+1) > Smax*1000 %dump power if over limit
-        D(t) = S(t+1) - Smax*1000; %[Wh]
-        S(t+1) = Smax*1000; %[Wh]
+    if S(t+1) > (Smax*1000 - cf) %dump power if over limit (minus cap fade)
+        D(t) = S(t+1) - (Smax*1000 - cf); %[Wh]
+        S(t+1) = Smax*1000 - cf; %[Wh]
     elseif S(t+1) <= Smax*batt.dmax*1000 %bottomed out
         S(t+1) = dt*P(t)*1000 + S(t) - sd; %[Wh] save what's remaining
         L(t) = 0; %drop load to zero because not enough power
@@ -67,8 +86,11 @@ P = P*1000; %convert to watts
 
 % battery degradation model
 if batt.lcm == 1 %bolun's model
-    [batt_L,batt_lft] =  irregularDegradation(S/(Smax*1000), ...
-        data.wave.time',uc.lifetime,batt);
+%     [batt_L,batt_lft] =  irregularDegradation(S/(Smax*1000), ...
+%         data.wave.time',uc.lifetime,batt); %retrospective modeling (old)
+    if ~exist('batt_lft','var') %battery never reached EoL
+        batt_lft = batt.EoL/batt_L(t)*t*12/(8760); %[mo]
+    end
 elseif batt.lcm == 2 %dyanmic (old) model
     opt.phi = Smax/(Smax - (min(S)/1000)); %extra depth
     batt_lft = batt.lc_nom*opt.phi^(batt.beta); %new lifetime
@@ -128,13 +150,13 @@ CapEx = Pmooring + Pinst + Pmtrl + ...
 OpEx = battreplace + wecrepair + vesselcost;
 cost = CapEx + OpEx;
 
-if sum(S > batt_L*Smax*1000)/(length(S)) < uc.uptime
+if sum(L == uc.draw)/(length(L)) < uc.uptime
     surv = 0;
     if opt.fmin
         cost = inf;
     end
 end
-% if sum(L == uc.draw)/(length(L)) < uc.uptime
+% if sum(S > batt_L*Smax*1000)/(length(S)) < uc.uptime
 %     surv = 0;
 %     if opt.fmin
 %         cost = inf;

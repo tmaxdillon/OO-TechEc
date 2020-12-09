@@ -1,4 +1,4 @@
-function [opt] = prepWave(data,opt,wave,atmo)
+function [opt] = prepWave(data,opt,wave,atmo,uc)
 
 opt.wave.wavepower_ra = (1/(16*4*pi))*atmo.rho_w*atmo.g^2* ...
     (wave.Hs_ra)^2*(wave.Tp_ra); %[W], wave power at rated
@@ -8,6 +8,13 @@ Tp = data.wave.peak_wave_period; %[s]
 opt.wave.wavepower_ts = (1/(16*4*pi))*atmo.rho_w*atmo.g^2* ...
     Hs.^2.*Tp./1000; %[kW/m] %timeseries of wavepower
 opt.wave.L = atmo.g.*Tp.^2/(2*pi); %wavelength timeseries
+
+%extend wavepower, time, hs, tp and wavelength timeseries
+[opt.wave.wavepower_ts,opt.wave.time] =  ...
+    extendToLifetime(opt.wave.wavepower_ts,data.wave.time,uc.lifetime);
+[opt.wave.Hs] = extendToLifetime(Hs,data.wave.time,uc.lifetime);
+[opt.wave.Tp] = extendToLifetime(Tp,data.wave.time,uc.lifetime);
+[opt.wave.L] = extendToLifetime(opt.wave.L,data.wave.time,uc.lifetime);
 
 if wave.method == 1 %divide by B methodology
     
