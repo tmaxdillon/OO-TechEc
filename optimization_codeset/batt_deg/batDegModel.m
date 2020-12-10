@@ -41,7 +41,7 @@ if ~toggle_os %using signal processing toolbox
     L = Nonlinear_degradation( d );
 else %using open source code (HPC friendly)
     [tp,exttime] = sig2ext(s); %calculate turning points
-    if length(tp) < 3 %needs three cycles to evaluate
+    if length(tp) < 4 %needs four cycles to evaluate
         d = 0;
         L = 0;
     else

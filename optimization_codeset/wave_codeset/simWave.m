@@ -4,10 +4,10 @@ function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst,Pmooring, ...
     simWave(kW,Smax,opt,data,atmo,batt,econ,uc,bc,wave)
 
 %for debug
-ID = [kW Smax];
 % disp([num2str(kW) ' ' num2str(Smax)])
-% kW = 0.215;
-% Smax = 500;
+% kW = 0.2306;
+% Smax = 187;
+% ID = [kW Smax];
 
 %if fmin is suggesting a negative input, block it
 if opt.fmin && Smax < 0 || kW < 0
