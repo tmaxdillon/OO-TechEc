@@ -1,4 +1,4 @@
-function [L, d] = batDegModel(s, ts, T, t_tot,toggle_os)
+function [L, d] = batDegModel(s, ts, T, t_tot,toggle_os,ID)
 %% Title: Degradation calculation
 % Author: Bolun Xu
 % Date: 2012-04-19
@@ -33,11 +33,10 @@ if ~toggle_os %using signal processing toolbox
     % rf(:,2) cycle range
     % rf(:,3) cycle mean value
     % rf(:,4) initial sample index
-    % rf(:,5) final sample index    
+    % rf(:,5) final sample index
     N = rf(:,1); %full cycle or half cycle
     DoD = rf(:,2); %depth of discharge, not multiplied by 2? [dec %]
     SoC = rf(:,3); %mean state of charge [dec %]
-    t = ts * (rf(:,5) - rf(:,4)); % duration [s]
     d = Linear_degradation(DoD, SoC, T, N, t_tot);
     L = Nonlinear_degradation( d );
 else %using open source code (HPC friendly)
@@ -46,7 +45,21 @@ else %using open source code (HPC friendly)
         d = 0;
         L = 0;
     else
-        rf = rainflow_os(tp,exttime); %run rainflow algorithm
+        try
+            %[tp,exttime] = sig2ext([1 2 3 4 5]); %calculate turning points            
+            rf = rainflow_os(tp,exttime); %run rainflow algorithm
+        catch ME
+            if (strcmp(ME.identifier,'MATLAB:badsubscript'))
+                msg = ['Bad subscript occurred: ' ...
+                    'tp is ' num2str(length(tp)) ' long, ' ...
+                    'id is ' num2str(ID(1)) ' kW ' ...
+                    num2str(ID(2)) ' Smax'];
+                causeException = ...
+                    MException('MATLAB:myCode:dimensions',msg);
+                ME = addCause(ME,causeException);
+            end
+            rethrow(ME)
+        end
         % rf(1,:) cycle range
         % rf(2,:) cycle mean value
         % rf(3,:) whether this is a 1 or 0.5 cycle
@@ -55,7 +68,6 @@ else %using open source code (HPC friendly)
         N = rf(3,:)'; %full cycle or half cycle
         DoD = rf(1,:)'; %depth of discharge, not multiplied by 2? [dec %]
         SoC = rf(2,:)'; %mean state of charge [dec %]
-        t = ts * rf(5,:)'; %duration [s]
         d = Linear_degradation(DoD, SoC, T, N, t_tot);
         L = Nonlinear_degradation( d );
     end

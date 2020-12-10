@@ -4,7 +4,8 @@ function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst,Pmooring, ...
     simWave(kW,Smax,opt,data,atmo,batt,econ,uc,bc,wave)
 
 %for debug
-disp([num2str(kW) ' ' num2str(Smax)])
+ID = [kW Smax];
+% disp([num2str(kW) ' ' num2str(Smax)])
 % kW = 0.215;
 % Smax = 500;
 
@@ -61,7 +62,7 @@ for t = 1:T
         batt_L(t) = 0;
     elseif rem(t,batt.bdi) == 0 %evaluate degradation on interval
         batt_L(t:t+batt.bdi) = batDegModel(S(fbi:t)/(1000*Smax), ...
-            dt*3600,batt.T,3600*t,batt.rf_os);
+            dt*3600,batt.T,3600*t,batt.rf_os,ID);
         if batt_L > batt.EoL %new battery
             fbi = t+1;
             S(t) = Smax*1000; 
