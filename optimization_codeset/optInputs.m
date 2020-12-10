@@ -10,8 +10,8 @@ opt.tdsens = 0;
 opt.senssm = 0;
 opt.highresobj = 0;
 pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
-c = 2;  %use case 1:ST 2:LT
-loc = 'cosPioneer'; %location
+c = 1;  %use case 1:ST 2:LT
+loc = 'cosEndurance_wa'; %location
 %batch = false;
 if ~exist('batchtype','var')
     batchtype = [];
@@ -81,8 +81,8 @@ end
 
 %check to see if HPC
 if feature('numcores') < 36
-    opt.bf.n = 10;
-    opt.bf.m = 10;
+    opt.bf.n = 3;
+    opt.bf.m = 3;
 end
 
 %strings
