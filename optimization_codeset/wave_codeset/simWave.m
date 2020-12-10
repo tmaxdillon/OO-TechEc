@@ -4,7 +4,7 @@ function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst,Pmooring, ...
     simWave(kW,Smax,opt,data,atmo,batt,econ,uc,bc,wave)
 
 %for debug
-%disp([num2str(kW) ' ' num2str(Smax)])
+disp([num2str(kW) ' ' num2str(Smax)])
 % kW = 0.215;
 % Smax = 500;
 

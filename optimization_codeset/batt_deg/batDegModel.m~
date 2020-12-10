@@ -33,18 +33,22 @@ if ~toggle_os %using signal processing toolbox
     % rf(:,2) cycle range
     % rf(:,3) cycle mean value
     % rf(:,4) initial sample index
-    % rf(:,5) final sample index    
+    % rf(:,5) final sample index
+    
     N = rf(:,1); %full cycle or half cycle
     DoD = rf(:,2); %depth of discharge, not multiplied by 2? [dec %]
     SoC = rf(:,3); %mean state of charge [dec %]
     t = ts * (rf(:,5) - rf(:,4)); % duration [s]
     d = Linear_degradation(DoD, SoC, T, N, t_tot);
+    
     L = Nonlinear_degradation( d );
+    
 else %using open source code (HPC friendly)
     [tp,exttime] = sig2ext(s); %calculate turning points
     if length(tp) < 3 %needs three cycles to evaluate
         d = 0;
         L = 0;
+        return
     else
         rf = rainflow_os(tp,exttime); %run rainflow algorithm
         % rf(1,:) cycle range
@@ -59,8 +63,13 @@ else %using open source code (HPC friendly)
         d = Linear_degradation(DoD, SoC, T, N, t_tot);
         L = Nonlinear_degradation( d );
     end
-end
-
+    
+    
+    %% linearized degradation
+    d = Linear_degradation(DoD, SoC, T, N, t_tot);
+    
+    %% nonlinear part
+    L = Nonlinear_degradation( d );
 end
 
 
