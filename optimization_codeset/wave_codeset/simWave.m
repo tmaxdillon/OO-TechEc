@@ -62,7 +62,7 @@ for t = 1:T
         batt_L(t) = 0;
     elseif rem(t,batt.bdi) == 0 %evaluate degradation on interval
         batt_L(t:t+batt.bdi) = batDegModel(S(fbi:t)/(1000*Smax), ...
-            dt*3600,batt.T,3600*t,batt.rf_os);
+            batt.T,3600*t,batt.rf_os);
         if batt_L > batt.EoL %new battery
             fbi = t+1;
             S(t) = Smax*1000; 
