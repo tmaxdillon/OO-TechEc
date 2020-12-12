@@ -4,12 +4,14 @@ data = optStruct.data;
 output = optStruct.output;
 opt = optStruct.opt;
 
+[output.min.S,opt.wave.time] = extendToLifetime(output.min.S(1:end-1)',data.wave.time,5);
+
 figure
 set(gcf,'Units','inches')
 set(gcf,'Position', [0, 0, 20, 4])
 %STORAGE TIME SERIES
 ax(1) = subplot(3,1,1);
-plot(datetime(opt.wave.time,'ConvertFrom','datenum'), ...
+plot(datetime(opt.wave.time(1:end-1),'ConvertFrom','datenum'), ...
     output.min.S(1:end-1)/1000,'Color',[255,69,0]/256, ... 
     'DisplayName','Battery Storage','LineWidth',2)
 legend('show')
