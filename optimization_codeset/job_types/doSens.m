@@ -11,6 +11,25 @@ data = data.(loc);
 opt.S = length(opt.tuning_array);
 %initialize outputs
 multStruct(opt.S) = struct();
+% %set number of cores
+% if isempty(gcp('nocreate')) %no parallel pool running
+%     cores = feature('numcores'); %find number of cores
+%     if cores > 2 %only start if using HPC
+%         parpool(cores);
+%         disp([ opt.tuned_parameter ' optimization beginning after ' ...
+%             num2str(round(toc(tTot),2)) ' seconds. '])
+%         %         atmo = atmo;
+%         %         batt = batt;
+%         parfor i = 1:opt.S
+%             if isequal(opt.tuned_parameter,'wcp')
+%                 wave.cutout_prctile = opt.tuning_array(i);
+%             end
+%             [multStruct(i).output,multStruct(i).opt] =  ...
+%                 optRun(pm,opt,data,atmo,batt,econ,uc(c),bc, ...
+%                 inso,turb,wave,dies);
+%         end
+%     end
+% end
 for i = 1:opt.S
     opt.s = i;
     disp(['Optimization ' num2str(opt.s) ' out of ' num2str(opt.S) ...
@@ -113,6 +132,12 @@ for i = 1:opt.S
     end
     if isequal(opt.tuned_parameter,'bcc')
         batt.cost = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'bbt')
+        batt.T = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'eol')
+        batt.EoL = opt.tuning_array(i);
     end
     [multStruct(i).output,multStruct(i).opt] =  ...
         optRun(pm,opt,data,atmo,batt,econ,uc(c),bc, ...

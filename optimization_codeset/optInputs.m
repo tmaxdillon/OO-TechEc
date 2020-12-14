@@ -7,7 +7,7 @@ opt.allscenuses = 0;
 opt.alllocuses = 0;
 opt.sens = 0;
 opt.tdsens = 0;
-opt.senssm = 0;
+opt.senssm = 1;
 opt.highresobj = 0;
 pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
 c = 1;  %use case 1:ST 2:LT
@@ -81,8 +81,8 @@ end
 
 %check to see if HPC
 if feature('numcores') < 36
-    opt.bf.n = 3;
-    opt.bf.m = 3;
+    opt.bf.n = 1;
+    opt.bf.m = 1;
 end
 
 %strings
@@ -220,7 +220,7 @@ lfp.lcm = 1;%battery life cycle model, 1:bolun 2:dyn_lc 3:fixed_lc
 lfp.T = 15;                 %[C] temperature
 lfp.EoL = 0.2;              %battery end of life
 lfp.rf_os = true;           %toggle using open source  rainflow
-lfp.bdi = 1000;              %battery degradation evaluation interaval
+lfp.bdi = 2190;              %battery degradation evaluation interaval
 bc = 2; %battery chemistry 1:AGM 2:LFP
 if bc == 1 %agm chemistry
     batt = agm;

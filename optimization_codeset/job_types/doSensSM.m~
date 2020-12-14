@@ -68,7 +68,7 @@ if pm == 3
         parpool(cores)
     end
     cores = feature('numcores'); %find number of cores
-    if  cores > 2
+    if  cores > 1
         s(length(ta),n) = struct();
         for i = 1:length(ta)
             X = ...
