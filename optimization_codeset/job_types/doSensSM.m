@@ -64,10 +64,10 @@ tp{nps+13} = 'eol'; %battery end of life [BATT]
 ta(nps+13,:) = 0.05:0.025:0.275;
 
 if pm == 3
+    cores = feature('numcores'); %find number of cores
     if isempty(gcp('nocreate')) %no parallel pool running
         parpool(cores)
     end
-    cores = feature('numcores'); %find number of cores
     if  cores > 2
         s(length(ta),n) = struct();
         for i = 1:length(ta)
