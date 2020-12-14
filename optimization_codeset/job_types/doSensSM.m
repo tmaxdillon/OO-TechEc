@@ -64,47 +64,47 @@ tp{nps+13} = 'eol'; %battery end of life [BATT]
 ta(nps+13,:) = 0.05:0.025:0.275;
 
 if pm == 3
-    cores = feature('numcores'); %find number of cores
-    if isempty(gcp('nocreate')) %no parallel pool running
-        parpool(cores);
-    end
-    if  cores > 2
-        s(length(ta),n) = struct();
-        parfor i = 1:length(ta)
-            X = ...
-                doSens(ta(i,:),tp{i},batchtype,batchscen,batchloc,batchc);
-            for j = 1:n
-                s(i,n).output = X(n).output;
-                s(i,n).opt = X(n).opt;
-                s(i,n).data = X(n).data;
-                s(i,n).atmo = X(n).atmo;
-                s(i,n).batt = X(n).batt;
-                s(i,n).econ = X(n).econ;
-                s(i,n).uc = X(n).uc;
-                s(i,n).pm = X(n).pm;
-                s(i,n).c = X(n).c;
-                s(i,n).loc = X(n).loc;
-                s(i,n).wave = X(n).wave;
-            end
-        end
-        s1 = s(1,:);
-        s2 = s(2,:);
-        s3 = s(3,:);
-        s4 = s(4,:);
-        s5 = s(5,:);
-        s6 = s(6,:);
-        s7 = s(7,:);
-        s8 = s(8,:);
-        s9 = s(9,:);
-        s10 = s(10,:);
-        s11 = s(11,:);
-        s12 = s(12,:);
-        s13 = s(13,:);
-        s14 = s(14,:);
-        s15 = s(15,:);
-        s16 = s(16,:);
-        clear s
-    else
+%     cores = feature('numcores'); %find number of cores
+%     if isempty(gcp('nocreate')) %no parallel pool running
+%         parpool(cores);
+%     end
+%     if  cores > 2
+%         s(length(ta),n) = struct();
+%         parfor i = 1:length(ta)
+%             X = ...
+%                 doSens(ta(i,:),tp{i},batchtype,batchscen,batchloc,batchc);
+%             for j = 1:n
+%                 s(i,n).output = X(n).output;
+%                 s(i,n).opt = X(n).opt;
+%                 s(i,n).data = X(n).data;
+%                 s(i,n).atmo = X(n).atmo;
+%                 s(i,n).batt = X(n).batt;
+%                 s(i,n).econ = X(n).econ;
+%                 s(i,n).uc = X(n).uc;
+%                 s(i,n).pm = X(n).pm;
+%                 s(i,n).c = X(n).c;
+%                 s(i,n).loc = X(n).loc;
+%                 s(i,n).wave = X(n).wave;
+%             end
+%         end
+%         s1 = s(1,:);
+%         s2 = s(2,:);
+%         s3 = s(3,:);
+%         s4 = s(4,:);
+%         s5 = s(5,:);
+%         s6 = s(6,:);
+%         s7 = s(7,:);
+%         s8 = s(8,:);
+%         s9 = s(9,:);
+%         s10 = s(10,:);
+%         s11 = s(11,:);
+%         s12 = s(12,:);
+%         s13 = s(13,:);
+%         s14 = s(14,:);
+%         s15 = s(15,:);
+%         s16 = s(16,:);
+%         clear s
+%     else
         s1 = doSens(ta(1,:),tp{1},batchtype,batchscen,batchloc,batchc);
         s2 = doSens(ta(2,:),tp{2},batchtype,batchscen,batchloc,batchc);
         s3 = doSens(ta(3,:),tp{3},batchtype,batchscen,batchloc,batchc);
@@ -121,7 +121,7 @@ if pm == 3
         s14 = doSens(ta(14,:),tp{14},batchtype,batchscen,batchloc,batchc);
         s15 = doSens(ta(15,:),tp{15},batchtype,batchscen,batchloc,batchc);
         s16 = doSens(ta(16,:),tp{16},batchtype,batchscen,batchloc,batchc);
-    end
+%     end
 end
 
 %get S0, default results
