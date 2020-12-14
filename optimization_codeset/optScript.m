@@ -32,26 +32,26 @@ elseif opt.allscenuses %run all dimensions for a location
         ' scenario complete after' num2str(round(toc(T)/60,2)) ...
         ' minutes.'])
 elseif opt.senssm
-    [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s17,s0] = ...
+    [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s0] = ...
         doSensSM(batchtype,batchscen,batchloc,batchc);
     if pm == 3 %assign output to descriptive variables
         cwm = s1;
-        wiv = s2;
-        wcm = s3;
-        whl = s4;
-        ild = s5;
-        osv = s6;
-        nbl = s7;
-        sdr = s8;
-        utp = s9;
-        bhc = s10;
-        dep = s11;
-        dtc = s12;
-        mbl = s13;
-        lft = s14;
-        spv = s15;
-        tmt = s16;
-        bcc = s17;
+        wiv = s1;
+        wcm = s2;
+        whl = s3;
+        ild = s4;
+        osv = s5;
+        sdr = s6;
+        utp = s7;
+        bhc = s8;
+        dep = s9;
+        dtc = s10;
+        lft = s11;
+        spv = s12;
+        tmt = s13;
+        bcc = s14;
+        bbt = s15;
+        eol = s16;
     end
 else %just one simulation
     disp(['Optimization (' char(loc) ', pm: ' num2str(pm), ...

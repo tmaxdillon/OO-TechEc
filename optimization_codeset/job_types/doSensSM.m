@@ -1,4 +1,4 @@
-function [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s17, ...
+function [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16, ...
     s0] = ...
     doSensSM(batchtype,batchscen,batchloc,batchc)
 
@@ -66,11 +66,11 @@ ta(nps+13,:) = 0.05:0.025:0.275;
 if pm == 3
     cores = feature('numcores'); %find number of cores
     if isempty(gcp('nocreate')) %no parallel pool running
-        parpool(cores)
+        parpool(cores);
     end
-    if  cores > 2
+    if  cores > 1
         s(length(ta),n) = struct();
-        for i = 1:length(ta)
+        parfor i = 1:length(ta)
             X = ...
                 doSens(ta(i,:),tp{i},batchtype,batchscen,batchloc,batchc);
             for j = 1:n
