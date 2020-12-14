@@ -68,7 +68,7 @@ if pm == 3
     if isempty(gcp('nocreate')) %no parallel pool running
         parpool(cores);
     end
-    if  cores > 1
+    if  cores > 2
         s(length(ta),n) = struct();
         parfor i = 1:length(ta)
             X = ...
