@@ -9,6 +9,9 @@ function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst,Pmooring, ...
 % Smax = 187;
 % ID = [kW Smax];
 
+% array = linspace(100,400,10);
+% uc.draw = array(6);
+
 %if fmin is suggesting a negative input, block it
 if opt.fmin && Smax < 0 || kW < 0
     surv = 0;
@@ -67,7 +70,7 @@ for t = 1:T
             fbi = t+1;
             S(t) = Smax*1000; 
             if ~exist('batt_lft','var')
-                batt_lft = t*dt*(1/8760)*(12); %[mo[ battery lifetime
+                batt_lft = t*dt*(1/8760)*(12); %[mo] battery lifetime
             end
         end
     end
