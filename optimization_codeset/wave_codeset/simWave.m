@@ -7,7 +7,7 @@ function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst,Pmooring, ...
 % disp([num2str(kW) ' ' num2str(Smax)])
 % kW = 0.2306;
 % Smax = 187;
-% ID = [kW Smax];
+ID = [kW Smax];
 
 % array = linspace(100,400,10);
 % uc.draw = array(6);
@@ -65,7 +65,7 @@ for t = 1:T
         batt_L(t) = 0;
     elseif rem(t,batt.bdi) == 0 %evaluate degradation on interval
         batt_L(t:t+batt.bdi) = batDegModel(S(fbi:t)/(1000*Smax), ...
-            batt.T,3600*t,batt.rf_os);
+            batt.T,3600*t,batt.rf_os,ID);
         if batt_L > batt.EoL %new battery
             fbi = t+1;
             S(t) = Smax*1000; 

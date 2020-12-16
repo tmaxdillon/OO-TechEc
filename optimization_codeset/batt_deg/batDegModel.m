@@ -1,4 +1,4 @@
-function [L, d] = batDegModel(s, T, t_tot,toggle_os)
+function [L, d] = batDegModel(s, T, t_tot,toggle_os,ID)
 %% Title: Degradation calculation
 % Author: Bolun Xu
 % Date: 2012-04-19
