@@ -47,7 +47,7 @@ end
 %winter cleaning
 if inso.cleanstrat == 3 %winter cleaning
     %winter cleaning (if applicable)
-    if data.met.lat < 0 %southern hemisphere
+    if data.lat < 0 %southern hemisphere
         wint_clean_mo = 5; %may
     else
         wint_clean_mo = 11; %november

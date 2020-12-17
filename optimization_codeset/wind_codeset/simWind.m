@@ -1,7 +1,11 @@
 function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst,Pmooring, ...
     vesselcost,turbrepair,battreplace,battencl, ... 
-    triptime,nvi,dp,S,P,D,L] =  ...
+    triptime,nvi,batt_L,batt_lft,dp,S,P,D,L] =  ...
     simWind(kW,Smax,opt,data,atmo,batt,econ,uc,bc,turb)
+
+%for debug
+% disp([num2str(kW) ' ' num2str(Smax)])
+ID = [kW Smax];
 
 %if fmin is suggesting a negative input (physically impossible), exit 
 if opt.fmin && Smax < 0 || kW < 0
@@ -19,6 +23,7 @@ if atmo.dyn_h %use log law to adjust wind speed based on rotor height
             sqrt(1000*2*kW/(atmo.rho_a*pi*turb.ura^3)),'log',atmo.zo);
     end
 end
+T = length(wind); %total time steps
 dt = 24*(data.met.time(2) - data.met.time(1)); %time in hours
 dist = data.dist; %[m] distance to shore
 depth = data.depth;   %[m] water depth
@@ -29,10 +34,26 @@ S(1) = Smax*1000; %assume battery begins fully charged
 P = zeros(1,length(wind)); %power produced timeseries
 D = zeros(1,length(wind)); %power dumped timeseries
 L = ones(1,length(wind))*uc.draw; %power put to sensing timeseries
+batt_L = zeros(1,T); %battery L (degradation) timeseries
+fbi = 1; %fresh battery index
 surv = 1;
 
 %run simulation
 for t = 1:length(wind)
+    if t < fbi + batt.bdi - 1 %less than first interval after fresh batt
+        batt_L(t) = 0;
+    elseif rem(t,batt.bdi) == 0 %evaluate degradation on interval
+        batt_L(t:t+batt.bdi) = batDegModel(S(fbi:t)/(1000*Smax), ...
+            batt.T,3600*t,batt.rf_os,ID);
+        if batt_L > batt.EoL %new battery
+            fbi = t+1;
+            S(t) = Smax*1000; 
+            if ~exist('batt_lft','var')
+                batt_lft = t*dt*(1/8760)*(12); %[mo] battery lifetime
+            end
+        end
+    end
+    %MOVE TO PREP WIND EVENTUALLY (as in simWave)
     %find power from turbine
     if wind(t) < turb.uci %below cut out
         P(t) = 0; %[W]
@@ -44,26 +65,33 @@ for t = 1:length(wind)
         P(t) = 0; %[W]
     end
     %find next battery storage level
+    cf = batt_L(t)*Smax*1000; %[Wh] capacity fading
     sd = S(t)*(batt.sdr/100)*(1/(30*24))*dt; %[Wh] self discharge
     S(t+1) = dt*(P(t) - uc.draw) + S(t) - sd; %[Wh]
-    if S(t+1) > Smax*1000 %dump power if larger than battery capacity
-        D(t) = S(t+1) - Smax*1000; %[Wh]
-        S(t+1) = Smax*1000; %[Wh]
+    if S(t+1) > (Smax*1000 - cf) %dump power if larger than battery capacity
+        D(t) = S(t+1) - (Smax*1000 - cf); %[Wh]
+        S(t+1) = Smax*1000 - cf; %[Wh]
     elseif S(t+1) <= Smax*batt.dmax*1000 %empty battery bank
         S(t+1) = dt*P(t) + S(t) - sd; %[Wh] save what's remaining, L = 0
         L(t) = 0; %drop load to zero because not enough power
     end
 end
 
-%dynamic battery degradation model
-if batt.dyn_lc
-    opt.phi = Smax/(Smax - (min(S)/1000)); %unused depth
-    batt.lc = batt.lc_nom*opt.phi^(batt.beta); %[m] new lifetime
-    batt.lc(batt.lc > batt.lc_max) = batt.lc_max; %no larger than max 
-else
-    batt.lc = batt.lc_nom; %[m]
+% battery degradation model
+if batt.lcm == 1 %bolun's model
+%     [batt_L,batt_lft] =  irregularDegradation(S/(Smax*1000), ...
+%         data.wave.time',uc.lifetime,batt); %retrospective modeling (old)
+    if ~exist('batt_lft','var') %battery never reached EoL
+        batt_lft = batt.EoL/batt_L(t)*t*12/(8760); %[mo]
+    end
+elseif batt.lcm == 2 %dyanmic (old) model
+    opt.phi = Smax/(Smax - (min(S)/1000)); %extra depth
+    batt_lft = batt.lc_nom*opt.phi^(batt.beta); %new lifetime
+    batt_lft(batt_lft > batt.lc_max) = batt.lc_max; %no larger than max
+else %fixed (really old) model
+    batt_lft = batt.lc_nom; %[m]
 end
-nbr = ceil((12*uc.lifetime/batt.lc-1)); %number of battery replacements
+nbr = ceil((12*uc.lifetime/batt_lft-1)); %number of battery replacements
 
 nvi = nbr + uc.turb.lambda; %number of vessel interventions
 
@@ -109,7 +137,7 @@ else %long term instrumentation and infrastructures
     C_v = econ.vessel.osvcost;
 end
 vesselcost = C_v*(nvi*(2*triptime + t_os)); %vessel cost
-turbrepair = 1/2*kWcost*(uc.turb.lambda-1); %turbine repair cost
+turbrepair = 1/2*kWcost*(uc.turb.lambda); %turbine repair cost
 if turbrepair < 0, turbrepair = 0; end
 battreplace = Scost*nbr; %number of battery replacements
 CapEx = Pmooring + Pinst + Pmtrl + battencl + Scost + Icost + kWcost;

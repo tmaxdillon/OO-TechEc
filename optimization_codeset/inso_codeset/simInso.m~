@@ -137,15 +137,15 @@ while cont
     
     if inso.shootdebug
         disp(['pvci = ' num2str(inso.pvci)])
-        disp(['battlc = ' num2str(batt_lft)])
+        disp(['battlc = ' num2str(batt.lc)])
         disp(['dm = ' num2str(dm)])
         pause
     end
     
-    if uc.SI == 6 || abs(batt_lft - mult*inso.pvci) < tol || ...
+    if uc.SI == 6 || abs(batt.lc - mult*inso.pvci) < tol || ...
         inso.cleanstrat == 3
         cont = 0;
-    elseif batt_lft < mult*inso.pvci %cleaning interval > battery life
+    elseif batt.lc < mult*inso.pvci %cleaning interval > battery life
         inso.pvci = inso.pvci - dm;
         if inso.shootdebug
             disp('Decreasing pvci...')
@@ -155,7 +155,7 @@ while cont
             dm = dm/2;
             over = true;
         end
-    elseif batt_lft > mult*inso.pvci %cleaning interval < battery life
+    elseif batt.lc > mult*inso.pvci %cleaning interval < battery life
         inso.pvci = inso.pvci + dm;
         if inso.shootdebug
             disp('Increasing pvci...')
@@ -241,7 +241,7 @@ else %long term instrumentation and infrastructure
     C_v = econ.vessel.osvcost;
 end
 vesselcost = C_v*(nvi*(2*triptime + t_os)); %vessel cost
-battreplace = Scost*(12/batt_lft*uc.lifetime-1);
+battreplace = Scost*(12/batt.lc*uc.lifetime-1);
 if battreplace < 0, battreplace = 0; end
 CapEx = Pmooring + Pinst + Pmtrl + battencl + Scost + Icost + ...
     Mcost + Ecost + Strcost;
