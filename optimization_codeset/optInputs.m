@@ -4,13 +4,13 @@ econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
 opt.bf.m = 500;
 opt.bf.n = 500;
 opt.allscenuses = 0;
-opt.alllocuses = 0;
+opt.alllocuses = 1;
 opt.sens = 0;
 opt.tdsens = 0;
 opt.senssm = 0;
 opt.highresobj = 0;
-pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
-c = 1;  %use case 1:ST 2:LT
+pm = 4; %power module, 1:Wi 2:In 3:Wa 4:Di
+c = 2;  %use case 1:ST 2:LT
 loc = 'argBasin'; %location
 %batch = false;
 if ~exist('batchtype','var')
@@ -43,7 +43,7 @@ elseif isequal(batchtype,'alllocuses')
     opt.tdsens = 0;
     opt.senssm = 0;
     opt.highresobj = 0;
-    pm = 3;
+    pm = batchpm;
     c = [];
     loc = [];
     %batch = true;
@@ -81,8 +81,8 @@ end
 
 %check to see if HPC
 if feature('numcores') < 36
-    opt.bf.n = 10;
-    opt.bf.m = 10;
+    opt.bf.n = 1;
+    opt.bf.m = 1;
 end
 
 %strings

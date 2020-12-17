@@ -16,7 +16,6 @@ end
 
 %extract data
 time = data.time;
-T = length(time);
 dt = 24*(data.met.time(2) - data.met.time(1)); %time in hours
 dist = data.dist; %[m] distance to shore
 depth = data.depth; %[m] water depth
@@ -59,7 +58,7 @@ for t = 1:length(time)
         P(t) = kW*1000;
         S(t+1) = dt*(P(t) - uc.draw) + S(t) - sd; %[Wh]
         if S(t+1) >= (Smax*1000 - cf)
-            S(t+1) = Smax*1000 - cf;
+            S(t+1) = Smax*1000;
             charging = false;
         end
         runtime = runtime + dt; %[h]
@@ -70,21 +69,14 @@ for t = 1:length(time)
     end
 end
 
-% battery degradation model
-if batt.lcm == 1 %bolun's model
-%     [batt_L,batt_lft] =  irregularDegradation(S/(Smax*1000), ...
-%         data.wave.time',uc.lifetime,batt); %retrospective modeling (old)
-    if ~exist('batt_lft','var') %battery never reached EoL
-        batt_lft = batt.EoL/batt_L(t)*t*12/(8760); %[mo]
-    end
-elseif batt.lcm == 2 %dyanmic (old) model
-    opt.phi = Smax/(Smax - (min(S)/1000)); %extra depth
-    batt_lft = batt.lc_nom*opt.phi^(batt.beta); %new lifetime
-    batt_lft(batt_lft > batt.lc_max) = batt.lc_max; %no larger than max
-else %fixed (really old) model
-    batt_lft = batt.lc_nom; %[m]
+%dynamic battery degradation model
+if batt.dyn_lc
+    opt.phi = Smax/(Smax - (min(S)/1000)); %unused depth
+    batt.lc = batt.lc_nom*opt.phi^(batt.beta); %new lifetime
+    batt.lc(batt.lc > batt.lc_max) = batt.lc_max; %no larger than max
+else
+    batt.lc = batt.lc_nom; %[m]
 end
-nbr = ceil((12*uc.lifetime/batt_lft-1)); %number of battery replacements
 
 %find burn rate
 lph = polyval(opt.p_dev.d_burn,kW); %[l/h]
@@ -94,6 +86,7 @@ if uc.lifetime/nfr > dies.ftmax/12 %fuel will go bad
     nfr = ceil(12*uc.lifetime/dies.ftmax-1);
 end
 noc = ceil(runtime/dies.oilint-1); %number of oil changes
+nbr = ceil(12*uc.lifetime/batt.lc-1); %number of battery replacements
 
 nvi = max([nfr noc nbr]) + uc.dies.lambda; %number of vessel interventions
 
@@ -139,7 +132,7 @@ else %long term instrumentation and infrastructure
     C_v = econ.vessel.osvcost;
 end
 vesselcost = C_v*(nvi*(2*triptime + t_os)); %vessel cost
-genrepair = 1/2*kWcost*(uc.dies.lambda); %generator repair cost
+genrepair = 1/2*kWcost*(uc.dies.lambda-1); %turbine repair cost
 battreplace = Scost*nbr; %number of battery replacements
 CapEx = Pmooring + Pinst + Pmtrl + battencl + Scost + ...
     genencl + kWcost;

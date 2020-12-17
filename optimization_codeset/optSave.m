@@ -1,4 +1,5 @@
-function [] = optSave(prepath,name,batchtype,batchscen,batchloc,batchc)
+function [] = optSave(prepath,name,batchtype,batchpm,batchscen, ...
+    batchloc,batchc)
 
 %clearvars -except name prepath batchtype scen loc c
 optScript

@@ -1,16 +1,11 @@
-function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst,Pmooring, ...
-    vesselcost,wecrepair,battreplace,battencl, ...
+function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst, ...
+    Pmooring,vesselcost,wecrepair,battreplace,battencl, ...
     triptime,nvi,batt_L,batt_lft,dp,width,cw,S,P,D,L] =  ...
     simWave(kW,Smax,opt,data,atmo,batt,econ,uc,bc,wave)
 
 %for debug
 % disp([num2str(kW) ' ' num2str(Smax)])
-% kW = 0.2306;
-% Smax = 187;
 ID = [kW Smax];
-
-% array = linspace(100,400,10);
-% uc.draw = array(6);
 
 %if fmin is suggesting a negative input, block it
 if opt.fmin && Smax < 0 || kW < 0
