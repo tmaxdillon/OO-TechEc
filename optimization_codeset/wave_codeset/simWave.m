@@ -6,8 +6,6 @@ function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst, ...
 %for debug
 % disp([num2str(kW) ' ' num2str(Smax)])
 ID = [kW Smax];
-kW = 0.529545454545455;
-Smax = 16.121212121212120;
 
 %if fmin is suggesting a negative input, block it
 if opt.fmin && Smax < 0 || kW < 0
@@ -101,7 +99,7 @@ else %fixed (really old) model
 end
 nbr = ceil((12*uc.lifetime/batt_lft-1)); %number of battery replacements
 
-nvi = econ.wave.lambda + nbr; %vessel interventions
+nvi = econ.wave.lambda*uc.lifetime + nbr; %vessel interventions
 
 %economic modeling
 kWcost = 2*econ.wave.costmult*polyval(opt.p_dev.t,kW); %wec

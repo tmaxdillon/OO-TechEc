@@ -25,8 +25,8 @@ elseif pm == 3 %wave
     nps = 3; %number of power-specific parameters
 %     tp{1} = 'cwm'; %capture width multiplier [WEC]
 %     ta(1,:) = linspace(0.5,5,n);
-    tp{1} = 'wiv'; %wec interventions [WEC]
-    ta(1,:) = linspace(0,9,n);
+    tp{1} = 'wiv'; %wec interventions/year [WEC]
+    ta(1,:) = linspace(0,1.5,n);
     tp{2} = 'wcm'; %wec cost multiplier [WEC]
     ta(2,:) = linspace(2,14,n);
     tp{3} = 'whl'; %wec hotel load [WEC]

@@ -81,8 +81,8 @@ end
 
 %check to see if HPC
 if feature('numcores') < 36
-    opt.bf.n = 10;
-    opt.bf.m = 10;
+    opt.bf.n = 1;
+    opt.bf.m = 1;
 end
 
 %strings
@@ -146,8 +146,8 @@ econ.inso.marinization = 1.2;       %[~]
 econ.wave.scenarios = 3;            %number of scenarios
 econ.wave.costmult_con = 10;         %conservative cost multiplier
 econ.wave.costmult_opt = 4;         %optimistic cost multiplier
-econ.wave.lowfail = 0;              %optimistic failures
-econ.wave.highfail = 4;              %conservative failures
+econ.wave.lowfail = 0;              %failures per year (optimistic)
+econ.wave.highfail = 1;              %failure per year (conservative)
 %diesel costs
 econ.dies.fcost = .83;              %[$/L] diesel fuel cost
 econ.dies.enclcost = 5000;          %[$]
