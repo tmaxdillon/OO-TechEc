@@ -7,6 +7,9 @@ function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst,Pmooring, ...
 % disp([num2str(kW) ' ' num2str(Smax)])
 ID = [kW Smax];
 
+%NOTE TO SELF - you need to create prepWind an d extend the wind timeseires
+%to 5 years to fully evaluate degradation
+
 %if fmin is suggesting a negative input (physically impossible), exit 
 if opt.fmin && Smax < 0 || kW < 0
     surv = 0;

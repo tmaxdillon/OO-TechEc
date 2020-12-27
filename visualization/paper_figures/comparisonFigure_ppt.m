@@ -7,10 +7,10 @@ set(0,'DefaultAxesFontName', 'calibri')
 
 if ~exist('allStruct','var')
     load('wind')
-    load('wave_optc')
+    load('waveoptc')
     load('inso')
     load('dies')
-    allStruct = mergeWiWaDiIn(wind,wave_optc,dies,inso);
+    allStruct = mergeWiWaDiIn(wind,waveoptc,dies,inso);
     %rearrange
     asadj(:,1,:) = allStruct(:,4,:);
     asadj(:,2,:) = allStruct(:,3,:);
@@ -29,7 +29,7 @@ nu = size(allStruct,3); %number of use cases
 costdata = zeros(nl,np,nc,nu);
 gendata = zeros(nl,np,1,nu);
 stordata = zeros(nl,np,1,nu);
-cycdata = zeros(nl,np,1,nu);
+Ldata = zeros(nl,np,1,nu);
 cfdata = zeros(nl,np,1,nu);
 massdata = zeros(nl,np,1,nu);
 dpdata = zeros(nl,np,1,nu);
@@ -80,7 +80,8 @@ for loc = 1:nl
             end
             gendata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.kW;
             stordata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.Smax;
-            cycdata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.cyc60;
+            Ldata(loc,pm,1,c) = ...
+                100*max(allStruct(loc,pm,c).output.min.batt_L);
             cfdata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.CF;
             massdata(loc,pm,1,c) = ...
                 1000*allStruct(loc,pm,c).output.min.Smax/ ...
@@ -284,7 +285,7 @@ for c = 1:nu
     ax(4,c) = subplot(7,nu,10+c);
     hold on
     for i = 1:NumStacksPerGroup
-        Y = squeeze(cycdata(:,i,:,c));
+        Y = squeeze(Ldata(:,i,:,c));
         internalPosCount = i - ((NumStacksPerGroup+1) / 2);
         groupDrawPos = (internalPosCount)* groupOffset + groupBins;
         h4(i,c) = bar(Y, 'stacked','FaceColor','flat');
@@ -309,7 +310,7 @@ for c = 1:nu
     %set(gca,'XTickLabel',opt.locations);
     xtickangle(45)
     if c == 1
-        ylabel({'60%-','Discharge','Cycles','per','Month'},'FontSize',fs2);
+        ylabel({'Battery','Capacity','Fade','[%]'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
         set(ylh,'Rotation',0,'Units', ...
             'Normalized','Position',[yaxhpos .5 -1], ...
@@ -317,7 +318,7 @@ for c = 1:nu
             'HorizontalAlignment','center')
     end
     grid on
-    ylim([0 cymult*max(cycdata(:))])
+    ylim([0 cymult*max(Ldata(:))])
     linkaxes(ax(4,:),'y')
     
     ax(5,c) = subplot(7,nu,12+c);

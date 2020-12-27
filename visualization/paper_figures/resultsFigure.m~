@@ -51,7 +51,7 @@ for loc = 1:nl
             stordata(loc,pm,1,c) = ...
                 allStruct(fixer(loc),pm,c).output.min.Smax;
             Ldata(loc,pm,1,c) = ...
-                 max(allStruct(fixer(loc),pm,c).output.min.batt_L);
+                 100*max(allStruct(fixer(loc),pm,c).output.min.batt_L);
             cfdata(loc,pm,1,c) = ...
                 allStruct(fixer(loc),pm,c).output.min.CF;
             massdata(loc,pm,1,c) = ...
@@ -70,16 +70,17 @@ set(gcf,'Units','inches')
 set(gcf, 'Position', [1, 1, 6.5, 7])
 fs = 6; %annotation font size
 fs2 = 8; %axis font size
+fs3 = 4; %eol font size
 yaxhpos = -.25; %
-cmult = 1.6; %cost axis multiplier
+cmult = 1.35; %cost axis multiplier
 gmult = 1.9; %generation axis multiplier
 bmult = 2.1; %battery axis multiplier
-cymult = 1.5; %cycles axis multiplier 
+blmult = 2.8; %cycles axis multiplier 
 cfmult = 1.5; %capacity factor axis multiplier
-cbuff = 20; %cost text buffer
-gbuff = .26; %generation text buffer
-bbuff = 15;  %battery text buffer
-cybuff = 2; %battery cycle text buffer
+cbuff = 10; %cost text buffer
+gbuff = .23; %generation text buffer
+bbuff = 10;  %battery text buffer
+blbuff = 1.5; %battery cycle text buffer
 cfbuff = .05; %capacity factor text buffer
 
 %titles and labels
@@ -143,11 +144,11 @@ for c = 1:nu
         for lay = 1:cols
             h(i,lay,c).CData = col(lay,:);
         end
-        if c == 2 && i == np
+        if c == 1 && i == np
             leg = legend(h(i,:,c),leg,'Location','northeast');
             leg.FontSize = fs;
-            leg.Position(1) = .77;
-            leg.Position(2) = .835;
+            leg.Position(1) = .345;
+            leg.Position(2) = .815;
         end
     end
     hold off;
@@ -220,6 +221,7 @@ for c = 1:nu
     end
     grid on
     ylim([0 gmult*max(gendata(:))])
+    set(gca,'YTick',[0 1 2 3 4 5])
     linkaxes(ax(2,:),'y')
     
     ax(3,c) = subplot(7,nu,8+c);
@@ -280,12 +282,19 @@ for c = 1:nu
         x = get(h4(i,c),'XData');
         for j = 1:length(Y)
             tx = round(Y(j),1);
-            text(x(j),Y(j)+cybuff,num2str(tx), ...
+            text(x(j),Y(j)+blbuff,num2str(tx), ...
                 'Rotation',90, ...
                 'HorizontalAlignment','left', ...
                 'verticalAlignment','middle', ...
                 'FontSize',fs)
         end
+    end
+    yl = yline(20,'--r','Battery End of Life, \sigma_{EoL} = 20%', ...
+        'LabelVerticalAlignment', ...
+    'top','LabelHorizontalAlignment','left','FontSize',fs, ...
+    'LineWidth',.75,'FontName','cmr10');
+    if c == 2
+        yl.Label = '';
     end
     hold off;
     set(gca,'XTickMode','manual');
@@ -307,8 +316,9 @@ for c = 1:nu
             'FontSize',fs2);
     end
     grid on
-    ylim([0 cymult*max(Ldata(:))])
+    ylim([0 blmult*max(Ldata(:))])
     %set(gca,'YTick',[0 10 20 30 40])
+    set(gca,'XTickLabels',[])
     linkaxes(ax(4,:),'y')
     
     ax(5,c) = subplot(7,nu,12+c);
@@ -356,5 +366,5 @@ for c = 1:nu
     
 end
 
-print(results,'../Research/OO-TechEc/paper_figures/results',  ...
-    '-dpng','-r600')
+print(results,['~/Dropbox (MREL)/Research/OO-TechEc/' ...
+    'paper_figures/results'],'-dpng','-r600')

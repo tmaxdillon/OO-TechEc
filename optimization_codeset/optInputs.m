@@ -9,9 +9,9 @@ opt.sens = 0;
 opt.tdsens = 0;
 opt.senssm = 0;
 opt.highresobj = 0;
-pm = 1; %power module, 1:Wi 2:In 3:Wa 4:Di
-c = 2;  %use case 1:ST 2:LT
-loc = 'argBasin'; %location
+pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
+c = 1;  %use case 1:ST 2:LT
+loc = 'irmSea'; %location
 %batch = false;
 if ~exist('batchtype','var')
     batchtype = [];
@@ -62,8 +62,8 @@ elseif isequal(batchtype,'hros')
     loc = batchloc;
     %batch = true;
 elseif isequal(batchtype,'sens')
-    opt.tuning_array = linspace(9,60,10);
-    opt.tuned_parameter = 'nbl';
+    opt.tuning_array = linspace(1,10,10);
+    opt.tuned_parameter = 'lft';
     econ.wave.scen = batchscen; 
     opt.bf.m = 500;
     opt.bf.n = 500;
@@ -81,8 +81,8 @@ end
 
 %check to see if HPC
 if feature('numcores') < 36
-    opt.bf.n = 1;
-    opt.bf.m = 1;
+    opt.bf.n = 10;
+    opt.bf.m = 10;
 end
 
 %strings
@@ -241,7 +241,7 @@ atmo.soil = 35;             %[%/year]
 %USE CASES
 %short term instrumentation
 uc(1).draw = 200;               %[W] - secondary node
-uc(1).lifetime = 5;             %[y]
+uc(1).lifetime = 7;             %[y]
 uc(1).SI = 6;                   %[months] service interval
 uc(1).uptime = .99;             %[%] uptime
 uc(1).turb.lambda = 4;          %turbine interventions

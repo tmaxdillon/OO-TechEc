@@ -23,20 +23,20 @@ if ~exist('array','var')
         %merge
         array(1,:,i) = sdr;
         x0(1,i) = s0.batt.sdr;
-        array(13,:,i) = bcc;
-        x0(13,i) = s0.batt.cost;
+        array(5,:,i) = bcc;
+        x0(5,i) = s0.batt.cost;
         array(3,:,i) = bhc;
         x0(3,i) = s0.econ.batt.enclmult;
-        array(5,:,i) = bbt;
-        x0(5,i) = s0.batt.T;
-        array(9,:,i) = eol;
-        x0(9,i) = s0.batt.EoL;
-        array(6,:,i) = dep;
-        x0(6,i) = s0.data.depth;
-        array(10,:,i) = utp;
-        x0(10,i) = s0.uc.uptime;
-        array(2,:,i) = lft;
-        x0(2,i) = s0.uc.lifetime;
+        array(9,:,i) = bbt;
+        x0(9,i) = s0.batt.T;
+        array(13,:,i) = eol;
+        x0(13,i) = s0.batt.EoL;
+        array(2,:,i) = dep;
+        x0(2,i) = s0.data.depth;
+        array(6,:,i) = utp;
+        x0(6,i) = s0.uc.uptime;
+        array(10,:,i) = lft;
+        x0(10,i) = s0.uc.lifetime;
         array(14,:,i) = ild;
         x0(14,i) = s0.uc.draw;
 %         array(3,:,i) = cwm;
@@ -260,9 +260,7 @@ for a = 1:size(array,1)
         xlabel(({'Battery','Cell Cost [$/kWh]'}),'FontSize',fs2)
     elseif isequal(array(a,1).opt.tuned_parameter,'bbt')
         xlabel(({'Battery','Temperature [C]'}),'FontSize',fs2)
-    elseif isequal(array(a,1).opt.tuned_parameter,'eol')
-        xlabel(({'Battery','End of Life [%]'}),'FontSize',fs2)
-        xticklabels({'5%','27.5%'})
+    elseif isequal(array(a,1).opt.tuned_parameter,'
     end
     %set x axis label to a consistent position
     set(ax(a).XLabel,'units','normalized')

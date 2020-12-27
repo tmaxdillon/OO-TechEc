@@ -6,6 +6,8 @@ function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst, ...
 %for debug
 % disp([num2str(kW) ' ' num2str(Smax)])
 ID = [kW Smax];
+kW = 0.529545454545455;
+Smax = 16.121212121212120;
 
 %if fmin is suggesting a negative input, block it
 if opt.fmin && Smax < 0 || kW < 0
