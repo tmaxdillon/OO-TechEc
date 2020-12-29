@@ -5,7 +5,7 @@ set(0,'defaulttextinterpreter','none')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
-path = '~/Dropbox (MREL)/MATLAB/OO-TechEc/output_data/10_17/';
+path = '~/Dropbox (MREL)/MATLAB/OO-TechEc/output_data/';
 loadcell{1} = 'ssm_ab_st.mat';
 loadcell{2} = 'ssm_ce_st.mat';
 loadcell{3} = 'ssm_cp_st.mat';
@@ -22,18 +22,14 @@ if ~exist('array','var')
         tic
         load([path loadcell{i}])
         %merge
-        array(1,:,i) = dtc;
-        x0(1,i) = s0.data.dist;
         array(16,:,i) = sdr;
         x0(16,i) = s0.batt.sdr;
-        array(15,:,i) = bcc;
-        x0(15,i) = s0.batt.cost;
-        array(8,:,i) = bhc;
-        x0(8,i) = s0.econ.batt.enclmult;
-        array(14,:,i) = mbl;
-        x0(14,i) = s0.batt.lc_max;
-        array(13,:,i) = nbl;
-        x0(13,i) = s0.batt.lc_nom;
+        array(15,:,i) = bbt;
+        x0(15,i) = s0.batt.T;
+        array(14,:,i) = eol;
+        x0(14,i) = s0.batt.EoL;
+        array(13,:,i) = bcc;
+        x0(13,i) = s0.batt.cost;
         array(12,:,i) = dep;
         x0(12,i) = s0.data.depth;
         array(11,:,i) = utp;
@@ -42,8 +38,8 @@ if ~exist('array','var')
         x0(10,i) = s0.uc.lifetime;
         array(9,:,i) = ild;
         x0(9,i) = s0.uc.draw;
-%         array(3,:,i) = cwm;
-%         x0(3,i) = 1;
+        array(8,:,i) = bhc;
+        x0(8,i) = s0.econ.batt.enclmult;
         array(7,:,i) = whl;
         x0(7,i) = s0.wave.house;
         array(6,:,i) = wcm;
@@ -58,16 +54,18 @@ if ~exist('array','var')
         else
             x0(5,i) = s0.econ.wave.highfail;
         end
+        array(4,:,i) = spv;
+        x0(4,i) = s0.econ.vessel.speccost;
         array(3,:,i) = tmt;
         if s0.c == 1 %short term
             x0(3,i) = s0.econ.vessel.t_ms;
         elseif s0.c == 2 %long term
             x0(3,i) = s0.econ.vessel.t_mosv;
         end
-        array(4,:,i) = spv;
-        x0(4,i) = s0.econ.vessel.speccost;
         array(2,:,i) = osv;
         x0(2,i) = s0.econ.vessel.osvcost;
+        array(1,:,i) = dtc;
+        x0(1,i) = s0.data.dist;
         t0(i) = s0.output.min.cost; %total cost of base case
         for a = 1:16
             ta(a,:,i) = array(a,1,i).opt.tuning_array;
@@ -81,11 +79,11 @@ if ~exist('array','var')
     ta(4,:,:) = ta(4,:,:)./1000;
 end
 
-units = fliplr({' % month^{-1}',' $k Wh^{-1}',' months',' months', ...
+units = fliplr({' % month^{-1}',' %','^{\circ} C',' $k Wh^{-1}', ...
     ' meters',' %',' year',' watts',' multiples',' %',' multiples', ...
     ' failure',' $k day^{-1}',' hours',' $k day^{-1}',' kilometers'});
 
-rval = fliplr([1, -1, 1, 1, -1, 2, 0, 0, 2, 2, 1, 0, 0, 1, 1, -1]);
+rval = fliplr([1, 1, 1, -1, -1, 2, 0, 0, 2, 2, 1, 0, 0, 1, 1, -1]);
 %rval = 3*ones(1,16);
 
 for i = 1:16
@@ -129,8 +127,8 @@ fs2 = 10;
 fs3 = 12;
 xticks = 1.5:1:10.5;
 yticks = 1.5:1:16.5;
-ytl = {'Self-Discharge Rate','Battery Cell Cost', ...
-    'Maximum Battery Lifetime','Nominal Battery Lifetime', ...
+ytl = {'Self-Discharge Rate','Battery Temperature', ...
+    'Battery End of Life','Battery Cell Cost', ...
     'Water Depth','Persistence Requirement','Lifetime','Power Draw', ...
     'Battery Housing Cost','WEC Hotel Load','WEC Cost Multiplier', ...
     'WEC Failures','Specialized Vessel Cost','Maintenance Time', ...

@@ -23,28 +23,35 @@ if ~exist('array','var')
         end
     end
 end
-clearvars -except array nc ns nl
+clearvars -except array nc ns nl ax
 
 %plot setup
 objSpacesSM = figure;
 set(gcf,'Units','inches','Color','w')
-set(gcf,'Position', [0.1, 1, 6, 6])
+set(gcf,'Position', [0.1, 1, 6.5, 5.5])
 % axcol = [.65 .65 .65];
 axcol = [0 0 0];
 lw = 0.45;
 fs = 8; %titles
 fs2 = 7; %tick lables
 fs3 = 10; %annotations
-Sm_max = 400; %[kWh]
-Gr_max = 6; %[kW]
-ytpos = [0.15 3 6];
-ytl = {'0.215','3','6'};
-xtpos = [1 200 400];
-xtl = {'1','200','400'};
-rshift = 0; %shift axis right
-xshrink = 1.2; %shrink size of x axis
-ygrow = 1.35; %expand size of y axis
-dshift = 5; %shift axes down
+fs4 = 5.5; %colorbar tick labels
+Sm_max = 300; %[kWh]
+Gr_max = 4; %[kW]
+ytpos = [0.215 2 4];
+ytl = {'0.215','2','4'};
+xtpos = [1 150 300];
+xtl = {'1','150','300'};
+
+Xwidth = .65; %subplot width
+Yheight = .65; 
+XmargW = 0.3;
+YmargW = 0.05;
+Yoff = 0.8;
+Xoff = 0.7;
+Cbwidth = 0.03;
+Cbyroom = -0.1;
+
 xlabdshift = 2; %shift xlabel down
 ylablshift = 250; %shift ylabel left
 ylabdshift = 4; %shift ylabel down
@@ -58,11 +65,11 @@ ann_sp = {'(a)','(b)','(c)','(d)','(e)','(f)','(g)','(h)','(i)','(j)', ...
     '(v)','(w)','(x)','(y)','(z)','(aa)','(ab)','(ac)','(ad)'};
 
 ann = { ...
-    '\begin{tabular}{l} Short-Term \\ Optimistic Durability \end{tabular}', ...
-    '\begin{tabular}{l} Short-Term \\ Optimistic Cost \end{tabular}', ...
+    '\begin{tabular}{l} Short-Term \\ Optimistic \\ Durability \end{tabular}', ...
+    '\begin{tabular}{l} Short-Term \\ Optimistic \\ Cost \end{tabular}', ...
     '\begin{tabular}{l} Short-Term \\ Conservative \end{tabular}', ...
-    '\begin{tabular}{l} Long-Term \\ Optimistic Durability \end{tabular}', ...
-    '\begin{tabular}{l} Long-Term \\ Optimistic Cost \end{tabular}', ...
+    '\begin{tabular}{l} Long-Term \\ Optimistic \\ Durability \end{tabular}', ...
+    '\begin{tabular}{l} Long-Term \\ Optimistic \\ Cost \end{tabular}', ...
     '\begin{tabular}{l} Long-Term \\ Conservative \end{tabular}'};
 
 for i = 1:length(array)
@@ -97,82 +104,80 @@ for i = 1:length(array)
     set(gca,'YTick',ytpos)
     set(gca,'XTickLabels',[])
     set(gca,'YTickLabels',[])
+    
+    %titles and annotations
     hold on
     if i < 6
-        t = title(locations{i},'FontWeight','normal','FontSize',fs);
-        t.Position(2) = t.Position(2)*1.1;
+        tt = title(locations{i},'FontWeight','normal','FontSize',fs);
+        tt.Position(2) = tt.Position(2)*1.25;
+        tt.Units = 'normalized';
+        tt.HorizontalAlignment = 'center';
+        tt.Position(1) = 0.6;
     end
     if rem(i,nl) == 0
-        text(1.05,.5,ann{i/5},'Units','Normalized', ...
+        text(1.65,.5,ann{i/5},'Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...
             'HorizontalAlignment','left','FontSize',fs, ...
             'Color','k','Interpreter','latex');
     end
-%     if i > 25
-%         if rem(i,nl) == 3
-% %             xl = xlabel('Battery Storage Capacity [kWh]','FontSize',fs3);
-% %             xlpos = get(xl,'Position');    
-% %             xlpos(2) = xlpos(2) - xlabdshift;
-% %             set(xl,'Position',xlpos)
-%         end
-% %         set(gca,'XTick',[10 460])
-% %         set(gca,'XTickLabels',{'1','500'})
-%     end
-%     if rem(i,nl) == 1
-%         if i == 11
-% %             yl = ylabel({'WEC Rated Power [kW]'},'FontSize',fs3);
-% %             ylpos = get(yl,'Position');    
-% %             ylpos(2) = ylpos(2) - ylabdshift;
-% %             ylpos(1) = ylpos(1) - ylablshift;
-% %             set(yl,'Position',ylpos)
-%         end
-% %         set(gca,'YTick',ytpos)
-%         %set(gca,'YTickLabels',{'0.15','8'})
-% %         t = text([0 0],ytpos, ytl, ...
-% %             'FontSize',fs2,'HorizontalAlignment','right');
-% %         for ti = 1:length(t)
-% %             set(t(ti), 'Units','pixels');
-% %             set(t(ti), 'Position', get(t(ti),'Position')-[7.5 0 0]);
-% %         end
-%     end
     axis manual
     
     set(gca,'LineWidth',lw)
     set(gca,'XColor',axcol,'YColor',axcol)
     set(gca,'TickLength',[0.025 1])
     set(gca, 'Layer', 'top')
-    
-    %get axespositions for adjustmet later
-    set(ax(i),'Units','pixels');
-    axpos(:,i) = get(ax(i),'Position');
-    axpos(1,i) = axpos(1,i)+rshift;
-    axpos(3,i) = xshrink*axpos(3,i);
-    axpos(4,i) = ygrow*axpos(4,i);
-    axpos(2,i) = axpos(2,i)-dshift*(ceil(i/nl)-1);
         
     %find maximums and minimum for colorbar
     a_max(i) = max(a_sat(:)); %actual max
     p_max(i) = max(max(sb.ZData(sb.YData(:,1) < Gr_max, ... 
         sb.XData(1,:) < Sm_max))); %plot max
     a_min(i) = min(a_sat(:));
+    
+    lb(i) = a_min(i)/p_max(i);
+    lb(i) = 0;
+    colormap(ax(i),AdvancedColormap('kkgw glw lww r',1000, ...
+        [lb(i),lb(i)+.05*(1-lb(i)),lb(i)+0.15*(1-lb(i)),1]));
+    set(ax(i),'CLim',[a_min(i) p_max(i)])
+    c(i) = colorbar(ax(i),'location','eastoutside');
+    c(i).Ticks = [a_min(i) p_max(i)];
+    c(i).TickLabels = {['$' num2str(round(c(i).Ticks(1)/1000,2)) 'M'], ...
+        ['$' num2str(round(c(i).Ticks(2)/1000,2)) 'M']};
+    c(i).Box = 'off';
 end
-%drawnow
 
-%add room to bottom of plot
-addbottom = 0.5; %[in]
-addright = 1; %[in]
-set(gcf,'Position', [0.1, 1, 6+addright, 6+addbottom])
-%reposition figures and add labels
+%reposition figures add labels
 for i=1:length(array)
     axes(ax(i))
-    set(gca,'Position',axpos(:,i))
-    set(gca,'Units','Inches')
-    axpos_in = get(gca,'Position');
-    axpos_in(2) = axpos_in(2)+addbottom;
-    set(gca,'Position',axpos_in)
+    %set axes position
+    ax(i).Units = 'inches';
+    ax(i).Position = [Xoff + rem(i-1,5)*(XmargW+Xwidth), ...
+        Yoff + floor((30-i)/5)*(YmargW+Yheight), Xwidth, Yheight];
+    %set colorbar position
+    c(i).Units = 'inches';
+    c(i).Position = ...
+        [Xoff + Xwidth + rem(i-1,5)*(XmargW+Xwidth) + Cbwidth, ...
+        Yoff + floor((30-i)/5)*(YmargW+Yheight) - Cbyroom, ...
+        Cbwidth, Yheight + Cbyroom*2];
+    %set colorbar tick labels
+    ctl = c(i).TickLabels;
+    c(i).TickLabels = [];
+    ctickpos = get(c(i),'Ticks');
+    ct(1) = text(0,0,ctl{1});
+    ct(1).Units = 'inches';
+    set(ct(1),'Units','Inches','Position', ...
+        [Xwidth + Cbwidth,0], ...
+        'FontSize',fs4,'VerticalAlignment','bottom', ...
+        'HorizontalAlignment','left','Color',[.25 .25 .25]);
+    ct(2) = text(0,0,ctl{2});
+    ct(2).Units = 'inches';
+    set(ct(2),'Units','Inches','Position', ...
+        [Xwidth + Cbwidth,Yheight + Cbyroom], ...
+        'FontSize',fs4,'VerticalAlignment','bottom', ...
+        'HorizontalAlignment','left','Color',[.25 .25 .25]);
+    %set subplot annotation
     ha = {'left','center','right'};
     va = {'bottom','middle','top'};
-    text(.975,.825,ann_sp{i},'Units','Normalized', ...
+    text(.975,.775,ann_sp{i},'Units','Normalized', ...
         'VerticalAlignment','bottom','FontWeight','normal', ...
         'HorizontalAlignment','right','FontSize',fs, ...
         'Color',[1 1 1]);
@@ -196,43 +201,32 @@ for i=1:length(array)
     end
 end
 
-%colormap and bar
-for i=1:length(array)        
-    lb(i) = a_min(i)/p_max(i);
-    colormap(ax(i),AdvancedColormap('kkgw glw lww r',1000, ...
-        [lb(i),lb(i)+.05*(1-lb(i)),lb(i)+0.15*(1-lb(i)),1]));
-    %c(i) = colorbar(ax(i));
-    %set(c(i).Label,'String','[$k]','Rotation',0,'Units','Pixels') 
-    %clabrspot = 38;
-    %clpos = get(c(i).Label,'Position');
-    %clpos(1) = clabrspot;
-    %set(c(i).Label,'Position',clpos)
-    set(ax(i),'CLim',[-inf p_max(i)])
-    %set(c(i),'Limits',[0 pmax(i)])
-    if i == 26
-        c = colorbar(ax(i),'location','southoutside');
-        cbtlabel = ...
-            {'\begin{tabular}{c} Global \\ Minimum \end{tabular}'; ...
-            '\begin{tabular}{c} Global \\ Maximum \end{tabular}'};
-        set(c,'Position',[.05 .045 .15 .01],'box','off', ...
-            'Limits',[a_min(i) a_max(i)],'Ticks',[a_min(i) a_max(i)], ...
-            'TickLabels',cbtlabel,'TickLabelInterpreter','latex', ...
-            'Color',[0 0 0],'LineWidth',.01,'FontSize',fs2)
-        set(c.Label,'String','Model Output [$]','FontSize',fs)
-        clabpos = get(c.Label,'Position');
-        clabpos(2) = clabpos(2)+8.5;
-        set(c.Label,'Position',clabpos)
-    end
-end
+%colorbar legend
+i = 26;
+cleg = colorbar(ax(i),'location','southoutside');
+cbtlabel = ...
+    {'\begin{tabular}{c} Objective Space \\ Minimum \end{tabular}'; ...
+    '\begin{tabular}{c} Objective Space \\ Maximum \end{tabular}'};
+set(cleg,'Position',[.775 .06 .15 .01],'box','off', ...
+    'Limits',[a_min(i) a_max(i)],'Ticks',[a_min(i) a_max(i)], ...
+    'TickLabels',cbtlabel,'TickLabelInterpreter','latex', ...
+    'Color',[0 0 0],'LineWidth',.01,'FontSize',fs2)
+set(cleg.Label,'String','Model Output [$]','FontSize',fs)
+cleg.Label.Units = 'normalized';
+clabpos = get(cleg.Label,'Position');
+clabpos(2) = 4;
+set(cleg.Label,'Position',clabpos)
 
 %add labels
-xlabdim = [0.2 -0.1 6 .5];
+axes(ax(28))
+xlabdim = [0.3 -0.75*Xoff];
 xlab = 'Battery Storage Capacity [kWh]';
-xl = annotation('textbox',[0 0 0 0],'String',xlab);
-set(xl,'Units','inches','Position',xlabdim,'FitBoxToText','on', ...
-    'HorizontalAlignment','center','FontSize',fs,'EdgeColor',[1 1 1]);
+xl = text(0,0,xlab);
+set(xl,'Units','inches','Position',xlabdim, ...
+    'HorizontalAlignment','center','FontSize',fs, ... 
+    'Rotation',0);
 axes(ax(16))
-ylabdim = [-0.6 .9];
+ylabdim = [-0.75*Xoff .75];
 ylab = 'WEC Rated Power Output [kW]';
 yl = text(0,0,ylab);
 set(yl,'Units','inches','Position',ylabdim, ...

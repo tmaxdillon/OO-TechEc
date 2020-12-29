@@ -65,8 +65,8 @@ elseif isequal(batchtype,'sens')
     opt.tuning_array = linspace(0,1.5,10);
     opt.tuned_parameter = 'wiv';
     econ.wave.scen = batchscen; 
-    opt.bf.m = 500;
-    opt.bf.n = 500;
+    opt.bf.m = 100;
+    opt.bf.n = 100;
     opt.allscenuses = 0;
     opt.alllocuses = 0;
     opt.sens = 1;

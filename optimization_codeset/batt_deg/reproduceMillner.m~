@@ -1,3 +1,0 @@
-for delta = 1:10:100; %depth of discharge
-    
-end
