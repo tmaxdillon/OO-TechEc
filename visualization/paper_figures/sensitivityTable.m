@@ -1,5 +1,5 @@
 close all
-clearvars -except array x0 t0 cost ta tp
+clearvars -except array_st x0 t0 cost ta tp
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
@@ -17,62 +17,62 @@ loadcell{8} = 'ssm_cp_lt.mat';
 loadcell{9} = 'ssm_is_lt.mat';
 loadcell{10} = 'ssm_so_lt.mat';
 
-if ~exist('array','var')
+if ~exist('array_st','var')
     for i = 1:10
         tic
         load([path loadcell{i}])
         %merge
-        array(16,:,i) = sdr;
+        array_st(16,:,i) = sdr;
         x0(16,i) = s0.batt.sdr;
-        array(15,:,i) = bbt;
+        array_st(15,:,i) = bbt;
         x0(15,i) = s0.batt.T;
-        array(14,:,i) = eol;
+        array_st(14,:,i) = eol;
         x0(14,i) = s0.batt.EoL;
-        array(13,:,i) = bcc;
+        array_st(13,:,i) = bcc;
         x0(13,i) = s0.batt.cost;
-        array(12,:,i) = dep;
+        array_st(12,:,i) = dep;
         x0(12,i) = s0.data.depth;
-        array(11,:,i) = utp;
+        array_st(11,:,i) = utp;
         x0(11,i) = s0.uc.uptime;
-        array(10,:,i) = lft;
-        x0(10,i) = s0.uc.lifetime;
-        array(9,:,i) = ild;
-        x0(9,i) = s0.uc.draw;
-        array(8,:,i) = bhc;
+        array_st(10,:,i) = ild;
+        x0(10,i) = s0.uc.draw;
+        array_st(9,:,i) = lft;
+        x0(9,i) = s0.uc.lifetime;
+        array_st(8,:,i) = bhc;
         x0(8,i) = s0.econ.batt.enclmult;
-        array(7,:,i) = whl;
+        array_st(7,:,i) = whl;
         x0(7,i) = s0.wave.house;
-        array(6,:,i) = wcm;
+        array_st(6,:,i) = wcm;
         if s0.econ.wave.scen == 2 %opt cost
             x0(6,i) = s0.econ.wave.costmult_opt;
         else
             x0(6,i) = s0.econ.wave.costmult_con;
         end
-        array(5,:,i) = wiv;
+        array_st(5,:,i) = wiv;
         if s0.econ.wave.scen == 3 %opt durability
             x0(5,i) = s0.econ.wave.lowfail;
         else
             x0(5,i) = s0.econ.wave.highfail;
         end
-        array(4,:,i) = spv;
+        array_st(4,:,i) = spv;
         x0(4,i) = s0.econ.vessel.speccost;
-        array(3,:,i) = tmt;
+        array_st(3,:,i) = tmt;
         if s0.c == 1 %short term
             x0(3,i) = s0.econ.vessel.t_ms;
         elseif s0.c == 2 %long term
             x0(3,i) = s0.econ.vessel.t_mosv;
         end
-        array(2,:,i) = osv;
+        array_st(2,:,i) = osv;
         x0(2,i) = s0.econ.vessel.osvcost;
-        array(1,:,i) = dtc;
+        array_st(1,:,i) = dtc;
         x0(1,i) = s0.data.dist;
         t0(i) = s0.output.min.cost; %total cost of base case
         for a = 1:16
-            ta(a,:,i) = array(a,1,i).opt.tuning_array;
+            ta(a,:,i) = array_st(a,1,i).opt.tuning_array;
         end
         disp(['Sensitivity ' num2str(i) ' loaded succesfully.'])
         toc
-        clearvars -except array x0 t0 cost loadcell path ta tp
+        clearvars -except array_st x0 t0 cost loadcell path ta tp
     end
     ta(1,:,:) = ta(1,:,:)./1000;
     ta(2,:,:) = ta(2,:,:)./1000;
@@ -80,7 +80,7 @@ if ~exist('array','var')
 end
 
 units = fliplr({' % month^{-1}',' %','^{\circ} C',' $k Wh^{-1}', ...
-    ' meters',' %',' year',' watts',' multiples',' %',' multiples', ...
+    ' meters',' %',' watts',' year',' multiples',' %',' multiples', ...
     ' failure',' $k day^{-1}',' hours',' $k day^{-1}',' kilometers'});
 
 rval = fliplr([1, 1, 1, -1, -1, 2, 0, 0, 2, 2, 1, 0, 0, 1, 1, -1]);
@@ -94,7 +94,7 @@ end
 for a = 1:16
     for i = 1:10
         for n = 1:10
-            cost(a,n,i) = array(a,n,i).output.min.cost;
+            cost(a,n,i) = array_st(a,n,i).output.min.cost;
         end
         ms(a,i) = mean(abs(diff(cost(a,:,i)/t0(i)))); %mean slope
         %ms(a,i) = mean(abs(diff(cost(a,:,i)))); %mean slope
@@ -129,7 +129,7 @@ xticks = 1.5:1:10.5;
 yticks = 1.5:1:16.5;
 ytl = {'Self-Discharge Rate','Battery Temperature', ...
     'Battery End of Life','Battery Cell Cost', ...
-    'Water Depth','Persistence Requirement','Lifetime','Power Draw', ...
+    'Water Depth','Persistence Requirement','Power Draw','Lifetime', ...
     'Battery Housing Cost','WEC Hotel Load','WEC Cost Multiplier', ...
     'WEC Failures','Specialized Vessel Cost','Maintenance Time', ...
     'Offshore Support Vessel Cost','Distance to Coast'};

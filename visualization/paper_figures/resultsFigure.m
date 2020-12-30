@@ -75,11 +75,11 @@ yaxhpos = -.25; %
 cmult = 1.35; %cost axis multiplier
 gmult = 1.9; %generation axis multiplier
 bmult = 2.1; %battery axis multiplier
-blmult = 3.1; %cycles axis multiplier 
+blmult = 3; %cycles axis multiplier 
 cfmult = 1.5; %capacity factor axis multiplier
 cbuff = 10; %cost text buffer
 gbuff = .23; %generation text buffer
-bbuff = 10;  %battery text buffer
+bbuff = 5;  %battery text buffer
 blbuff = 1.5; %battery cycle text buffer
 cfbuff = .05; %capacity factor text buffer
 
@@ -290,7 +290,7 @@ for c = 1:nu
         end
     end
     yl = yline(20,'--','Battery End of Life, \sigma_{EoL} = 20%', ...
-        'Color',[.6 0 0],'LabelVerticalAlignment', ...
+        'Color',[.9 0 .2],'LabelVerticalAlignment', ...
     'top','LabelHorizontalAlignment','left','FontSize',fs, ...
     'LineWidth',.75,'FontName','cmr10');
     if c == 2

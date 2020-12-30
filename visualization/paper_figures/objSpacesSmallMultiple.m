@@ -1,11 +1,11 @@
-clc, close all
+clc, close all, clear ax
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
 %load allStruct
-if ~exist('array','var')
+if ~exist('array_os','var')
     load('waveoptd')
     load('waveoptc')
     load('wavecons')
@@ -18,12 +18,12 @@ if ~exist('array','var')
         for s = 1:ns %scenario
             for l = 1:nl %location
                 i = l+nl*(s-1)+(ns*nl)*(c-1);
-                array(i) = allStruct(l,s,c);
+                array_os(i) = allStruct(l,s,c);
             end
         end
     end
 end
-clearvars -except array nc ns nl ax
+clearvars -except array_os nc ns nl ax
 
 %plot setup
 objSpacesSM = figure;
@@ -72,9 +72,9 @@ ann = { ...
     '\begin{tabular}{l} Long-Term \\ Optimistic \\ Cost \end{tabular}', ...
     '\begin{tabular}{l} Long-Term \\ Conservative \end{tabular}'};
 
-for i = 1:length(array)
+for i = 1:length(array_os)
     
-    optStruct = array(i);
+    optStruct = array_os(i);
     opt = optStruct.opt;
     output = optStruct.output;
     %adjust cost to thousands
@@ -146,7 +146,7 @@ for i = 1:length(array)
 end
 
 %reposition figures add labels
-for i=1:length(array)
+for i=1:length(array_os)
     axes(ax(i))
     %set axes position
     ax(i).Units = 'inches';

@@ -185,7 +185,7 @@ for a = 1:size(array_ssm,1)
 %     YTickString{2} = ['$$\begin{array}{c} \mathrm{Total} \\' ...
 %         '\mathrm{Cost} \\ \end{array}$$'];
       %percent tick labels
-    xt_yadj = -4;
+    xt_yadj = -6;
     ylim([.25 mean([max(squeeze(max(cost(:,:,:),[],1:2))./t0(:)) 1])])
     yticks([0 0.5 1])
     YTickString{1} = '0%';
@@ -249,7 +249,7 @@ for a = 1:size(array_ssm,1)
     elseif isequal(array_ssm(a,1).opt.tuned_parameter,'wcm')
         xlabel(({'WEC Cost','Multiplier'}),'FontSize',fs2)
     elseif isequal(array_ssm(a,1).opt.tuned_parameter,'wiv')
-        xlabel(({'WEC','Failures per Year'}),'FontSize',fs2)
+        xlabel(({'WEC Failures'}),'FontSize',fs2)
     elseif isequal(array_ssm(a,1).opt.tuned_parameter,'tmt')
         xlabel(({'Maintenance','Time [h]'}),'FontSize',fs2)
     elseif isequal(array_ssm(a,1).opt.tuned_parameter,'dtc')
