@@ -241,7 +241,7 @@ atmo.soil = 35;             %[%/year]
 %USE CASES
 %short term instrumentation
 uc(1).draw = 200;               %[W] - secondary node
-uc(1).lifetime = 7;             %[y]
+uc(1).lifetime = 5;             %[y]
 uc(1).SI = 6;                   %[months] service interval
 uc(1).uptime = .99;             %[%] uptime
 uc(1).turb.lambda = 4;          %turbine interventions

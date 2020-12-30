@@ -1,4 +1,4 @@
-clearvars -except wave_optd wave_optc wave_cons allStruct
+clearvars -except waveoptd waveoptc wavecons allStruct
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
@@ -289,8 +289,8 @@ for c = 1:nu
                 'FontSize',fs)
         end
     end
-    yl = yline(20,'--r','Battery End of Life, \sigma_{EoL} = 20%', ...
-        'LabelVerticalAlignment', ...
+    yl = yline(20,'--','Battery End of Life, \sigma_{EoL} = 20%', ...
+        'Color',[.6 0 0],'LabelVerticalAlignment', ...
     'top','LabelHorizontalAlignment','left','FontSize',fs, ...
     'LineWidth',.75,'FontName','cmr10');
     if c == 2
