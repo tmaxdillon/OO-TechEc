@@ -268,7 +268,7 @@ for a = 1:size(array_ssm,1)
     elseif isequal(array_ssm(a,1).opt.tuned_parameter,'bbt')
         xlabel(({'Battery','Temperature [C]'}),'FontSize',fs2)
     elseif isequal(array_ssm(a,1).opt.tuned_parameter,'eol')
-        xlabel(({'Battery','End of Life [%]'}),'FontSize',fs2)
+        xlabel(({'Battery','End of Life'}),'FontSize',fs2)
         xticklabels({'5%','27.5%'})
     end
     %set x axis label to a consistent position

@@ -107,14 +107,14 @@ end
 %[x_ms,y_ms] = meshgrid(1:11,1:17);
 
 %set middle colum width
-mcw = .075;
+mcw = ;
 
 %annotations
 tS = num2str(round(ms(:).*100,0,'decimal'),'%0.f'); %strings
 tS = strtrim(cellstr(tS)); %remove any space padding
 %tS = cellfun(@(c)['$' c 'k'],tS,'uni',false);
 tS = cellfun(@(c)[c '%'],tS,'uni',false);
-[x_t,y_t] = meshgrid((1:10)+1,(1:16)+1);
+[x_t,y_t] = meshgrid((1:10)+0.5+mcw,(1:16)+0.5+mcw);
 x_t(:,6:end) = x_t(:,6:end) + mcw;
 
 %add row, column and center column to mean slope matrix
@@ -123,7 +123,7 @@ ms = [ms ; zeros(1,c_ms)];
 ms = [ms zeros(r_ms+1,1)];
 ms = [ms(:,1:5) NaN(r_ms+1,1) ms(:,6:end)];
 [x_t_ms,y_t_ms] = meshgrid((1:12)+0.5,(1:17)+0.5);
-x_t_ms(:,7:end) = x_t_ms(:,7:end) - (1 - mcw);
+x_t_ms(:,7:end) = x_t_ms(:,7:end) - mcw;
 
 %colors
 nc = 1000;
@@ -134,9 +134,9 @@ cmap = cmap(round(nc*0.1):round(nc*0.6),:);
 fs1 = 8.5;
 fs2 = 10;
 fs3 = 12;
-xticks = 2:1:12;
-xticks(6:end) = xticks(6:end) - (1 - mcw);
-yticks = 2:1:17;
+xticks = 1.5:1:11.5;
+% xticks(6:end) = xticks(6:end) + mcw;
+yticks = 1.5:1:16.5;
 % [CW,RW] = meshgrid(xticks,yticks);
 ytl = {'Self-Discharge Rate','Battery Temperature', ...
     'Battery End of Life','Battery Cell Cost', ...
@@ -148,8 +148,7 @@ xtl = {'Argentine Basin: Short-Term', ...
     'Coastal Endurance: Short-Term', ...
     'Coastal Pioneer: Short-Term', ...
     'Irminger Sea: Short-Term', ...
-    'Southern Ocean: Short-Term', ...
-    '', ...
+    'Southern Ocean: Short-Term'...
     'Argentine Basin: Long-Term', ...
     'Coastal Endurance: Long-Term', ...    
     'Coastal Pioneer: Long-Term', ...    
@@ -179,11 +178,11 @@ t = text(zeros(1,16)',ytickpos',dx,'FontSize',fs2, ...
     'HorizontalAlignment','left','Interpreter','tex');
 for i = 1:length(t)
     set(t(i),'Units','normalized');
-    set(t(i),'Position', get(t(i),'Position')+[1.13+(mcw) 0 0]);
+    set(t(i),'Position', get(t(i),'Position')+[1.13 0 0]);
 end
 posdel1 = get(t(end),'Position');
 posdel2 = get(t(end-1),'Position');
-t = text(posdel1(1)+0.04,posdel1(2)+abs(posdel1(2)-posdel2(2)), ...
+t = text(posdel1(1)+0.01,posdel1(2)+abs(posdel1(2)-posdel2(2)), ...
     '\underline{Unit Step}','interpreter','latex','Units','normalized', ...
     'HorizontalAlignment','left','FontSize',fs3);
 

@@ -100,7 +100,7 @@ for i = 1:6
 end
 
 %plot setup
-lw1 = 0.3;
+lw1 = 0.2;
 lw2 = .5;
 lw3 = .5;
 ms = 4;
@@ -125,7 +125,6 @@ for i = size(cwr_int,3):-1:1
     a(i,2).FaceColor = col(i,:);
     a(i,2).FaceAlpha = 0.2;
     a(i,1).FaceAlpha = 0;
-    a(i,1).LineWidth = lw1;
     a(i,2).LineWidth = lw1;
     plot(Tp_all(inflex_ind(i),i),mean([cwr_int(1,inflex_ind(i),i) ...
         cwr_int(2,inflex_ind(i),i)]),'ko','MarkerSize',ms, ...
@@ -144,10 +143,10 @@ hYLabel.Position = [-.15, 0.5,0];
 xlim([0 15])
 ylim([0 .275])
 xticks(1:1:15)
-xticklabels({'','','','','5','','','','','10','','','','','15'})
+xticklabels({'','2','','4','5','','','','','10','','','','','15'})
 yticks(0:.1:.3)
 set(gca,'Units','Inches')
-set(gca,'Position',[1.25,0.45,4.75,1.5])
+set(gca,'Position',[1.25,0.5,4.75,1.25])
 %add arrow
 ax = gca;
 ax.Units = 'normalized';
@@ -173,5 +172,5 @@ legend([a(1,2) a(2,2) a(3,2) ...
 grid on
 set(gca,'FontSize',fs,'LineWidth',lw2)
 
-print(wscwr,'~/Dropbox (MREL)/Research/OO-TechEc/paper_figures/wscwr', '-dpng','-r600')
+print(wscwr,'../Research/OO-TechEc/paper_figures/wscwr', '-dpng','-r600')
 
