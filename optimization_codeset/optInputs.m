@@ -21,8 +21,8 @@ if ~exist('batchtype','var')
 end
 if isequal(batchtype,'ssm')
     econ.wave.scen = batchscen; %scenario indicator 1:C,2:OC,3:OD
-    opt.bf.m = 100;
-    opt.bf.n = 100;
+    opt.bf.m = 500;
+    opt.bf.n = 500;
     opt.allscenuses = 0;
     opt.alllocuses = 0;
     opt.sens = 0;
