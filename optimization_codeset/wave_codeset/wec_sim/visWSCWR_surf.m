@@ -71,11 +71,11 @@ for i = 1:2
     if i == 1
         sf = CWR;
         ann = tS;
-        ttl = 'Capture Width at All Sea States';
+        ttl = 'Capture Width Ratio at All Sea States';
     else
         sf = CWP_trim;
         ann = tS_trim;
-        ttl = 'Capture Width at Occurring Sea States';
+        ttl = 'Capture Width Ratio at Occurring Sea States';
     end
     
     %%interpolated surface
@@ -99,9 +99,9 @@ for i = 1:2
     colormap(ax(i),cmap(1:220,:))
     c = colorbar;
     c.Label.String = 'CWR';
-    %ylabel('Hs [m]')
-    %xlabel('Tp [s]')
-    %title(ttl)
+    ylabel('Hs [m]')
+    xlabel('Tp [s]')
+    title(ttl)
     zlim([0 1.1*max(CWR(:))])
     caxis([0 1.1*max(CWR(:))])
     set(gca,'FontSize',13)

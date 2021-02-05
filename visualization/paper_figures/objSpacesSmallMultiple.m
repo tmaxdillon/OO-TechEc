@@ -28,7 +28,7 @@ clearvars -except array_os nc ns nl ax
 %plot setup
 objSpacesSM = figure;
 set(gcf,'Units','inches','Color','w')
-set(gcf,'Position', [0.1, 1, 6.5, 5.5])
+set(gcf,'Position', [0.1, 1, 6.5, 5.75])
 % axcol = [.65 .65 .65];
 axcol = [0 0 0];
 lw = 0.45;
@@ -43,23 +43,24 @@ ytl = {'0.215','2','4'};
 xtpos = [1 150 300];
 xtl = {'1','150','300'};
 
-Xwidth = .65; %subplot width
+%WSC = with subplot colorbar
+Xwidth = .725; %WSC = .65
 Yheight = .65; 
-XmargW = 0.3;
-YmargW = 0.05;
-Yoff = 0.8;
-Xoff = 0.7;
+XmargW = 0.16; %WSC = .3
+YmargW = 0.1; %WSC = 0.05
+Yoff = .8; %WSC = 0.8
+Xoff = .95; %WSC = 0.7 ?
 Cbwidth = 0.03;
 Cbyroom = -0.1;
 
 xlabdshift = 2; %shift xlabel down
 ylablshift = 250; %shift ylabel left
 ylabdshift = 4; %shift ylabel down
-locations{1} = {'Argentine Basin'};
-locations{2} = {'Coastal Endurance'};
-locations{3} = {'Coastal Pioneer'};
-locations{4} = {'Irminger Sea'};
-locations{5} = {'Southern Ocean'};
+locations{1} = {'\begin{tabular}{c} Argentine \\ Basin \end{tabular}'};
+locations{2} = {'\begin{tabular}{c} Coastal \\ Endurance \end{tabular}'};
+locations{3} = {'\begin{tabular}{c} Coastal \\ Pioneer \end{tabular}'};
+locations{4} = {'\begin{tabular}{c} Irminger \\ Sea \end{tabular}'};
+locations{5} = {'\begin{tabular}{c} Southern \\ Ocean \end{tabular}'};
 ann_sp = {'(a)','(b)','(c)','(d)','(e)','(f)','(g)','(h)','(i)','(j)', ...
     '(k)','(l)','(m)','(n)','(o)','(p)','(q)','(r)','(s)','(t)','(u)', ...
     '(v)','(w)','(x)','(y)','(z)','(aa)','(ab)','(ac)','(ad)'};
@@ -108,14 +109,16 @@ for i = 1:length(array_os)
     %titles and annotations
     hold on
     if i < 6
-        tt = title(locations{i},'FontWeight','normal','FontSize',fs);
+        tt = title(locations{i},'FontWeight','normal','FontSize',fs, ...
+            'Interpreter','latex');
         tt.Position(2) = tt.Position(2)*1.25;
         tt.Units = 'normalized';
         tt.HorizontalAlignment = 'center';
         tt.Position(1) = 0.6;
     end
     if rem(i,nl) == 0
-        text(1.65,.5,ann{i/5},'Units','Normalized', ...
+        %orig = 1.65
+        text(1.55,.5,ann{i/5},'Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...
             'HorizontalAlignment','left','FontSize',fs, ...
             'Color','k','Interpreter','latex');
@@ -132,55 +135,77 @@ for i = 1:length(array_os)
     p_max(i) = max(max(sb.ZData(sb.YData(:,1) < Gr_max, ... 
         sb.XData(1,:) < Sm_max))); %plot max
     a_min(i) = min(a_sat(:));
-    
-    lb(i) = a_min(i)/p_max(i);
+    p_max_mult(i) = p_max(i)/a_min(i);
     lb(i) = 0;
-    colormap(ax(i),AdvancedColormap('kkgw glw lww r',1000, ...
-        [lb(i),lb(i)+.05*(1-lb(i)),lb(i)+0.15*(1-lb(i)),1]));
-    set(ax(i),'CLim',[a_min(i) p_max(i)])
-    c(i) = colorbar(ax(i),'location','eastoutside');
-    c(i).Ticks = [a_min(i) p_max(i)];
-    c(i).TickLabels = {['$' num2str(round(c(i).Ticks(1)/1000,2)) 'M'], ...
-        ['$' num2str(round(c(i).Ticks(2)/1000,2)) 'M']};
-    c(i).Box = 'off';
+    
+    %add circle
+    s = scatter3(output.min.Smax,output.min.kW,a_min(i)*2,18,'ko', ...
+        'MarkerEdgeAlpha',.8);
+    
+%     colormap(ax(i),AdvancedColormap('kkgw glw lww r',1000, ...
+%         [lb(i),lb(i)+.05*(1-lb(i)),lb(i)+0.15*(1-lb(i)),1]));
+%     set(ax(i),'CLim',[a_min(i) p_max(i)])
+%     c(i) = colorbar(ax(i),'location','eastoutside');
+%     c(i).Ticks = [a_min(i) p_max(i)];
+%     c(i).TickLabels = {['$' num2str(round(c(i).Ticks(1)/1000,2)) 'M'], ...
+%         ['$' num2str(round(c(i).Ticks(2)/1000,2)) 'M']};
+%     c(i).Box = 'off';
+    
 end
 
-%reposition figures add labels
+%add colorbar, reposition figures, add labels
 for i=1:length(array_os)
     axes(ax(i))
+    %set colorbar limits
+    if exist('p_max_mult','var')
+        colormap(ax(i),AdvancedColormap('kkgw glww lww r rrrk',1000, ...
+            [lb(i),lb(i)+.05*(1-lb(i)),lb(i)+0.15*(1-lb(i)),.75,1]));
+        set(ax(i),'CLim',[a_min(i) ceil(max(p_max_mult)*a_min(i))])
+%         c(i) = colorbar(ax(i),'location','eastoutside');
+%         c(i).Ticks = [a_min(i) p_max(i)];
+%         c(i).Limits = c(i).Ticks;
+%         c(i).TickLabels = {['$' num2str(round(c(i).Ticks(1)/1000,2)) 'M'], ...
+%             ['$' num2str(round(c(i).Ticks(2)/1000,2)) 'M']};
+%         c(i).Box = 'off';
+        %ax(i).CLim = [a_min(i) max(p_max_mult)*a_min(i)];
+    end
     %set axes position
     ax(i).Units = 'inches';
     ax(i).Position = [Xoff + rem(i-1,5)*(XmargW+Xwidth), ...
         Yoff + floor((30-i)/5)*(YmargW+Yheight), Xwidth, Yheight];
     %set colorbar position
-    c(i).Units = 'inches';
-    c(i).Position = ...
-        [Xoff + Xwidth + rem(i-1,5)*(XmargW+Xwidth) + Cbwidth, ...
-        Yoff + floor((30-i)/5)*(YmargW+Yheight) - Cbyroom, ...
-        Cbwidth, Yheight + Cbyroom*2];
-    %set colorbar tick labels
-    ctl = c(i).TickLabels;
-    c(i).TickLabels = [];
-    ctickpos = get(c(i),'Ticks');
-    ct(1) = text(0,0,ctl{1});
-    ct(1).Units = 'inches';
-    set(ct(1),'Units','Inches','Position', ...
-        [Xwidth + Cbwidth,0], ...
-        'FontSize',fs4,'VerticalAlignment','bottom', ...
-        'HorizontalAlignment','left','Color',[.25 .25 .25]);
-    ct(2) = text(0,0,ctl{2});
-    ct(2).Units = 'inches';
-    set(ct(2),'Units','Inches','Position', ...
-        [Xwidth + Cbwidth,Yheight + Cbyroom], ...
-        'FontSize',fs4,'VerticalAlignment','bottom', ...
-        'HorizontalAlignment','left','Color',[.25 .25 .25]);
+%     c(i).Units = 'inches';
+%     c(i).Position = ...
+%         [Xoff + Xwidth + rem(i-1,5)*(XmargW+Xwidth) + Cbwidth, ...
+%         Yoff + floor((30-i)/5)*(YmargW+Yheight) - Cbyroom, ...
+%         Cbwidth, Yheight + Cbyroom*2];
+%     %set colorbar tick labels
+%     ctl = c(i).TickLabels;
+%     c(i).TickLabels = [];
+%     ctickpos = get(c(i),'Ticks');
+%     ct(1) = text(0,0,ctl{1});
+%     ct(1).Units = 'inches';
+%     set(ct(1),'Units','Inches','Position', ...
+%         [Xwidth + Cbwidth,0], ...
+%         'FontSize',fs4,'VerticalAlignment','bottom', ...
+%         'HorizontalAlignment','left','Color',[.25 .25 .25]);
+%     ct(2) = text(0,0,ctl{2});
+%     ct(2).Units = 'inches';
+%     set(ct(2),'Units','Inches','Position', ...
+%         [Xwidth + Cbwidth,Yheight + Cbyroom], ...
+%         'FontSize',fs4,'VerticalAlignment','bottom', ...
+%         'HorizontalAlignment','left','Color',[.25 .25 .25]);
     %set subplot annotation
     ha = {'left','center','right'};
     va = {'bottom','middle','top'};
-    text(.975,.775,ann_sp{i},'Units','Normalized', ...
+    tasp = text(.975,.775,ann_sp{i},'Units','Normalized', ...
         'VerticalAlignment','bottom','FontWeight','normal', ...
         'HorizontalAlignment','right','FontSize',fs, ...
         'Color',[1 1 1]);
+    %change annotation green background
+    if p_max_mult(i) < 4
+        tasp.Color = [0 0 0];
+    end
     %y axes
     if rem(i,nl) == 1
         t = text(zeros(1,length(ytpos)),ytpos, ytl, ...
@@ -203,12 +228,25 @@ end
 
 %colorbar legend
 i = 26;
+% cleg = colorbar(ax(i),'location','southoutside');
+% cbtlabel = ...
+%     {'\begin{tabular}{c} Objective Space \\ Minimum \end{tabular}'; ...
+%     '\begin{tabular}{c} Objective Space \\ Maximum \end{tabular}'};
+% set(cleg,'Position',[.775 .06 .15 .01],'box','off', ...
+%     'Limits',[a_min(i) a_max(i)],'Ticks',[a_min(i) a_max(i)], ...
+%     'TickLabels',cbtlabel,'TickLabelInterpreter','latex', ...
+%     'Color',[0 0 0],'LineWidth',.01,'FontSize',fs2)
+% set(cleg.Label,'String','Model Output [$]','FontSize',fs)
+% cleg.Label.Units = 'normalized';
+% clabpos = get(cleg.Label,'Position');
+% clabpos(2) = 4;
+% set(cleg.Label,'Position',clabpos)
+i = 26;
 cleg = colorbar(ax(i),'location','southoutside');
-cbtlabel = ...
-    {'\begin{tabular}{c} Objective Space \\ Minimum \end{tabular}'; ...
-    '\begin{tabular}{c} Objective Space \\ Maximum \end{tabular}'};
-set(cleg,'Position',[.775 .06 .15 .01],'box','off', ...
-    'Limits',[a_min(i) a_max(i)],'Ticks',[a_min(i) a_max(i)], ...
+cbtlabel = {'min','2min','3min','4min','5min','6min'};
+set(cleg,'Position',[.7 .06 .25 .01],'box','off', ...
+    'Limits',[a_min(i) ceil(max(p_max_mult))*a_min(i)],'Ticks', ...
+    linspace(a_min(i),ceil(max(p_max_mult))*a_min(i),6), ...
     'TickLabels',cbtlabel,'TickLabelInterpreter','latex', ...
     'Color',[0 0 0],'LineWidth',.01,'FontSize',fs2)
 set(cleg.Label,'String','Model Output [$]','FontSize',fs)
@@ -219,7 +257,7 @@ set(cleg.Label,'Position',clabpos)
 
 %add labels
 axes(ax(28))
-xlabdim = [0.3 -0.75*Xoff];
+xlabdim = [0.3 -0.5*Xoff];
 xlab = 'Battery Storage Capacity [kWh]';
 xl = text(0,0,xlab);
 set(xl,'Units','inches','Position',xlabdim, ...
