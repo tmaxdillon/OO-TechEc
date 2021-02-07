@@ -8,8 +8,6 @@ function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst, ...
 % kW = 0.2306;
 % Smax = 296;
 ID = [kW Smax];
-temp = linspace(uc.draw/2,uc.draw*2,10);
-uc.draw = temp(5);
 
 %if fmin is suggesting a negative input, block it
 if opt.fmin && Smax < 0 || kW < 0
