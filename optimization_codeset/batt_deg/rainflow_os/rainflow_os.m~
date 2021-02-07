@@ -156,10 +156,7 @@ end
 end
 end
 
-%hard code in avoidance of error -trent
-if j+1 > length(ext)
-    j = length(ext) - 1;
-end
+if j > 
 
 for index=1:j
 ampl=abs(ext(index)-ext(index+1))/2;
