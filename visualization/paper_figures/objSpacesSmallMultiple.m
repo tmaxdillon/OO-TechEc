@@ -44,12 +44,12 @@ xtpos = [1 150 300];
 xtl = {'1','150','300'};
 
 %WSC = with subplot colorbar
-Xwidth = .725; %WSC = .65
+Xwidth = .65; %WOSC = .725
 Yheight = .65; 
-XmargW = 0.16; %WSC = .3
-YmargW = 0.1; %WSC = 0.05
-Yoff = .8; %WSC = 0.8
-Xoff = .95; %WSC = 0.7 ?
+XmargW = 0.3; %WOSC = .16
+YmargW = 0.05; %WOSC = 0.1
+Yoff = .8; %WOSC = 0.8
+Xoff = .7; %WOSC = 0.95 ?
 Cbwidth = 0.03;
 Cbyroom = -0.1;
 
@@ -161,40 +161,40 @@ for i=1:length(array_os)
         colormap(ax(i),AdvancedColormap('kkgw glww lww r rrrk',1000, ...
             [lb(i),lb(i)+.05*(1-lb(i)),lb(i)+0.15*(1-lb(i)),.75,1]));
         set(ax(i),'CLim',[a_min(i) ceil(max(p_max_mult)*a_min(i))])
-%         c(i) = colorbar(ax(i),'location','eastoutside');
-%         c(i).Ticks = [a_min(i) p_max(i)];
-%         c(i).Limits = c(i).Ticks;
-%         c(i).TickLabels = {['$' num2str(round(c(i).Ticks(1)/1000,2)) 'M'], ...
-%             ['$' num2str(round(c(i).Ticks(2)/1000,2)) 'M']};
-%         c(i).Box = 'off';
-        %ax(i).CLim = [a_min(i) max(p_max_mult)*a_min(i)];
+        c(i) = colorbar(ax(i),'location','eastoutside');
+        c(i).Ticks = [a_min(i) p_max(i)];
+        c(i).Limits = c(i).Ticks;
+        c(i).TickLabels = {['$' num2str(round(c(i).Ticks(1)/1000,2)) 'M'], ...
+            ['$' num2str(round(c(i).Ticks(2)/1000,2)) 'M']};
+        c(i).Box = 'off';
+        ax(i).CLim = [a_min(i) max(p_max_mult)*a_min(i)];
     end
     %set axes position
     ax(i).Units = 'inches';
     ax(i).Position = [Xoff + rem(i-1,5)*(XmargW+Xwidth), ...
         Yoff + floor((30-i)/5)*(YmargW+Yheight), Xwidth, Yheight];
     %set colorbar position
-%     c(i).Units = 'inches';
-%     c(i).Position = ...
-%         [Xoff + Xwidth + rem(i-1,5)*(XmargW+Xwidth) + Cbwidth, ...
-%         Yoff + floor((30-i)/5)*(YmargW+Yheight) - Cbyroom, ...
-%         Cbwidth, Yheight + Cbyroom*2];
-%     %set colorbar tick labels
-%     ctl = c(i).TickLabels;
-%     c(i).TickLabels = [];
-%     ctickpos = get(c(i),'Ticks');
-%     ct(1) = text(0,0,ctl{1});
-%     ct(1).Units = 'inches';
-%     set(ct(1),'Units','Inches','Position', ...
-%         [Xwidth + Cbwidth,0], ...
-%         'FontSize',fs4,'VerticalAlignment','bottom', ...
-%         'HorizontalAlignment','left','Color',[.25 .25 .25]);
-%     ct(2) = text(0,0,ctl{2});
-%     ct(2).Units = 'inches';
-%     set(ct(2),'Units','Inches','Position', ...
-%         [Xwidth + Cbwidth,Yheight + Cbyroom], ...
-%         'FontSize',fs4,'VerticalAlignment','bottom', ...
-%         'HorizontalAlignment','left','Color',[.25 .25 .25]);
+    c(i).Units = 'inches';
+    c(i).Position = ...
+        [Xoff + Xwidth + rem(i-1,5)*(XmargW+Xwidth) + Cbwidth, ...
+        Yoff + floor((30-i)/5)*(YmargW+Yheight) - Cbyroom, ...
+        Cbwidth, Yheight + Cbyroom*2];
+    %set colorbar tick labels
+    ctl = c(i).TickLabels;
+    c(i).TickLabels = [];
+    ctickpos = get(c(i),'Ticks');
+    ct(1) = text(0,0,ctl{1});
+    ct(1).Units = 'inches';
+    set(ct(1),'Units','Inches','Position', ...
+        [Xwidth + Cbwidth,0], ...
+        'FontSize',fs4,'VerticalAlignment','bottom', ...
+        'HorizontalAlignment','left','Color',[0 0 0]);
+    ct(2) = text(0,0,ctl{2});
+    ct(2).Units = 'inches';
+    set(ct(2),'Units','Inches','Position', ...
+        [Xwidth + Cbwidth,Yheight + Cbyroom], ...
+        'FontSize',fs4,'VerticalAlignment','bottom', ...
+        'HorizontalAlignment','left','Color',[0 0 0]);
     %set subplot annotation
     ha = {'left','center','right'};
     va = {'bottom','middle','top'};
@@ -203,7 +203,7 @@ for i=1:length(array_os)
         'HorizontalAlignment','right','FontSize',fs, ...
         'Color',[1 1 1]);
     %change annotation green background
-    if p_max_mult(i) < 4
+    if p_max_mult(i) < 3.5
         tasp.Color = [0 0 0];
     end
     %y axes

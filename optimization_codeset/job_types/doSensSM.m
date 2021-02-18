@@ -26,7 +26,7 @@ elseif pm == 3 %wave
 %     tp{1} = 'cwm'; %capture width multiplier [WEC]
 %     ta(1,:) = linspace(0.5,5,n);
     tp{1} = 'wiv'; %wec interventions/year [WEC]
-    ta(1,:) = linspace(0,1.5,n);
+    ta(1,:) = linspace(0,2.25,n);
     tp{2} = 'wcm'; %wec cost multiplier [WEC]
     ta(2,:) = linspace(2,14,n);
     tp{3} = 'whl'; %wec hotel load [WEC]
