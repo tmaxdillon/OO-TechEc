@@ -1,9 +1,8 @@
 clearvars -except allStruct
-
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
-set(0,'DefaultTextFontname', 'calibri')
-set(0,'DefaultAxesFontName', 'calibri')
+set(0,'DefaultTextFontname', 'cmr10')
+set(0,'DefaultAxesFontName', 'cmr10')
 
 if ~exist('allStruct','var')
     load('wind')
@@ -94,31 +93,32 @@ end
 %plotting setup
 comparison_results = figure;
 set(gcf,'Units','inches')
-set(gcf, 'Position', [1, 1, 10, 12])
-fs = 9; %annotation font size
-fs2 = 11; %axis font size
+set(gcf, 'Position', [1, 1, 6.5, 5.5])
+fs = 6; %annotation font size
+fs2 = 8; %axis font size
+fs3 = 4; %eol font size
 yaxhpos = -.25; %
-cmult = 1.4; %cost axis multiplier
-gmult = 1.8; %generation axis multiplier
-bmult = 2; %battery axis multiplier
-cymult = 1.75; %cycles axis multiplier 
-cfmult = 1.4; %capacity factor axis multiplier
-cbuff = 5; %cost text buffer
-gbuff = 1.5; %generation text buffer
-bbuff = 12.5;  %battery text buffer
-cybuff = 150; %battery cycle text buffer
-cfbuff = .03; %capacity factor text buffer
+cmult = 1.1; %cost axis multiplier
+gmult = 1.9; %generation axis multiplier
+bmult = 2.1; %battery axis multiplier
+blmult = 3; %cycles axis multiplier 
+cfmult = 1.5; %capacity factor axis multiplier
+cbuff = 10; %cost text buffer
+gbuff = 2; %generation text buffer
+bbuff = 3;  %battery text buffer
+blbuff = 1.5; %battery cycle text buffer
+cfbuff = .05; %capacity factor text buffer
 
 %titles and labels
-stt = {'Short-Term Instrumentation';'(six month service interval)'};
-ltt = {'Long-Term Instrumentation';'(no service interval)'};
+stt = {'Short-Term Instrumentation'};
+ltt = {'Long-Term Instrumentation'};
 titles = {stt,ltt};
 xlab = {'\begin{tabular}{l} Argentine \\ Basin \end{tabular}'; ...
     '\begin{tabular}{l} Coastal \\ Endurance \end{tabular}'; ...
     '\begin{tabular}{l} Coastal \\ Pioneer \end{tabular}'; ...
     '\begin{tabular}{l} Irminger \\ Sea \end{tabular}'; ...
     '\begin{tabular}{l} Southern \\ Ocean \end{tabular}'};
-pms = {'Solar','Diesel','Wave (Optimal Cost Scenario)','Wind'};
+pms = {'Solar','Diesel','Wave','Wind'};
 leg = {'Mooring','Gen CapEx','Battery CapEx','Gen OpEx', ...
     'Battery OpEx','Vessel'};
 
@@ -149,7 +149,7 @@ groupOffset = MaxGroupWidth/NumStacksPerGroup;
 %plot
 for c = 1:nu
     
-    ax(1,c) = subplot(7,nu,c+[0 2 4]);
+    ax(1,c) = subplot(5,nu,c+[0 2 4]);
     hold on
     for i = 1:NumStacksPerGroup
         Y = squeeze(costdata(:,i,:,c));
@@ -170,11 +170,11 @@ for c = 1:nu
         for lay = 1:cols
             h(i,lay,c).CData = col(lay,:);
         end
-        if c == 2 && i == np
+        if c == 1 && i == np
             leg = legend(h(i,:,c),leg,'Location','northeast');
             leg.FontSize = fs;
-%             leg.Position(1) = .775;
-%             leg.Position(2) = .840;
+%             leg.Position(1) = .2;
+%             leg.Position(2) = .72;
         end
     end
     hold off;
@@ -201,7 +201,7 @@ for c = 1:nu
     ylim([0 cmult*max(max(max(sum(costdata,3))))])
     linkaxes(ax(1,:),'y')
     
-    ax(2,c) = subplot(7,nu,6+c);
+    ax(2,c) = subplot(5,nu,6+c);
     hold on
     for i = 1:NumStacksPerGroup
         Y = squeeze(gendata(:,i,:,c));
@@ -241,7 +241,7 @@ for c = 1:nu
     ylim([0 gmult*max(gendata(:))])
     linkaxes(ax(2,:),'y')
     
-    ax(3,c) = subplot(7,nu,8+c);
+    ax(3,c) = subplot(5,nu,8+c);
     hold on
     for i = 1:NumStacksPerGroup
         Y = squeeze(stordata(:,i,:,c));
@@ -265,7 +265,7 @@ for c = 1:nu
     set(gca,'XTickMode','manual');
     set(gca,'XTick',1:NumGroupsPerAxis);
     set(gca,'XTickLabelMode','manual');
-    %set(gca,'XTickLabel',opt.locations);
+    set(gca,'XTickLabel',xlab,'TickLabelInterpreter','latex');
     set(gca,'FontSize',fs2)
     xtickangle(45)
     if c == 1
@@ -279,87 +279,10 @@ for c = 1:nu
     end
     grid on
     ylim([0 bmult*max(stordata(:))])
-    set(gca,'YTick',[0 100 200 300 400])
+    set(gca,'YTick',[0 20 40 60 80 100])
     linkaxes(ax(3,:),'y')
     
-    ax(4,c) = subplot(7,nu,10+c);
-    hold on
-    for i = 1:NumStacksPerGroup
-        Y = squeeze(Ldata(:,i,:,c));
-        internalPosCount = i - ((NumStacksPerGroup+1) / 2);
-        groupDrawPos = (internalPosCount)* groupOffset + groupBins;
-        h4(i,c) = bar(Y, 'stacked','FaceColor','flat');
-        set(h4(i,c),'BarWidth',groupOffset);
-        set(h4(i,c),'XData',groupDrawPos);
-        h4(i,c).CData = cycol/256;
-        x = get(h4(i,c),'XData');
-        for j = 1:length(Y)
-            tx = round(Y(j),1);
-            text(x(j),Y(j)+cybuff,num2str(tx), ...
-                'Rotation',90, ...
-                'HorizontalAlignment','left', ...
-                'verticalAlignment','middle', ...
-                'FontSize',fs)
-        end
-    end
-    hold off;
-    set(gca,'XTickMode','manual');
-    set(gca,'XTick',1:NumGroupsPerAxis);
-    set(gca,'XTickLabelMode','manual');
-    set(gca,'FontSize',fs2)
-    %set(gca,'XTickLabel',opt.locations);
-    xtickangle(45)
-    if c == 1
-        ylabel({'Battery','Capacity','Fade','[%]'},'FontSize',fs2);
-        ylh = get(gca,'ylabel');
-        set(ylh,'Rotation',0,'Units', ...
-            'Normalized','Position',[yaxhpos .5 -1], ...
-            'VerticalAlignment','middle', ...
-            'HorizontalAlignment','center')
-    end
-    grid on
-    ylim([0 cymult*max(Ldata(:))])
-    linkaxes(ax(4,:),'y')
-    
-    ax(5,c) = subplot(7,nu,12+c);
-    hold on
-    for i = 1:NumStacksPerGroup
-        Y = squeeze(cfdata(:,i,:,c));
-        internalPosCount = i - ((NumStacksPerGroup+1) / 2);
-        groupDrawPos = (internalPosCount)* groupOffset + groupBins;
-        h5(i,c) = bar(Y, 'stacked','FaceColor','flat');
-        set(h5(i,c),'BarWidth',groupOffset);
-        set(h5(i,c),'XData',groupDrawPos);
-        h5(i,c).CData = cfcol/256;
-        x = get(h5(i,c),'XData');
-        for j = 1:length(Y)
-            tx = round(Y(j),2);
-            text(x(j),Y(j)+cfbuff,num2str(tx), ...
-                'Rotation',90, ...
-                'HorizontalAlignment','left', ...
-                'verticalAlignment','middle', ...
-                'FontSize',fs)
-        end
-    end
-    hold off;
-    set(gca,'XTickMode','manual');
-    set(gca,'XTick',1:NumGroupsPerAxis);
-    set(gca,'XTickLabelMode','manual');
-    set(gca,'FontSize',fs2)
-    set(gca,'XTickLabel',xlab,'TickLabelInterpreter','latex');
-    xtickangle(45)
-    if c == 1
-        ylabel({'Capacity','Factor'},'FontSize',fs2);
-        ylh = get(gca,'ylabel');
-        set(ylh,'Rotation',0,'Units', ...
-            'Normalized','Position',[yaxhpos .5 -1], ...
-            'VerticalAlignment','middle', ...
-            'HorizontalAlignment','center')
-    end
-    grid on
-    ylim([0 cfmult*max(cfdata(:))])
-    linkaxes(ax(5,:),'y')
-    
 end
+
 print(comparison_results,['~/Dropbox (MREL)/Research/OO-TechEc/' ...
-    'paper_figures/comparison_results'],'-dpng','-r600')
+    'paper_figures/comparison_results_genex'],'-dpng','-r600')
