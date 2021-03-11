@@ -6,10 +6,10 @@ set(0,'DefaultTextFontname', 'calibri')
 set(0,'DefaultAxesFontName', 'calibri')
 
 if ~exist('allStruct','var')
-    load('wave_optd')
-    load('wave_optc')
-    load('wave_cons')
-    allStruct = mergeWaWaWa(wave_optd,wave_optc,wave_cons);
+    load('waveoptd')
+    load('waveoptc')
+    load('wavecons')
+    allStruct = mergeWaWaWa(waveoptd,waveoptc,wavecons);
 end
 
 np = 3; %number of power modules
@@ -47,8 +47,8 @@ for loc = 1:nl
                 allStruct(fixer(loc),pm,c).output.min.kW;
             stordata(loc,pm,1,c) = ...
                 allStruct(fixer(loc),pm,c).output.min.Smax;
-            cycdata(loc,pm,1,c) = ...
-                allStruct(fixer(loc),pm,c).output.min.cyc60*(1/7)*(365/12);
+            Ldata(loc,pm,1,c) = ...
+                 100*max(allStruct(fixer(loc),pm,c).output.min.batt_L);
             cfdata(loc,pm,1,c) = ...
                 allStruct(fixer(loc),pm,c).output.min.CF;
             massdata(loc,pm,1,c) = ...
@@ -71,17 +71,17 @@ yaxhpos = -.25; %
 cmult = 1.35; %cost axis multiplier
 gmult = 1; %generation axis multiplier
 bmult = 1; %battery axis multiplier
-cymult = 1; %cycles axis multiplier 
+blmult = 3; %battery cycle axis multiplier 
 cfmult = 1; %capacity factor axis multiplier
 cbuff = 20; %cost text buffer
 gbuff = .25; %generation text buffer
 bbuff = 15;  %battery text buffer
-cybuff = 1.5; %battery cycle text buffer
+blbuff = 1.5; %battery cycle text buffer
 cfbuff = .025; %capacity factor text buffer
 
 %titles and labels
-stt = {'Short-Term Instrumentation';'(six month service interval)'};
-ltt = {'Long-Term Instrumentation';'(no service interval)'};
+stt = {'Short-Term Instrumentation';'(planned interventions every six months)'};
+ltt = {'Long-Term Instrumentation';'(no planned interventions)'};
 titles = {stt,ltt};
 xlab = {'\begin{tabular}{l} Argentine \\ Basin \end{tabular}'; ...
     '\begin{tabular}{l} Coastal \\ Endurance \end{tabular}'; ...
@@ -207,7 +207,7 @@ for c = 1:nu
     end
     grid on
     %ylim([0 gmult*max(gendata(:))])
-    ylim([0 4.5])
+    ylim([0 3])
     set(gca,'YTick',[0 1 2 3 4 5])
     linkaxes(ax(2,:),'y')
     
@@ -250,14 +250,14 @@ for c = 1:nu
     end
     grid on
     %ylim([0 bmult*max(stordata(:))])
-    ylim([0 300])
+    ylim([0 60])
     %set(gca,'YTick',[0 100 200 300 400])
     linkaxes(ax(3,:),'y')
     
     ax(4,c) = subplot(7,nu,10+c);
     hold on
     for i = 1:NumStacksPerGroup
-        Y = squeeze(cycdata(:,i,:,c));
+        Y = squeeze(Ldata(:,i,:,c));
         internalPosCount = i - ((NumStacksPerGroup+1) / 2);
         groupDrawPos = (internalPosCount)* groupOffset + groupBins;
         h4(i,c) = bar(Y, 'stacked','FaceColor','flat');
@@ -274,17 +274,24 @@ for c = 1:nu
 %                 'FontSize',fs)
         end
     end
+    yl = yline(20,'--','Battery End of Life, \sigma_{EoL} = 20%', ...
+        'Color',[.9 0 .2],'LabelVerticalAlignment', ...
+    'top','LabelHorizontalAlignment','left','FontSize',fs, ...
+    'LineWidth',.75,'FontName','cmr10');
+    if c == 2
+        yl.Label = '';
+    end
     hold off;
     set(gca,'XTickMode','manual');
     set(gca,'XTick',1:NumGroupsPerAxis);
     set(gca,'XTickLabelMode','manual');
     set(gca,'FontSize',fs2)
-    %set(gca,'XTickLabel',opt.locations);
+    set(gca,'XTickLabel',[]);
     xtickangle(45)
     set(gca,'Units','pixels')
     axpos(4,c,:) = get(gca,'Position');
     if c == 1
-        ylabel({'60%-','Discharge','Cycles','per','Month'},'FontSize',fs2);
+        ylabel({'Battery','Capacity','Fade','[%]'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
         set(ylh,'Rotation',0,'Units', ...
             'Normalized','Position',[yaxhpos .5 -1], ...
@@ -292,7 +299,7 @@ for c = 1:nu
             'HorizontalAlignment','center')
     end
     grid on
-    ylim([0 cymult*max(cycdata(:))])
+    ylim([0 blmult*max(Ldata(:))])
     linkaxes(ax(4,:),'y')
     
     ax(5,c) = subplot(7,nu,12+c);
@@ -349,6 +356,9 @@ end
 % legpos(1) = 0.78;
 % legpos = 1;
 
-print(hl_results,'../Research/OO-TechEc/pf3/hl_results',  ...
+set(gcf, 'Color',[255 255 245]/256,'InvertHardCopy','off')
+set(ax,'Color',[255 255 245]/256)
+print(hl_results,['~/Dropbox (MREL)/Research/General Exam/' ...
+    'pf/results_hl'],  ...
     '-dpng','-r600')
 

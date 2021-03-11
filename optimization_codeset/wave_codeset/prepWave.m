@@ -7,7 +7,7 @@ Hs = data.wave.significant_wave_height; %[m]
 Tp = data.wave.peak_wave_period; %[s]
 opt.wave.wavepower_ts = (1/(16*4*pi))*atmo.rho_w*atmo.g^2* ...
     Hs.^2.*Tp./1000; %[kW/m] %timeseries of wavepower
-opt.wave.L = atmo.g.*Tp.^2/(2*pi); %wavelength timeseries
+opt.wave.L = atmo.g.*Tp.^2/(2*pi); %wavelength timeseri
 
 %extend wavepower, time, hs, tp and wavelength timeseries
 [opt.wave.wavepower_ts,opt.wave.time] =  ...

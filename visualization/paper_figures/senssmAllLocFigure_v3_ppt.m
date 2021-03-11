@@ -320,6 +320,11 @@ hL = legend(locs,'location','eastoutside','Box','off', ...
 newPosition = [0.25 0.075 0.5 0];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits,'FontSize',fs1);
-print(gcf,['~/Dropbox (MREL)/Research/OO-TechEc/paper_figures/' ...
-    'ssm_allscen'],'-dmeta','-r600')
+
+
+set(gcf, 'Color',[255 255 245]/256,'InvertHardCopy','off')
+set(ax,'Color',[255 255 245]/256)
+print(ssm_allscen,'~/Dropbox (MREL)/Research/General Exam/pf/ssm',  ...
+    '-dpng','-r600')
+
 

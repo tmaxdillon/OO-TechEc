@@ -11,7 +11,7 @@ opt.p_dev.d_burn = calcDeviceVal('dieselburn',[],econ.diesburn_n);
 
 
 if pm == 1 %WIND
-    data = prepWind(data,uc);
+    data = prepWind(data,turb,atmo,uc);
     [output,opt] = optWind(opt,data,atmo,batt,econ,uc,bc,turb);
 elseif pm == 2 %SOLAR
     data = prepInso(data,inso,uc);

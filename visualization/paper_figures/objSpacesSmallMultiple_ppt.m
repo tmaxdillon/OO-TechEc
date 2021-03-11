@@ -89,10 +89,10 @@ for i = 1:length(array_os)
     a_sat(output.surv == 0) = nan; 
     
     ax(i) = subplot(nc*ns,nl,i);
-    sb = surf(Smaxgrid,kWgrid,output.cost,1.*ones(length(Smaxgrid), ...
-        length(kWgrid),3)); %white
-%     colordata = permute(repmat([255 255 245]'./256,[1,500,500]),[3 2 1]);
-%     sb = surf(Smaxgrid,kWgrid,output.cost,colordata); %offwhite
+    %     sb = surf(Smaxgrid,kWgrid,output.cost,1.*ones(length(Smaxgrid), ...
+    %         length(kWgrid),3)); %white
+    colordata = permute(repmat([255 255 245]'./256,[1,500,500]),[3 2 1]);
+    sb = surf(Smaxgrid,kWgrid,output.cost,colordata); %offwhite
     sb.EdgeColor = 'none';
     sb.FaceColor = 'flat';
     hold on
@@ -274,7 +274,8 @@ set(yl,'Units','inches','Position',ylabdim, ...
     'Rotation',90);
 
 set(gcf, 'Color',[255 255 245]/256,'InvertHardCopy','off') %offwhite
-print(objSpacesSM,['~/Dropbox (MREL)/Research/OO-TechEc/' ...
-    'paper_figures/objspacessm'],'-dpng','-r600')
+print(objSpacesSM, ...
+    '~/Dropbox (MREL)/Research/General Exam/pf/objspacesSM', ...
+    '-dpng','-r600')
 
 

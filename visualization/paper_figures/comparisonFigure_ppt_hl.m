@@ -1,4 +1,5 @@
 clearvars -except allStruct
+close all
 
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
@@ -7,10 +8,10 @@ set(0,'DefaultAxesFontName', 'calibri')
 
 if ~exist('allStruct','var')
     load('wind')
-    load('wave_optc')
+    load('waveoptc')
     load('inso')
     load('dies')
-    allStruct = mergeWiWaDiIn(wind,wave_optc,dies,inso);
+    allStruct = mergeWiWaDiIn(wind,waveoptc,dies,inso);
     %rearrange
     asadj(:,1,:) = allStruct(:,4,:);
     asadj(:,2,:) = allStruct(:,3,:);
@@ -28,7 +29,7 @@ nu = size(allStruct,3); %number of use cases
 costdata = zeros(nl,np,nc,nu);
 gendata = zeros(nl,np,1,nu);
 stordata = zeros(nl,np,1,nu);
-cycdata = zeros(nl,np,1,nu);
+Ldata = zeros(nl,np,1,nu);
 cfdata = zeros(nl,np,1,nu);
 massdata = zeros(nl,np,1,nu);
 dpdata = zeros(nl,np,1,nu);
@@ -77,7 +78,8 @@ for loc = 1:nl
             end
             gendata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.kW;
             stordata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.Smax;
-            cycdata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.cyc60;
+            Ldata(loc,pm,1,c) = ...
+                100*max(allStruct(loc,pm,c).output.min.batt_L);
             cfdata(loc,pm,1,c) = allStruct(loc,pm,c).output.min.CF;
             massdata(loc,pm,1,c) = ...
                 1000*allStruct(loc,pm,c).output.min.Smax/ ...
@@ -97,12 +99,12 @@ yaxhpos = -.25; %
 cmult = 1.15; %cost axis multiplier
 gmult = 1.8; %generation axis multiplier
 bmult = 2; %battery axis multiplier
-cymult = 1.75; %cycles axis multiplier 
+blmult = 3; %battery cycle axis multiplier 
 cfmult = 1.4; %capacity factor axis multiplier
 cbuff = 5; %cost text buffer
 gbuff = 1.5; %generation text buffer
-bbuff = 12.5;  %battery text buffer
-cybuff = 150; %battery cycle text buffer
+bbuff = 3;  %battery text buffer
+blbuff = 1.5; %battery cycle text buffer
 cfbuff = .03; %capacity factor text buffer
 
 %titles and labels
@@ -167,12 +169,12 @@ for c = 1:nu
         for lay = 1:cols
             h(i,lay,c).CData = col(lay,:,i);
         end
-        if c == 2 && i == np
-%             leg = legend(h(i,:,c),leg,'Location','northeast');
-%             leg.FontSize = fs2;
-%             leg.Position(1) = .7;
-%             leg.Position(2) = .85;
-%             legpos = leg.Position;
+        if c == 1 && i == np
+            leg = legend(h(:,1,c),pms,'Location','northeast');
+            leg.FontSize = fs2;
+            leg.Position(1) = .35;
+            leg.Position(2) = .8;
+            leg.Color = [255 255 245]/256;
         end
     end
     hold off;
@@ -239,6 +241,7 @@ for c = 1:nu
     end
     grid on
     ylim([0 gmult*max(gendata(:))])
+    set(gca,'YTick',[0 10 20 30])
     linkaxes(ax(2,:),'y')
     
     ax(3,c) = subplot(7,nu,8+c);
@@ -280,13 +283,13 @@ for c = 1:nu
     end
     grid on
     ylim([0 bmult*max(stordata(:))])
-    set(gca,'YTick',[0 200 400])
+    set(gca,'YTick',[0 20 40 60 80 100])
     linkaxes(ax(3,:),'y')
     
     ax(4,c) = subplot(7,nu,10+c);
     hold on
     for i = 1:NumStacksPerGroup
-        Y = squeeze(cycdata(:,i,:,c));
+        Y = squeeze(Ldata(:,i,:,c));
         internalPosCount = i - ((NumStacksPerGroup+1) / 2);
         groupDrawPos = (internalPosCount)* groupOffset + groupBins;
         h4(i,c) = bar(Y, 'stacked','FaceColor','flat');
@@ -296,12 +299,19 @@ for c = 1:nu
         x = get(h4(i,c),'XData');
         for j = 1:length(Y)
             tx = round(Y(j),1);
-            text(x(j),Y(j)+cybuff,num2str(tx), ...
+            text(x(j),Y(j)+blbuff,num2str(tx), ...
                 'Rotation',90, ...
                 'HorizontalAlignment','left', ...
                 'verticalAlignment','middle', ...
                 'FontSize',fs)
         end
+    end
+    yl = yline(20,'--','Battery End of Life = 20%', ...
+        'Color',[0 0 0],'LabelVerticalAlignment', ...
+        'top','LabelHorizontalAlignment','left','FontSize',fs, ...
+        'LineWidth',.75,'FontName','calibri');
+    if c == 2
+        yl.Label = '';
     end
     hold off;
     set(gca,'XTickMode','manual');
@@ -313,7 +323,7 @@ for c = 1:nu
     set(gca,'Units','pixels')
     axpos(4,c,:) = get(gca,'Position');
     if c == 1
-        ylabel({'60%-','Discharge','Cycles','per','Month'},'FontSize',fs2);
+        ylabel({'Battery','Capacity','Fade','[%]'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
         set(ylh,'Rotation',0,'Units', ...
             'Normalized','Position',[yaxhpos .5 -1], ...
@@ -321,7 +331,8 @@ for c = 1:nu
             'HorizontalAlignment','center')
     end
     grid on
-    ylim([0 cymult*max(cycdata(:))])
+    ylim([0 blmult*max(Ldata(:))])
+    set(gca,'XTickLabels',[])    
     linkaxes(ax(4,:),'y')
     
     ax(5,c) = subplot(7,nu,12+c);
@@ -367,7 +378,10 @@ for c = 1:nu
     
 end
 
-print(comparison_results_hl,'../Research/OO-TechEc/pf3/comparison_results_hl',  ...
+set(gcf, 'Color',[255 255 245]/256,'InvertHardCopy','off')
+set(ax,'Color',[255 255 245]/256)
+print(comparison_results_hl, ...
+    '~/Dropbox (MREL)/Research/General Exam/pf/comparison_results_hl',  ...
     '-dpng','-r600')
 
 

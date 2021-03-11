@@ -3,6 +3,10 @@ function [] = visWindSim(optStruct)
 data = optStruct.data;
 output = optStruct.output;
 
+[data.met.wind_spd,data.met.time] = ...
+    extendToLifetime(data.met.wind_spd,data.met.time, ...
+    optStruct.uc.lifetime);
+
 figure
 %STORAGE TIME SERIES
 ax(1) = subplot(3,1,1);

@@ -180,5 +180,8 @@ for i = 2:4
     set(ax(i),'Position',[pos(1)*rshift pos(2)+ushift pos(3) pos(4)]);
 end
 
-print(datacomp,'../Research/OO-TechEc/pf3/datacomp',  ...
+set(gcf, 'Color',[255 255 245]/256,'InvertHardCopy','off')
+set(ax,'Color',[255 255 245]/256)
+print(datacomp,['~/Dropbox (MREL)/Research/General Exam/' ...
+    'pf/data_loc'],  ...
     '-dpng','-r600')
