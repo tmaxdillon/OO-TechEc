@@ -32,7 +32,7 @@ lw = 2.5; %line width
 
 figure
 set(gcf, 'Position', [100, 100, 700, 700])
-col = colormap(brewermap(l,'Pastel1'));
+col = colormap(brewermap(l,'Set1'));
 %WAVE
 ax(1) = subplot(3,4,1:3);
 xt = [];
@@ -43,7 +43,7 @@ for i = 1:l
     xt = [xt ; datetime(Kwave{i}(:,1),'ConvertFrom','datenum')];
     hold on
 end
-hL = legend('show','location','eastoutside');
+hL = legend('show','location','eastoutside','Color',[255 255 245]/256);
 %xlabel('Time')
 ylabel({'Wave','[kW/m]'},'FontSize',14)
 ylim([0 inf])
@@ -102,6 +102,12 @@ set(hL,'Position', newPosition,'Units', newUnits,'FontSize',16);
 set(gcf, 'Position', [10, 100, 1200, 700])
 
 linkaxes(ax(1:3),'x')
+
+set(gcf, 'Color',[255 255 245]/256,'InvertHardCopy','off')
+set(ax,'Color',[255 255 245]/256)
+print(gcf,['~/Dropbox (MREL)/Research/General Exam/' ...
+    'pf/datatimeseries'],  ...
+    '-dpng','-r600')
 
 %unpack data structure
 dists = zeros(1,l);

@@ -176,7 +176,7 @@ inso.debug = false;          %toggle debugging kW/kWh combo for shooter
 inso.shootdebug = false;    %toggle debugging pvci shooter
 inso.shoottol = 5;          %months
 %inso.ct_eval = false;       %evaluate/compare trips for cleaning
-inso.cleanstrat = 3;        %panel cleaning strategy 1:NC, 2:CT, 3:CTW
+inso.cleanstrat = 2;        %panel cleaning strategy 1:NC, 2:CT, 3:CTW
 %inso.nu = 1.01;             %[m/kW]
 %wave energy parameters
 wave.method = 2;            %1: divide by B, 2: 3d interpolation

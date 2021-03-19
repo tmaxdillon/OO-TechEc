@@ -71,17 +71,17 @@ yaxhpos = -.25; %
 cmult = 1.35; %cost axis multiplier
 gmult = 1; %generation axis multiplier
 bmult = 1; %battery axis multiplier
-cymult = 1; %cycles axis multiplier 
+blmult = 3; %battery cycle axis multiplier 
 cfmult = 1; %capacity factor axis multiplier
 cbuff = 20; %cost text buffer
 gbuff = .25; %generation text buffer
 bbuff = 15;  %battery text buffer
-cybuff = 1.5; %battery cycle text buffer
+blbuff = 1.5; %battery cycle text buffer
 cfbuff = .025; %capacity factor text buffer
 
 %titles and labels
-stt = {'Short-Term Instrumentation';'(six month service interval)'};
-ltt = {'Long-Term Instrumentation';'(no service interval)'};
+stt = {'Short-Term Instrumentation';'(planned interventions every six months)'};
+ltt = {'Long-Term Instrumentation';'(no planned interventions)'};
 titles = {stt,ltt};
 xlab = {'\begin{tabular}{l} Argentine \\ Basin \end{tabular}'; ...
     '\begin{tabular}{l} Coastal \\ Endurance \end{tabular}'; ...
@@ -110,6 +110,16 @@ NumStacksPerGroup = size(costdata(:,:,:,1), 2);
 groupBins = 1:NumGroupsPerAxis;
 MaxGroupWidth = 0.75;
 groupOffset = MaxGroupWidth/NumStacksPerGroup;
+caxismax = cmult*max(max(max(sum(costdata,3))));
+
+%set all costs except first one to zero
+for loc = 1:nl
+    for c = 1:nu
+        if loc ~= 1 || c == 2
+            costdata(loc,:,:,c) = 0;
+        end
+    end
+end
 
 %plot
 for c = 1:nu
@@ -135,7 +145,7 @@ for c = 1:nu
         for lay = 1:cols
             h(i,lay,c).CData = col(lay,:);
         end
-        if c == 2 && i == np
+        if c == 1 && i == np
             leg = legend(h(i,:,c),leg,'Location','northeast');
             leg.FontSize = fs2;
 %             leg.Position(1) = .7;
@@ -165,7 +175,7 @@ for c = 1:nu
             'HorizontalAlignment','center')
     end
     grid on
-    ylim([0 cmult*max(max(max(sum(costdata,3))))])
+    ylim([0 caxismax])
     linkaxes(ax(1,:),'y')
     
     ax(2,c) = subplot(7,nu,6+c);
@@ -207,7 +217,7 @@ for c = 1:nu
     end
     grid on
     %ylim([0 gmult*max(gendata(:))])
-    ylim([0 4.5])
+    ylim([0 3])
     set(gca,'YTick',[0 1 2 3 4 5])
     linkaxes(ax(2,:),'y')
     
@@ -250,7 +260,7 @@ for c = 1:nu
     end
     grid on
     %ylim([0 bmult*max(stordata(:))])
-    ylim([0 300])
+    ylim([0 60])
     %set(gca,'YTick',[0 100 200 300 400])
     linkaxes(ax(3,:),'y')
     
@@ -286,12 +296,12 @@ for c = 1:nu
     set(gca,'XTick',1:NumGroupsPerAxis);
     set(gca,'XTickLabelMode','manual');
     set(gca,'FontSize',fs2)
-    %set(gca,'XTickLabel',opt.locations);
+    set(gca,'XTickLabel',[]);
     xtickangle(45)
     set(gca,'Units','pixels')
     axpos(4,c,:) = get(gca,'Position');
     if c == 1
-        ylabel({'60%-','Discharge','Cycles','per','Month'},'FontSize',fs2);
+        ylabel({'Battery','Capacity','Fade','[%]'},'FontSize',fs2);
         ylh = get(gca,'ylabel');
         set(ylh,'Rotation',0,'Units', ...
             'Normalized','Position',[yaxhpos .5 -1], ...
@@ -299,7 +309,7 @@ for c = 1:nu
             'HorizontalAlignment','center')
     end
     grid on
-    ylim([0 cymult*max(cycdata(:))])
+    ylim([0 blmult*max(Ldata(:))])
     linkaxes(ax(4,:),'y')
     
     ax(5,c) = subplot(7,nu,12+c);
@@ -356,6 +366,9 @@ end
 % legpos(1) = 0.78;
 % legpos = 1;
 
-print(hl_results,'../Research/OO-TechEc/pf3/hl_results',  ...
+set(gcf, 'Color',[255 255 245]/256,'InvertHardCopy','off')
+set(ax,'Color',[255 255 245]/256)
+print(hl_results,['~/Dropbox (MREL)/Research/General Exam/' ...
+    'pf/results_hl_1'],  ...
     '-dpng','-r600')
 

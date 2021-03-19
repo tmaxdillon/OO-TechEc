@@ -9,7 +9,7 @@ if ~exist('allStruct','var')
     load('waveoptd')
     load('waveoptc')
     load('wavecons')
-    allStruct = mergeWaWaWa(wave_optd,wave_optc,wave_cons);
+    allStruct = mergeWaWaWa(waveoptd,waveoptc,wavecons);
 end
 
 np = 3; %number of power modules
@@ -68,7 +68,7 @@ end
 %plotting setup
 full_results = figure;
 set(gcf,'Units','inches')
-set(gcf, 'Position', [1, 1, 10, 12])
+set(gcf, 'Position', [1, 1, 10, 6])
 fs = 9; %annotation font size
 fs2 = 11; %axis font size
 yaxhpos = -.25; %

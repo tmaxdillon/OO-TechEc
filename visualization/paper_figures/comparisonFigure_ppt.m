@@ -170,8 +170,9 @@ for c = 1:nu
         for lay = 1:cols
             h(i,lay,c).CData = col(lay,:);
         end
-        if c == 2 && i == np
-            leg = legend(h(i,:,c),leg,'Location','northeast');
+        if c == 1 && i == np
+            leg = legend(h(i,:,c),leg,'Location','northeast', ...
+                'Color',[255 255 245]/256);
             leg.FontSize = fs;
 %             leg.Position(1) = .775;
 %             leg.Position(2) = .840;
@@ -361,5 +362,8 @@ for c = 1:nu
     linkaxes(ax(5,:),'y')
     
 end
-print(comparison_results,['~/Dropbox (MREL)/Research/OO-TechEc/' ...
-    'paper_figures/comparison_results'],'-dpng','-r600')
+
+set(gcf, 'Color',[255 255 245]/256,'InvertHardCopy','off')
+set(ax,'Color',[255 255 245]/256)
+print(comparison_results,['~/Dropbox (MREL)/Research/General Exam/' ...
+    'pf/comparison_results_full'],'-dpng','-r600')

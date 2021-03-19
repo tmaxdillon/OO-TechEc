@@ -1,4 +1,4 @@
-clearvars -except allStruct
+clearvars -except allStruct trent
 
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
@@ -110,6 +110,16 @@ NumStacksPerGroup = size(costdata(:,:,:,1), 2);
 groupBins = 1:NumGroupsPerAxis;
 MaxGroupWidth = 0.75;
 groupOffset = MaxGroupWidth/NumStacksPerGroup;
+caxismax = cmult*max(max(max(sum(costdata,3))));
+
+%set all costs except first one to zero
+for loc = 1:nl
+    for c = 1:nu
+        if loc ~= 1 || c == 2
+            costdata(loc,:,:,c) = 0;
+        end
+    end
+end
 
 %plot
 for c = 1:nu
@@ -135,7 +145,7 @@ for c = 1:nu
         for lay = 1:cols
             h(i,lay,c).CData = col(lay,:);
         end
-        if c == 2 && i == np
+        if c == 1 && i == np
             leg = legend(h(i,:,c),leg,'Location','northeast');
             leg.FontSize = fs2;
 %             leg.Position(1) = .7;
@@ -165,7 +175,7 @@ for c = 1:nu
             'HorizontalAlignment','center')
     end
     grid on
-    ylim([0 cmult*max(max(max(sum(costdata,3))))])
+    ylim([0 caxismax])
     linkaxes(ax(1,:),'y')
     
     ax(2,c) = subplot(7,nu,6+c);
@@ -359,6 +369,6 @@ end
 set(gcf, 'Color',[255 255 245]/256,'InvertHardCopy','off')
 set(ax,'Color',[255 255 245]/256)
 print(hl_results,['~/Dropbox (MREL)/Research/General Exam/' ...
-    'pf/results_hl'],  ...
+    'pf/results_hl_2'],  ...
     '-dpng','-r600')
 
