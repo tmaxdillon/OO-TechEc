@@ -27,7 +27,7 @@ yls = -.1;
 
 timeseries = figure;
 set(gcf,'Units','inches')
-set(gcf,'Position', [0, 0, 8, 2])
+set(gcf,'Position', [0, 0, 11, 2.2])
 %STORAGE TIME SERIES
 ax(1) = subplot(3,1,1);
 plot(datetime(opt.wave.time,'ConvertFrom','datenum'), ...
@@ -93,7 +93,12 @@ grid on
 linkaxes(ax,'x')
 linkaxes(ax(2:3),'y')
 
-set(gcf, 'Color',[255 255 245]/256,'InvertHardCopy','off')
-set(ax,'Color',[255 255 245]/256)
-print(timeseries,['~/Dropbox (MREL)/Research/General Exam/' ...
-    'pf/timeseries'],'-dpng','-r600')
+% set(gcf, 'Color',[255 255 245]/256,'InvertHardCopy','off')
+% set(ax,'Color',[255 255 245]/256)
+% print(timeseries,['~/Dropbox (MREL)/Research/General Exam/' ...
+%     'pf/timeseries'],'-dpng','-r600')
+
+set(gcf, 'Color','w','InvertHardCopy','off')
+set(ax,'Color','w')
+print(timeseries,['~/Dropbox (MREL)/Research/WAMP-MDP/' ...
+    'Presentation/Figures/timeseries'],'-dpng','-r600')
