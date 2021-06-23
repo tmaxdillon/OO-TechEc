@@ -108,7 +108,8 @@ econ.platform.mdd.diameter = diameter;  %mooring cost lookup diameter
 clear cost depth diameter e_subsurface e_tension w_tension
 econ.platform.wf = 5;               %weight factor (of light ship)
 econ.platform.steel = 600;          %[$/metric ton]
-econ.platform.t_i = 12;             %[h] additional time on site for inst
+econ.platform.t_i = [6 12];         %[h] added h for inst
+econ.platform.d_i = [500 5000];     %[m] depth for inst cost
 %econ.platform.moorcost = 5.23;      %[$/(m-m)] cost of mooring (no AR)
 econ.platform.anchor = 1666.7;      %[$/m] anchor cost
 econ.platform.anchor_min = 1000;    %minimum anchor cost
@@ -219,7 +220,7 @@ lfp.cost = 580;             %[$/kWh]
 lfp.lcm = 1;%battery life cycle model, 1:bolun 2:dyn_lc 3:fixed_lc
 lfp.T = 15;                 %[C] temperature
 lfp.EoL = 0.2;              %battery end of life
-lfp.rf_os = true;           %toggle using open source  rainflow
+lfp.rf_os = true;           %toggle using open source rainflow
 lfp.bdi = 2190;              %battery degradation evaluation interaval
 bc = 2; %battery chemistry 1:AGM 2:LFP
 if bc == 1 %agm chemistry
