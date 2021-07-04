@@ -126,7 +126,7 @@ econ.platform.bm = 1.5;             %barge multiplier
 econ.vessel.osvcost = 15000;        %[$/day]
 econ.vessel.speed = 10;             %[kts]
 econ.vessel.t_mosv = 6;             %[h] time on site for maint (osv)
-econ.vessel.speccost = 70000;       %[$/day] 
+econ.vessel.speccost = 50000;       %[$/day] 
 econ.vessel.t_ms = 2;               %[h] time on site for maint (spec)
 %battery 
 % econ.batt.encl.sf = .5;             %scaling factor

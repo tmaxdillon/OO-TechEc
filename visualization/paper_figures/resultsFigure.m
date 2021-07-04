@@ -158,10 +158,10 @@ for c = 1:nu
     set(gca,'XTickLabel',[]);
     set(gca,'FontSize',fs2)
     if c == 1
-        title(stt,'FontWeight','normal')
+        title(stt,'FontName','cmb10');
         drawnow
     else
-        title(ltt,'FontWeight','normal')
+        title(ltt,'FontName','cmb10')
     end
     if c == 1
         ylabel({'Total','Estimated','Cost','[$1000s]'},'FontSize',fs2);
