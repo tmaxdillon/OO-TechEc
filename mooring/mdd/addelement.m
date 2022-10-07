@@ -548,6 +548,11 @@ elseif command == 8,
                 end
                 if already ==1,
                    disp('Modifying anchor element characteristics ! ');
+%                    if length(newele) > size(anchors,2)
+%                        anchors = [anchors ; ...
+%                            zeros(size(anchors,1), ...
+%                            length(newele) - size(anchors,2))];
+%                    end
                    anchors(imod,:)=newele;
                    anchors
                 end

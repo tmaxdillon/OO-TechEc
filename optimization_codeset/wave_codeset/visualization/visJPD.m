@@ -1,4 +1,4 @@
-function [] = visJPD(data)
+function [] = visJPD(data,i)
 
 %site properties
 g = 9.81;   %gravity [m/s^2]
@@ -8,9 +8,13 @@ rho = 1020; %seawater density [kg/m^3]
 dH = 0.5; %significant wave height [m]
 dT = 0.5; %peak period [s]
 
-Hs = data.wave.significant_wave_height;
-Tp = data.wave.peak_wave_period;
-
+if isfield(data,'wave') %OO-TechEc dataset
+    Hs = data.wave.significant_wave_height;
+    Tp = data.wave.peak_wave_period;
+elseif isfield(data,'hs') %we4M dataset
+    Hs = data.hs(i,:);
+    Tp = data.tp(i,:);
+end
 %set up bins for joint distribution - note: these are bin mid-points, not edges
 H_bins = (min(Hs):dH:max(Hs))';
 T_bins = (min(Tp):dT:max(Tp))';
