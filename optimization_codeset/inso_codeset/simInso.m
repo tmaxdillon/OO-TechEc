@@ -203,8 +203,9 @@ end
 battencl = econ.batt.enclmult*Scost; %battery enclosure cost
 Pmtrl = (1/1000)*econ.platform.wf*econ.platform.steel* ...
     inso.wf*kW/inso.rated; %platform material
-Pinst = econ.vessel.speccost* ...
-    ((econ.platform.t_i)/24); %platform instllation
+t_i = interp1(econ.platform.d_i,econ.platform.t_i,depth, ...
+    'linear','extrap'); %installation time
+Pinst = econ.vessel.speccost*(t_i/24); %platform instllation
 dp = getInsoDiameter(kW,inso);
 if dp < 1, dp = 1; end
 if dp < 4 %within bounds, use linear interpolation
