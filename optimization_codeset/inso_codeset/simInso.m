@@ -21,17 +21,6 @@ dt = 24*(data.met.time(2) - data.met.time(1)); %[h]
 dist = data.dist; %[m] dist to shore
 depth = data.depth;   %[m] water depth
 
-%initialize/preallocate
-S = zeros(1,length(swso)); %[Wh] storage
-S(1) = Smax*1000;
-P = zeros(1,length(swso)); %[W] power produced
-D = zeros(1,length(swso)); %[W] power dumped
-L = ones(1,length(swso))*uc.draw; %[W] load
-batt_L = zeros(1,T); %battery L (degradation) timeseries
-fbi = 1; %fresh battery index
-eff_t = zeros(1,length(swso)); %[~] efficiency
-surv = 1; % satisfies use case requirements
-
 % set the cleaning interval based on the use case service interval
 if uc.SI > 6
     %if service interval is long-term, guess the panels will be cleaned
@@ -67,10 +56,21 @@ cont = 1;
 %t1 = tic;
 t2 = tic;
 while cont
+    %initialize/preallocate
+    S = zeros(1,length(swso)); %[Wh] storage
+    S(1) = Smax*1000;
+    P = zeros(1,length(swso)); %[W] power produced
+    D = zeros(1,length(swso)); %[W] power dumped
+    L = ones(1,length(swso))*uc.draw; %[W] load
+    batt_L = zeros(1,T); %battery L (degradation) timeseries
+    fbi = 1; %fresh battery index
+    eff_t = zeros(1,length(swso)); %[~] efficiency
+    surv = 1; % satisfies use case requirements
     %set cleaning interval
-    clear clean_ind
+    clear clean_ind batt_lft
     clean_ind = zeros(length(swso),1);
-    if inso.cleanstrat == 3 && uc.SI > 6 %winter cleaning
+    if inso.cleanstrat == 3 || inso.cleanstrat == 4 && ...
+            uc.SI > 6 %winter cleaning
         clean_ind(data.wint_clean_ind) = 1;
     else
         clean_ind(1:ceil((inso.pvci/12)*8760):end) = 1; %interval cleaning
@@ -92,6 +92,9 @@ while cont
         end
         %find efficiency
         soil_eff = soil_eff - d_soil_eff;
+        if soil_eff < 0 
+            soil_eff = 0; %no negative efficiency
+        end
         if clean_ind(t) == 1
             soil_eff = 1; %panels cleaned
         end
@@ -143,7 +146,7 @@ while cont
     end
     
     if uc.SI == 6 || abs(batt_lft - mult*inso.pvci) < tol || ...
-        inso.cleanstrat == 3
+        inso.cleanstrat == 3 || inso.cleanstrat == 4
         cont = 0;
     elseif batt_lft < mult*inso.pvci %cleaning interval > battery life
         inso.pvci = inso.pvci - dm;
@@ -156,14 +159,20 @@ while cont
             over = true;
         end
     elseif batt_lft > mult*inso.pvci %cleaning interval < battery life
-        inso.pvci = inso.pvci + dm;
-        if inso.shootdebug
-            disp('Increasing pvci...')
-            %pause
-        end
-        if over
-            dm = dm/2;
-            over = false;
+        %if batt lifetime is too long for cleaning to occur then...
+        if inso.pvci > inso.cleanlim
+            inso.pvci = inso.cleanlim; %set cleaning interval to limit
+            cont = 0;
+        else
+            inso.pvci = inso.pvci + dm;
+            if inso.shootdebug
+                disp('Increasing pvci...')
+                %pause
+            end
+            if over
+                dm = dm/2;
+                over = false;
+            end
         end
     end
     
@@ -225,7 +234,7 @@ elseif inso.cleanstrat == 2
     else
         nvi = nbr;
     end
-elseif inso.cleanstrat == 3
+elseif inso.cleanstrat == 3 || inso.cleanstrat == 4
     if uc.SI > 6
         nvi = length(data.wint_clean_ind);
     else

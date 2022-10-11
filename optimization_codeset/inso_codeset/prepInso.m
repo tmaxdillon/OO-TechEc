@@ -45,7 +45,7 @@ for t = orig_l+1:length(data.swso)
 end
 
 %winter cleaning
-if inso.cleanstrat == 3 %winter cleaning
+if inso.cleanstrat == 3 || inso.cleanstrat == 4 %winter cleaning
     %winter cleaning (if applicable)
     if data.lat < 0 %southern hemisphere
         wint_clean_mo = 5; %may
@@ -55,6 +55,9 @@ if inso.cleanstrat == 3 %winter cleaning
     dv = datevec(time);
     data.wint_clean_ind = find(dv(:,2) == wint_clean_mo & dv(:,3) == 1 ...
         & dv(:,4) == 0);
+    if inso.cleanstrat == 4 %every other winter
+        data.wint_clean_ind = data.wint_clean_ind(2:2:end);
+    end
 end
 
 end

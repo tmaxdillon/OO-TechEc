@@ -2,7 +2,7 @@ function [output,opt] = optInso(opt,data,atmo,batt,econ,uc,bc,inso)
 
 %set kW and Smax mesh
 opt.kW_1 = 0.5;
-opt.kW_m = opt.bf.M*4; %[kW], up to 16 kW for inso
+opt.kW_m = opt.bf.M*2; %[kW], up to 16 kW for inso
 opt.Smax_1 = 1;
 opt.Smax_n = opt.bf.N; %[kWh]
 
@@ -21,9 +21,9 @@ while ~check_s
     [~,check_s] = simInso(opt.kW_m/2,opt.Smax_n/2,opt,data, ...
         atmo,batt,econ,uc,bc,inso);
     if ~check_s
-        opt.kW_m = 2*opt.kW_m;
-        %opt.Smax_n = 2*opt.Smax_n; 
-        %increasing battery size decreases cleaning
+        %opt.kW_m = 2*opt.kW_m;
+        opt.Smax_n = 2*opt.Smax_n; 
+        %increasing panel size increases surface float size
     end
 end
 
