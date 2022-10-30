@@ -18,13 +18,13 @@ ms = 50;
 fs = 16;
 lw = 1.2;
 
-addond = 3; %add on diameter range
+addond = 0; %add on diameter range
 
 [Xq,Yq] = meshgrid(linspace(0,max(diameter(:))+addond,n), ...
     linspace(0,max(depth(:)),n));
 
 %Cq = interp2(diameter,depth,cost,Xq,Yq,'linear');
-Cq = interp2(diameter,depth,cost,Xq,Yq,'spline');
+Cq = interp2(diameter,depth,cost,Xq,Yq,'linear');
 % Eq = interp2(diameter,depth,e_tension,Xq,Yq,'linear');
 
 %cost

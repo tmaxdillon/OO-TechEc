@@ -1,7 +1,0 @@
-function [data] = prepWind(data,turb,atmo,uc)
-
-%make time series data adequately long
-[data.met.wind_spd_ext = 
-
-end
-

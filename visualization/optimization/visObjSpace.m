@@ -5,7 +5,7 @@ output = optStruct.output;
 
 %plot settings
 Sm_max = 500; %[kWh]
-Gr_max = 8; %[kW]
+Gr_max = 16; %[kW]
 
 %adjust cost to thousands
 output.cost = output.cost/1000;
@@ -40,8 +40,8 @@ scatter3(Smaxgrid(m_ind),kWgrid(m_ind),m*2,130,'ko', ...
 view(0,90)
 xlabel('Storage Capacity [kWh]')
 ylabel('Rated Power [kW]')
-ylim([-inf Gr_max/2])
-xlim([-inf Sm_max/2])
+ylim([-inf Gr_max])
+xlim([-inf Sm_max])
 c = colorbar;
 c.Label.String = '[$] in thousands';
 caxis([0 max(a_sat(:))/2]) %to produce cartoon

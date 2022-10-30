@@ -20,6 +20,18 @@ if isfield(econ.vessel,'tmt_enf') && ...
     econ.vessel.t_ms = econ.vessel.tmt_enf; %spec maintenance time
 end
 
+%set econ scenario
+switch econ.wind.scen
+    case 1 %optimistic durability
+        econ.wind.lambda = econ.wind.lowfail; %vessel interventions
+    case 2 %conservative
+        econ.wind.lambda = econ.wind.highfail; %vessel interventions
+end
+%if sensitivity analysis
+if isfield(econ.wave,'lambda_mod')
+    econ.wind.lambda = econ.wind.lambda_mod; %lamdba modifier
+end
+
 %check to make sure coarse mesh will work
 opt.fmin = false;
 check_s = 0;

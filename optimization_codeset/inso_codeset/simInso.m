@@ -43,7 +43,12 @@ end
 %set panel degradation
 eff = (1-((inso.deg/100)/8760)*(1:1:length(swso)));
 %rain = repmat(linspace(0.5,0,24*30),[1,ceil(length(swso)/(24*30))]);
-d_soil_eff = (atmo.soil/100)/8760; %change in soil deg per hour
+if econ.inso.scen == 1 %automated cleaning
+    d_soil_eff = 0;
+    econ.inso.marinization = econ.inso.marinization*2;
+elseif econ.inso.scen == 2 %human cleaning
+    d_soil_eff = (atmo.soil/100)/8760; %change in soil deg per hour
+end
 soil_eff = 1; %starting soil efficiency
 
 % if inso.debug
@@ -226,7 +231,7 @@ else %not within bounds, use spline extrapolation
         econ.platform.mdd.depth, ...
         econ.platform.mdd.cost,dp,depth,'spline'); %mooring cost
 end
-if inso.cleanstrat == 1
+if inso.cleanstrat == 1 || econ.inso.scen == 1
     nvi = nbr;
 elseif inso.cleanstrat == 2
     if uc.SI > 6

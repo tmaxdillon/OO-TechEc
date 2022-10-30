@@ -1,7 +1,7 @@
-function [allStruct] = mergeInInWiWaWaWa(struct1,struct2,struct3, ... 
+function [allStruct] = mergeInWiDiWaWaWa(struct1,struct2,struct3, ... 
     struct4,struct5,struct6)
 
-% inputs ( solar, wind, wave_cons, wave_opt_c, wave_opt_d )
+% inputs ( solar, wind, dies, wave_cons, wave_opt_c, wave_opt_d )
 % output allStruct( location, use case, power modules)
 
 np = 6; %number of power modules
@@ -12,16 +12,25 @@ np = 6; %number of power modules
 for i = 1:size(struct1,1)
     for j = 1:size(struct1,2)
         struct1(i,j).turb = [];
+        struct1(i,j).dies = [];
         struct1(i,j).wave = [];
-        struct2(i,j).turb = [];
-        struct2(i,j).wave = [];
     end
 end
 
 %wind
+for i = 1:size(struct2,1)
+    for j = 1:size(struct2,2)
+        struct2(i,j).inso = [];
+        struct2(i,j).dies = [];
+        struct2(i,j).wave = [];
+    end
+end
+
+%dies
 for i = 1:size(struct3,1)
-    for j = 1:size(struct1,2)
+    for j = 1:size(struct3,2)
         struct3(i,j).inso = [];
+        struct3(i,j).turb = [];
         struct3(i,j).wave = [];
     end
 end
@@ -31,10 +40,13 @@ for i = 1:size(struct4,1)
     for j = 1:size(struct4,2)
         struct4(i,j).inso = [];
         struct4(i,j).turb = [];
+        struct4(i,j).dies = [];
         struct5(i,j).inso = [];
         struct5(i,j).turb = [];
+        struct5(i,j).dies = [];
         struct6(i,j).inso = [];
         struct6(i,j).turb = [];
+        struct6(i,j).dies = [];
     end
 end
 
@@ -61,7 +73,7 @@ for i = 1:size(allStruct,1)
         allStruct(i,1,j).wave = struct1(i,j).wave;
     end
 end
-%merge solar ctt
+%merge wind
 for i = 1:size(allStruct,1)
     for j = 1:size(allStruct,3)
         allStruct(i,2,j).output = struct2(i,j).output;
@@ -79,7 +91,7 @@ for i = 1:size(allStruct,1)
         allStruct(i,2,j).wave = struct2(i,j).wave;
     end
 end
-%merge wind
+%merge dies
 for i = 1:size(allStruct,1)
     for j = 1:size(allStruct,3)
         allStruct(i,3,j).output = struct3(i,j).output;
@@ -151,6 +163,5 @@ for i = 1:size(allStruct,1)
         allStruct(i,6,j).wave = struct6(i,j).wave;
     end
 end
-
 end
 

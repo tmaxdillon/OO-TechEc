@@ -1,6 +1,8 @@
 %simulation settings
 %interactive job
-econ.wave.scen = 1; %scenario indicator 1:C,2:OC,3:OD
+econ.wave.scen = 1; %scenario indicator 1:C, 2:OC, 3:OD
+econ.inso.scen = 1; %scenario indicator 1:AU, 2:HU
+econ.wind.scen = 2; %scenario indicator 1:OD, 2:C
 opt.bf.m = 500;
 opt.bf.n = 500;
 opt.allscenuses = 0;
@@ -9,7 +11,7 @@ opt.sens = 0;
 opt.tdsens = 0;
 opt.senssm = 0;
 opt.highresobj = 0;
-pm = 2; %power module, 1:Wi 2:In 3:Wa 4:Di
+pm = 4; %power module, 1:Wi 2:In 3:Wa 4:Di
 c = 2;  %use case 1:ST 2:LT
 loc = 'argBasin'; %location
 %batch = false;
@@ -20,7 +22,9 @@ if ~exist('batchtype','var')
     batchc = [];
 end
 if isequal(batchtype,'ssm')
-    econ.wave.scen = batchscen; %scenario indicator 1:C,2:OC,3:OD
+    econ.wave.scen = batchscen;
+    econ.inso.scen = batchscen;
+    econ.wind.scen = batchscen;
     opt.bf.m = 500;
     opt.bf.n = 500;
     opt.allscenuses = 0;
@@ -35,6 +39,8 @@ if isequal(batchtype,'ssm')
     %batch = true;
 elseif isequal(batchtype,'alllocuses')
     econ.wave.scen = batchscen; 
+    econ.inso.scen = batchscen;
+    econ.wind.scen = batchscen;
     opt.bf.m = 500;
     opt.bf.n = 500;
     opt.allscenuses = 0;
@@ -137,6 +143,8 @@ econ.batt.enclmult = 1;             %multiplier on battery cost for encl
 econ.wind.installed = 10117;        %[$/kW] installed cost (DWR)
 %econ.wind.mim = 137/49;             %marine installment multiplier (CoWR)
 econ.wind.marinization = 1.8;       %[CoWR]
+econ.wind.lowfail = 0;              %failures per year (optimistic)
+econ.wind.highfail = 1;              %failure per year (conservative)
 %solar
 econ.inso.module = 470;             %[$/kW], all SCB
 econ.inso.installation = 270;       %[$/kW]
@@ -154,6 +162,7 @@ econ.dies.fcost = .83;              %[$/L] diesel fuel cost
 econ.dies.enclcost = 5000;          %[$]
 econ.dies.enclcap = 1.5;            %[m^3]
 econ.dies.autostart = 3000;         %[$]
+econ.dies.fail = .2;                %failures per year
 
 %ENERGY
 %wind parameters
@@ -246,14 +255,14 @@ uc(1).draw = 200;               %[W] - secondary node
 uc(1).lifetime = 5;             %[y]
 uc(1).SI = 6;                   %[months] service interval
 uc(1).uptime = .99;             %[%] uptime
-uc(1).turb.lambda = 4;          %turbine interventions
+% uc(1).turb.lambda = 4;          %turbine interventions
 uc(1).dies.lambda = 1;          %diesel interventions
 %long term instrumentation
 uc(2).draw = 200;               %[W] - secondary node
 uc(2).lifetime = 5;             %[y]
 uc(2).SI = 12*uc(2).lifetime;   %[months] service interval
 uc(2).uptime = .99;             %[%] uptime
-uc(2).turb.lambda = 4;          %turbine interventions
+% uc(2).turb.lambda = 4;          %turbine interventions
 uc(2).dies.lambda = 1;          %diesel interventions
 %infrastructure
 % uc(3).draw = 8000;              %[W] - secondary node

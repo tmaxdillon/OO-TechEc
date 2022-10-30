@@ -7,9 +7,6 @@ function [cost,surv,CapEx,OpEx,kWcost,Scost,Icost,Pmtrl,Pinst,Pmooring, ...
 % disp([num2str(kW) ' ' num2str(Smax)])
 ID = [kW Smax];
 
-%NOTE TO SELF - you need to create prepWind an d extend the wind timeseires
-%to 5 years to fully evaluate degradation
-
 %if fmin is suggesting a negative input (physically impossible), exit 
 if opt.fmin && Smax < 0 || kW < 0
     surv = 0;
@@ -96,8 +93,7 @@ else %fixed (really old) model
 end
 nbr = ceil((12*uc.lifetime/batt_lft-1)); %number of battery replacements
 
-nvi = nbr + uc.turb.lambda; %number of vessel interventions
-
+nvi = nbr + econ.wind.lambda; %number of vessel interventions
 
 %economic modeling
 kWcost = polyval(opt.p_dev.t,kW)*econ.wind.marinization; %turbine
@@ -141,7 +137,7 @@ else %long term instrumentation and infrastructures
     C_v = econ.vessel.osvcost;
 end
 vesselcost = C_v*(nvi*(2*triptime + t_os)); %vessel cost
-turbrepair = 1/2*kWcost*(uc.turb.lambda); %turbine repair cost
+turbrepair = 1/2*kWcost*(econ.wind.lambda); %turbine repair cost
 if turbrepair < 0, turbrepair = 0; end
 battreplace = Scost*nbr; %number of battery replacements
 CapEx = Pmooring + Pinst + Pmtrl + battencl + Scost + Icost + kWcost;

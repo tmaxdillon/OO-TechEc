@@ -33,6 +33,8 @@ surv = 1;
 charging = false;
 runtime = 0; %[h], amount of time spent running
 
+lambda = floor(uc.lifetime*econ.dies.fail); %unexpected failures
+
 %run simulation
 for t = 1:length(time)
     if t < fbi + batt.bdi - 1 %less than first interval after fresh batt
@@ -95,7 +97,7 @@ if uc.lifetime/nfr > dies.ftmax/12 %fuel will go bad
 end
 noc = ceil(runtime/dies.oilint-1); %number of oil changes
 
-nvi = max([nfr noc nbr]) + uc.dies.lambda; %number of vessel interventions
+nvi = max([nfr noc nbr]) + lambda; %number of vessel interventions
 
 %economic modeling
 kWcost = polyval(opt.p_dev.d_cost,kW)*2 + ...
@@ -140,7 +142,7 @@ else %long term instrumentation and infrastructure
     C_v = econ.vessel.osvcost;
 end
 vesselcost = C_v*(nvi*(2*triptime + t_os)); %vessel cost
-genrepair = 1/2*kWcost*(uc.dies.lambda); %generator repair cost
+genrepair = 1/2*kWcost*lambda; %generator repair cost
 battreplace = Scost*nbr; %number of battery replacements
 CapEx = Pmooring + Pinst + Pmtrl + battencl + Scost + ...
     genencl + kWcost;
