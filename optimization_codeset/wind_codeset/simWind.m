@@ -53,7 +53,6 @@ for t = 1:length(wind)
             end
         end
     end
-    %MOVE TO PREP WIND EVENTUALLY (as in simWave)
     %find power from turbine
     if wind(t) < turb.uci %below cut out
         P(t) = 0; %[W]

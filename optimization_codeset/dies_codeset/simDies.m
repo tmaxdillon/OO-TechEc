@@ -101,7 +101,7 @@ nvi = max([nfr noc nbr]) + lambda; %number of vessel interventions
 
 %economic modeling
 kWcost = polyval(opt.p_dev.d_cost,kW)*2 + ...
-    econ.dies.autostart; %generator (with spare)
+    econ.dies.autostart; %generator (with spares provisioning - 2)
 genencl = polyval(opt.p_dev.d_size,kW)^3* ...
     (econ.dies.enclcost/econ.dies.enclcap); %generator enclosure
 fuel = runtime*lph*econ.dies.fcost; %cost of consumed fuel

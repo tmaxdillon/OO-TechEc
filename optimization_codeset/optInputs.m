@@ -1,7 +1,7 @@
 %simulation settings
 %interactive job
 econ.wave.scen = 1; %scenario indicator 1:C, 2:OC, 3:OD
-econ.inso.scen = 1; %scenario indicator 1:AU, 2:HU
+econ.inso.scen = 2; %scenario indicator 1:AU, 2:HU
 econ.wind.scen = 2; %scenario indicator 1:OD, 2:C
 opt.bf.m = 500;
 opt.bf.n = 500;
@@ -11,9 +11,9 @@ opt.sens = 0;
 opt.tdsens = 0;
 opt.senssm = 0;
 opt.highresobj = 0;
-pm = 4; %power module, 1:Wi 2:In 3:Wa 4:Di
+pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
 c = 2;  %use case 1:ST 2:LT
-loc = 'argBasin'; %location
+loc = 'souOcean'; %location
 %batch = false;
 if ~exist('batchtype','var')
     batchtype = [];
@@ -87,8 +87,8 @@ end
 
 %check to see if HPC
 if feature('numcores') < 36
-    opt.bf.n = 1;
-    opt.bf.m = 1;
+    opt.bf.n = 3;
+    opt.bf.m = 3;
 end
 
 %strings
@@ -111,16 +111,20 @@ load('mdd_output.mat')
 econ.platform.mdd.cost = cost;          %mooring cost lookup matrix
 econ.platform.mdd.depth = depth;        %mooring cost lookup depth
 econ.platform.mdd.diameter = diameter;  %mooring cost lookup diameter
+load('mdd_output_inso.mat')
+econ.platform.inso.cost = cost;
+econ.platform.inso.depth = depth;
+econ.platform.inso.diameter = diameter;
 clear cost depth diameter e_subsurface e_tension w_tension
 econ.platform.wf = 5;               %weight factor (of light ship)
 econ.platform.steel = 600;          %[$/metric ton]
 econ.platform.t_i = [6 12];         %[h] added h for inst
 econ.platform.d_i = [500 5000];     %[m] depth for inst cost
 %econ.platform.moorcost = 5.23;      %[$/(m-m)] cost of mooring (no AR)
-econ.platform.anchor = 1666.7;      %[$/m] anchor cost
-econ.platform.anchor_min = 1000;    %minimum anchor cost
-econ.platform.line = 4.83;          %[$/(m-m)] cost of line (no AR)
-econ.platform.bm = 1.5;             %barge multiplier
+% econ.platform.anchor = 1666.7;      %[$/m] anchor cost
+% econ.platform.anchor_min = 1000;    %minimum anchor cost
+% econ.platform.line = 4.83;          %[$/(m-m)] cost of line (no AR)
+% econ.platform.bm = 1.5;             %barge multiplier
 % econ.platform.S = 1.6;              %mooring scope
 % econ.platform.fiber = 0.48;         %[$/(m*MT)] fiber cost
 % econ.platform.anchor = 1200;        %[$/MT]
@@ -174,8 +178,8 @@ turb.clearance = 4;         %[m] surface to bottom of swept area clearance
 turb.wf = 70;               %[kg/kW]
 %turb.nu = 0.26;
 turb.spar_t = 0.04;         %[m] spar thickness
-turb.spar_ar = 4;           %aspect ratio 
-turb.spar_bm = 4;           %buoyancy multiplier
+turb.spar_ar = 6;           %aspect ratio 
+turb.spar_bm = 10;           %buoyancy multiplier
 %solar parameters
 inso.rated = 1;             %[kW/m^2] from Brian
 inso.eff = 0.18;            %[~] from Devin (may trail off when off of MPP)
@@ -204,19 +208,19 @@ dies.fmax = 800;            %[liters] fuel capacity
 dies.ftmax = 18;            %[m] fuel can sit idle before going "bad"
 %dies.lph = 2;               %[l/h]
 dies.oilint = 250;          %[hours] maintenance interval
-dies.genon = 0.3;           %battery level generator turns on at
+dies.genon = 0.1;           %battery level generator turns on at
 dies.kWmax = 15;            %maximum power generation
 dies.kWmin = 1;             %minimum power generation
 dies.bm = 2.5;                %barge multiplier
-%AGM parameters
-agm.V = 12;                %[V] Voltage
-agm.se = 3.3;              %[Ah/kg] specific energy factor
-agm.lc_nom = 18;           %[months] nominal life cycle
-agm.beta = 6/10;           %decay exponential for life cycle
-agm.lc_max = 12*5;        %maximum months of operation
-agm.sdr = 5;               %[%/month] self discharge rate
-%agm.dyn_lc = true;         %toggle dynamic life cycle
-agm.dmax = .2;             %maximum depth of discharge
+% %AGM parameters
+% agm.V = 12;                %[V] Voltage
+% agm.se = 3.3;              %[Ah/kg] specific energy factor
+% agm.lc_nom = 18;           %[months] nominal life cycle
+% agm.beta = 6/10;           %decay exponential for life cycle
+% agm.lc_max = 12*5;        %maximum months of operation
+% agm.sdr = 5;               %[%/month] self discharge rate
+% %agm.dyn_lc = true;         %toggle dynamic life cycle
+% agm.dmax = .2;             %maximum depth of discharge
 %LFP parameters
 lfp.V = 12;                 %[V] Voltage
 lfp.se = 8.75;              %[Ah/kg] specific energy factor
@@ -243,7 +247,7 @@ end
 atmo.rho_a = 1.225;         %[kg/m^3] density of air
 atmo.rho_w = 1025;          %[kg/m^3] density of water
 atmo.g = 9.81;              %[m/s^2]
-atmo.h = 4;                 %[m]
+%atmo.h = 4;                 %[m]
 atmo.zo = 0.02;             %[mm]
 atmo.dyn_h = true;          %toggle dynamic hub height
 atmo.soil = 35;             %[%/year]
@@ -256,14 +260,14 @@ uc(1).lifetime = 5;             %[y]
 uc(1).SI = 6;                   %[months] service interval
 uc(1).uptime = .99;             %[%] uptime
 % uc(1).turb.lambda = 4;          %turbine interventions
-uc(1).dies.lambda = 1;          %diesel interventions
+% uc(1).dies.lambda = 1;          %diesel interventions
 %long term instrumentation
 uc(2).draw = 200;               %[W] - secondary node
 uc(2).lifetime = 5;             %[y]
 uc(2).SI = 12*uc(2).lifetime;   %[months] service interval
 uc(2).uptime = .99;             %[%] uptime
 % uc(2).turb.lambda = 4;          %turbine interventions
-uc(2).dies.lambda = 1;          %diesel interventions
+% uc(2).dies.lambda = 1;          %diesel interventions
 %infrastructure
 % uc(3).draw = 8000;              %[W] - secondary node
 % uc(3).lifetime = 25;            %[y]
