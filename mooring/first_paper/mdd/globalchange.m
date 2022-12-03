@@ -159,7 +159,8 @@ elseif command == 3, % select an element from the list and get ready to globally
 elseif command == 4, % select an element from the list and add or insert it
    if change < 1 | strcmp('12345',complist2(1:5)), 
       disp('You must select an item, even it is the default value displayed.'); 
-      break;
+      %break;
+      return;
    end
    %
    % Need to find all element componets to replace, replace them

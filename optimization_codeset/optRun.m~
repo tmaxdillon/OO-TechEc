@@ -14,7 +14,7 @@ if pm == 1 %WIND
     data = prepWind(data,uc);
     [output,opt] = optWind(opt,data,atmo,batt,econ,uc,bc,turb);
 elseif pm == 2 %SOLAR
-    [data,econ] = prepInso(data,inso,econ,uc);
+    pdata = prepInso(data,inso,econ,uc);
     [output,opt] = optInso(opt,data,atmo,batt,econ,uc,bc,inso);
 elseif pm == 3 %WAVE
     opt = prepWave(data,opt,wave,atmo,uc);

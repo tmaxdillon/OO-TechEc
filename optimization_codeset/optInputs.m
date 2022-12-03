@@ -1,7 +1,7 @@
 %simulation settings
 %interactive job
 econ.wave.scen = 1; %scenario indicator 1:C, 2:OC, 3:OD
-econ.inso.scen = 2; %scenario indicator 1:AU, 2:HU
+econ.inso.scen = 1; %scenario indicator 1:AU, 2:HU
 econ.wind.scen = 2; %scenario indicator 1:OD, 2:C
 opt.bf.m = 500;
 opt.bf.n = 500;
@@ -11,9 +11,9 @@ opt.sens = 0;
 opt.tdsens = 0;
 opt.senssm = 0;
 opt.highresobj = 0;
-pm = 3; %power module, 1:Wi 2:In 3:Wa 4:Di
+pm = 2; %power module, 1:Wi 2:In 3:Wa 4:Di
 c = 2;  %use case 1:ST 2:LT
-loc = 'souOcean'; %location
+loc = 'irmSea'; %location
 %batch = false;
 if ~exist('batchtype','var')
     batchtype = [];
@@ -87,8 +87,8 @@ end
 
 %check to see if HPC
 if feature('numcores') < 36
-    opt.bf.n = 3;
-    opt.bf.m = 3;
+    opt.bf.n = 2;
+    opt.bf.m = 2;
 end
 
 %strings
@@ -115,6 +115,9 @@ load('mdd_output_inso.mat')
 econ.platform.inso.cost = cost;
 econ.platform.inso.depth = depth;
 econ.platform.inso.diameter = diameter;
+econ.platform.inso.boundary = 1; %1: multi-mooring, 2: 8m diameter limit
+econ.platform.inso.boundary_di = 12; %[m] for multi-mooring
+econ.platform.inso.boundary_mf = 3; %multi line factor
 clear cost depth diameter e_subsurface e_tension w_tension
 econ.platform.wf = 5;               %weight factor (of light ship)
 econ.platform.steel = 600;          %[$/metric ton]
@@ -211,7 +214,7 @@ dies.oilint = 250;          %[hours] maintenance interval
 dies.genon = 0.1;           %battery level generator turns on at
 dies.kWmax = 15;            %maximum power generation
 dies.kWmin = 1;             %minimum power generation
-dies.bm = 2.5;                %barge multiplier
+dies.bm = 4;                %barge multiplier
 % %AGM parameters
 % agm.V = 12;                %[V] Voltage
 % agm.se = 3.3;              %[Ah/kg] specific energy factor

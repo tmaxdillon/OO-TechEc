@@ -5,7 +5,7 @@ function [X,Y,Z,iobj]=moordyn(U,z,H,B,Cd,ME,V,W,rho)
 % X (+East), Y (+North) and Z (+Up) all in metres
 %    given a velocity profile U(z) at depths z [m] (+up), with U(0)=0
 % For an oceanographic mooring from top to bottom
-%    with N elemental components (including wire sec tions as elements),
+%    with N elemental components (including wire sections as elements),
 %    dimensions H(L W D i,N) [m] of each different mooring component/element,
 %    mass/buoyancies B(N) [in kg, or kg/m for wire/chain] (+up),
 %    Drag coefficients (Cd(N)). ME (modulus of elasticity indecies)
@@ -507,7 +507,7 @@ for izloop=1:2, % loop through at least twice with this mooring.
                     dgc=0;
                 end
                 if gamma>=1, gamma=1; ss=1; end
-                if abs(gamma) < 1e-20, % then this float is not required. Less than 0.01% of float used.
+                if abs(gamma) < 1e-6, % then this float is not required. Less than 0.01% of float used.
                     NN=length(B);
                     inext=find(B>1);
                     if length(inext)>1,
@@ -704,7 +704,7 @@ for izloop=1:2, % loop through at least twice with this mooring.
                         %
                         Qhe=0.5*rhoi(i)*0.65*abs(sin(psi(j)))*Aeco*UVLmag^2; % end face drag, no lift
                         Qxco=Qxco + Qhe*cos(theta3); % x part of end face drag
-                        Qyco=Qyco + Qhe*sin(theta3); % dy part of end face drag
+                        Qyco=Qyco + Qhe*sin(theta3); % y part of end face drag
                         Qzco=Qzco + 0.5*rhoi(i)*0.65*abs(cos(psi(j)))*Aeco*abs(Wi(i))*Wi(i); % z part of end face drag
                     end
                 end
@@ -724,44 +724,8 @@ for izloop=1:2, % loop through at least twice with this mooring.
         b=Bi(1)+Qz(1);  % add the vertical drag to the buoyancy, scale by submerged portion
         thetaNew(2)=atan2(Qy(1),Qx(1));
         Ti(2)=sqrt(Qx(1)^2 + Qy(1)^2 + b^2); % total tension/force on top element, must be balanced from below
-        %% 20/08/2022 Edit
         if gamma < 1, % for surface float, just use submerged drag and buoysncy.
-            if H(2,1) == 0 %sphere 
-                radius = H(3,1)*0.5;
-            else %cylinder
-                radius = H(2,1)*0.5;
-            end
-            line_mass = gamma*B(1);
-            cyl_area = pi*radius^2;
-            v_buoy = cyl_area*H(1,1);
-            freeBoard = 1/(rho(1)*cyl_area)*(B(1)-line_mass);
-            draftCyl = H(1,1) - freeBoard;
-            sigma_prime = draftCyl/H(1,1);
-
-%             line_mass = gamma*B(1);
-%             cyl_area = pi*radius^2;
-%             v_buoy = cyl_area*H(1,1);
-%             sigma_not = 1-(B(1)/(rho(1)*v_buoy));
-%             buoyAncy = rho(1)*v_buoy*(1-sigma_not);
-%             freeBoard = 1/(rho(1)*cyl_area)*(buoyAncy-line_mass);
-%             d = H(1,1) - freeBoard;
-%             sigma_prime = d/H(1,1);
-            
-            if ~exist('iii','var')
-                iii = 1;
-            end
-            sigma_doc(iii) = sigma_prime;
-            tester_doc(iii,1) = gamma;
-            tester_doc(iii,2) = sigma_prime;
-            iii = iii + 1;
-            if isequal(moorele(1,1:3),'imp')
-                sigma_temp = .8;
-                Ti(2)=sqrt((sigma_temp*Qx(1))^2 + (sigma_temp*Qy(1))^2 + (sigma_temp*b)^2);
-            else
-                Ti(2)=sqrt((sigma_prime*Qx(1))^2 + (sigma_prime*Qy(1))^2 + (sigma_prime*b)^2);     %% Do an if statement to check if cylinder if cylinder, use the updated phi calculation. If statement after line 727 if sphere add warning
-            end
-                % NOTE TO TRENT AND MARCO: LINE 728 MAY NEED UPDATING. Qx
-            % Qy should be calculated based on draft 28/06/2022
+            Ti(2)=sqrt((gamma*Qx(1))^2 + (gamma*Qy(1))^2 + (gamma*b)^2);
         end
         %
         psiNew(2)=real(acos(b/Ti(2)));  % tilt under top element(float)
@@ -956,85 +920,28 @@ disp('  ');
 if gamma >= 0.99 | ss==1,
     disp('This is a sub-surface solution.');
 else
-    disp(['===================Freeboard and Forces=========================']);
-    sigma_not = 1-(B(1)/(rho(1)*v_buoy));
-    disp(['sigma_not = ',num2str(sigma_not*100,5),'%']);
-    disp(['sigma_prime = ',num2str(sigma_prime*100,5),'%']);
-    disp(['This is a surface solution, using ',num2str(gamma*100,2),'% of the surface buoyancy.' ...
-        'B = ' num2str(B(1)) ' kg.']);
-
-
-    disp(['=====================For Excel==========================']);
-    disp(['Working FOS: 1, Extreme FOS = 4.5']);
-    disp(['Weight under anchor = ',num2str(WoB,'%8.1f'),' [kg]  (negative is down)']);
-    disp(['sigma_prime = ',num2str(sigma_prime*100,5),'%']);
-    disp(['gamma = ',num2str(gamma*100,2),'% ']);
-    disp(['Maximum tension = ' num2str(max(Ti./9.81))]);
-    disp(['1/4 Ultrex factor of safety: wkg = ' num2str(907.0/max(Ti./9.81)) ', ext = ' num2str(4081.6/max(Ti./9.81))]);
-    disp(['1/2 Ultrex factor of safety: wkg = ' num2str(3392.3/max(Ti./9.81)) ', ext = ' num2str(15265.3/max(Ti./9.81))]);
-    disp(['3/4 Ultrex factor of safety: wkg = ' num2str(6802.7/max(Ti./9.81)) ', ext = ' num2str(30612.2/max(Ti./9.81))]);
-    disp(['Shackle: Working FOS: 2.5, Extreme FOS = 4.5']);    
-    disp(['5/8 Shackle factor of safety: wkg = ' num2str(3628/max(Ti./9.81)) ', ext = ' num2str(21768/max(Ti./9.81))]);
-    disp(['1 Shackle factor of safety: wkg = ' num2str(22848/max(Ti./9.81)) ', ext = ' num2str(137087/max(Ti./9.81))]);
-    disp(['Drag H = ',num2str(Qx(1)/9.81), ' [kg]']);
-    disp(['Drag V = ',num2str(Qz(1)/9.81), ' [kg]']);
-    disp(['================================================================']);
-    if H(2,1) == 0 %sphere
-        radius = H(3,1)*0.5;
-    else %cylinder
-        radius = H(2,1)*0.5;
-    end
-    %% Written   Marco 15/02/2022
-    line_mass = gamma*B(1);
-    cyl_area = pi*radius^2;
-    v_buoy = cyl_area*H(1,1);
-    rho_buoy = (1/v_buoy) * (rho(1)*v_buoy - B(1));
-    
-    % calc below is for with B
-    f_board = (1/(rho(1)*cyl_area)) * (v_buoy*(rho(1) - rho_buoy) - line_mass);
-
-    % calc below with different formulation 
-    freeBoard = 1/(rho(1)*cyl_area) * (B(1) - line_mass);
-   
-    %Draft calc
-    draft  = (rho(1)*v_buoy - B(1) + line_mass) / (rho(1)*cyl_area);
-    
-    disp(['Free board = ' num2str(freeBoard) 'm'])
-    disp(['Free board 2 = ' num2str(f_board) 'm'])
-    disp(['Draft = ' num2str(draft) 'm'])
-    
+    disp(['This is a surface solution, using ',num2str(gamma*100,2),'% of the surface buoyancy.']);
 end % NOTE: The calculation of % of surface float used assumes a cylinder float.
 %           In otherwords, the % submerged = the percent buoyancy (not so for a shpere).
-%%
 %
-disp(['Maximum tension = ' num2str(max(Ti./9.81))]);
+disp(['Total Tension on Anchor [kg] = ',num2str(Wa,'%8.1f')]);
+disp(['Vertical load [kg] = ',num2str(VWa,'%8.1f'),'  Horizontal load [kg] = ',num2str(HWa,'%8.1f')]);
 % disp(['After applying a WHOI saftey factor:']);
 TWa=1.5*(VWa + HWa/0.6);
-disp(['=======================Anchor Outputs===========================']);
-disp(['Total Tension on Anchor [kg] = ',num2str(Wa,'%8.1f')]);
 disp(['Safe wet anchor mass = ',num2str(TWa,'%8.1f'),' [kg] = ',num2str((TWa*2.2),'%8.1f'),' [lb]']);
 disp(['Safe dry steel anchor mass = ',num2str((TWa/0.87),'%8.1f'),' [kg] = ',num2str((TWa*2.2/0.87),'%8.1f'),' [lb]']);
 disp(['Safe dry concrete anchor mass = ',num2str((TWa/0.65),'%8.1f'),' [kg] = ',num2str((TWa*2.2/0.65),'%8.1f'),' [lb]']);
 disp(['Weight under anchor = ',num2str(WoB,'%8.1f'),' [kg]  (negative is down)']);
+disp(['Maximum tension = ' num2str(max(Ti./9.81))]);
+disp(['3/4 factor of safety: wkg = ' num2str(1540/max(Ti./9.81)) ', ext = ' num2str(6930/max(Ti./9.81))]);
+disp(['1 factor of safety: wkg = ' num2str(2450/max(Ti./9.81)) ', ext = ' num2str(11025/max(Ti./9.81))]);
 disp(['Number of iterations = ' num2str(isave) ' then ' num2str(iavg)]);
-%Excel Displays
-disp(['=====================Factors of Safety==========================']);
-disp(['Working FOS: 1, Extreme FOS = 4.5']);
-disp(['1/4 Ultrex factor of safety: wkg = ' num2str(907.0/max(Ti./9.81)) ', ext = ' num2str(4081.6/max(Ti./9.81))]);
-disp(['1/2 Ultrex factor of safety: wkg = ' num2str(3392.3/max(Ti./9.81)) ', ext = ' num2str(15265.3/max(Ti./9.81))]);
-disp(['3/4 Ultrex factor of safety: wkg = ' num2str(6802.7/max(Ti./9.81)) ', ext = ' num2str(30612.2/max(Ti./9.81))]);
-disp(['5/8 Shackle factor of safety: wkg = ' num2str(3628/max(Ti./9.81)) ', ext = ' num2str(21768/max(Ti./9.81))]);
-disp(['======================Drag Forces===============================']);
-disp(['Drag x = ',num2str(Qx./9.81), ' [kg]']);
-disp(['Drag y = ',num2str(Qy./9.81), ' [kg]']);
-disp(['Drag z = ',num2str(Qz./9.81), ' [kg]']);
-disp(['================================================================'])
+%
 if abs(B(end)) < TWa,
     disp('*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*');
-    disp('*!*!*!*  Warning. Anchor is likely too light!   *!*!*!*')
+    disp('*!*!*!*  Warning. Anchor is likely TOO light!   *!*!*!*')
     disp('*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*!*');
 end
-
 %disp([S SS]); % display the summed length of mooring as a check...
 % reset original current profile.
 z=ztmp;U=Utmp;V=Vtmp;W=Wtmp;rho=rhotmp;

@@ -132,6 +132,9 @@ for el=1:mm,
       tmp=num2str(psi(jobj(jo))*180/pi,'%4.1f');
       line(95-length(tmp):94)=tmp;
       jo=jo+1;
+      if jo > length(jobj)
+          jo = length(jobj);
+      end
       tmp=num2str(Ti(jobj(jo)+1)/9.81,'%6.1f');
       line(89-length(tmp):88)=tmp;
       tmp=num2str(psi(jobj(jo)+1)*180/pi,'%4.1f');

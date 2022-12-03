@@ -3,15 +3,8 @@ function [output,opt] = optInso(opt,data,atmo,batt,econ,uc,bc,inso)
 %set kW and Smax mesh
 opt.kW_1 = 0.5;
 if econ.platform.inso.boundary == 2
-    opt.kW_m = 9.0477; %corresponds to 8m
-else
-    if econ.platform.inso.boundary_di == 12
-        opt.kW_m = 20.3575; %corresponds to 12m
-    else
-        error('update econ.platform.inso.boundary_di')
-    end
-end
-%opt.kW_m = opt.bf.M*2; %[kW], up to 16 kW for inso
+    opt.kW_m = opt.bf.M*2
+opt.kW_m = opt.bf.M*2; %[kW], up to 16 kW for inso
 opt.Smax_1 = 1;
 opt.Smax_n = opt.bf.N; %[kWh]
 
