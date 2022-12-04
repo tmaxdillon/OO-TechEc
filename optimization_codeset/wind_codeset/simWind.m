@@ -92,11 +92,15 @@ else %fixed (really old) model
 end
 nbr = ceil((12*uc.lifetime/batt_lft-1)); %number of battery replacements
 
-nvi = nbr + econ.wind.lambda; %number of vessel interventions
+nvi = nbr + econ.wind.lambda*uc.lifetime; %number of vessel interventions
 
 %economic modeling
-kWcost = polyval(opt.p_dev.t,kW)*econ.wind.marinization; %turbine
-Icost = (econ.wind.installed - kWcost/ ...
+%should we assume spares provisioning for wind too? if so:
+%-kW cost goes up x2
+%-turb repair goes down by 1/2
+%-assuming yes...
+kWcost = 2*polyval(opt.p_dev.t,kW)*econ.wind.marinization; %turbine
+Icost = 2*(econ.wind.installed - 0.5*kWcost/ ...
     (kW*econ.wind.marinization))*kW; %installation
 if Icost < 0, Icost = 0; end
 if bc == 1 %lead acid
@@ -136,7 +140,7 @@ else %long term instrumentation and infrastructures
     C_v = econ.vessel.osvcost;
 end
 vesselcost = C_v*(nvi*(2*triptime + t_os)); %vessel cost
-turbrepair = 1/2*kWcost*(econ.wind.lambda); %turbine repair cost
+turbrepair = 1/2*0.5*(kWcost+Icost)*(nvi); %turbine repair cost
 if turbrepair < 0, turbrepair = 0; end
 battreplace = Scost*nbr; %number of battery replacements
 CapEx = Pmooring + Pinst + Pmtrl + battencl + Scost + Icost + kWcost;
