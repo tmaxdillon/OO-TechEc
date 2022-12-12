@@ -88,20 +88,18 @@ else %fixed (really old) model
 end
 nbr = ceil((12*uc.lifetime/batt_lft-1)); %number of battery replacements
 
-%find burn rate
-lph = polyval(opt.p_dev.d_burn,kW); %[l/h]
-
+%compute number of vessel requirements
+lph = polyval(opt.p_dev.d_burn,kW); %[l/h], burn rate
 nfr = ceil(runtime*lph/dies.fmax-1); %number of fuel replacements
 if uc.lifetime/nfr > dies.ftmax/12 %fuel will go bad
     nfr = ceil(12*uc.lifetime/dies.ftmax-1);
 end
 noc = ceil(runtime/dies.oilint-1); %number of oil changes
-
 nvi = max([nfr noc nbr]) + lambda; %number of vessel interventions
 
 %economic modeling
 kWcost = polyval(opt.p_dev.d_cost,kW)*2 + ...
-    econ.dies.autostart; %generator (with spares provisioning - 2)
+    econ.dies.autostart; %generator (with spares provisioning: 2)
 genencl = polyval(opt.p_dev.d_size,kW)^3* ...
     (econ.dies.enclcost/econ.dies.enclcap); %generator enclosure
 fuel = runtime*lph*econ.dies.fcost; %cost of consumed fuel
@@ -118,20 +116,29 @@ end
 battencl = econ.batt.enclmult*Scost; %battery enclosure cost
 Pmtrl = (1/1000)*econ.platform.wf*econ.platform.steel* ...
     polyval(opt.p_dev.d_mass,kW); %platform material
-t_i = interp1(econ.platform.d_i,econ.platform.t_i,depth, ...
-    'linear','extrap'); %installation time
-Pinst = econ.vessel.speccost*(t_i/24); %platform instllation
-dp = polyval(opt.p_dev.d_size,kW)*dies.bm;
-if dp < 1, dp = 1; end
-if dp < 4 %within bounds, use linear interpolation
-    Pmooring = interp2(econ.platform.mdd.diameter, ...
-        econ.platform.mdd.depth, ...
-        econ.platform.mdd.cost,dp,depth,'linear'); %mooring cost
-else %not within bounds, use spline extrapolation
-    Pmooring = interp2(econ.platform.mdd.diameter, ...
-        econ.platform.mdd.depth, ...
-        econ.platform.mdd.cost,dp,depth,'spline'); %mooring cost
+dp = polyval(opt.p_dev.d_size,kW);
+if dp < 2, dp = 2; end %this will always occur - diesel platform = 2m
+if dp > 8 %apply installtion time multiplier if big mooring
+    inst_mult = interp1([8 econ.platform.inso.boundary_di], ...
+        [1 econ.platform.inso.boundary_mf],dp);
+else
+    inst_mult = 1;
 end
+t_i = interp1(econ.platform.d_i,econ.platform.t_i,depth, ...
+    'linear','extrap')*inst_mult; %installation time
+Pinst = econ.vessel.speccost*(t_i/24); %platform instllation
+% if dp < 4 %within bounds, use linear interpolation
+%     Pmooring = interp2(econ.platform.mdd.diameter, ...
+%         econ.platform.mdd.depth, ...
+%         econ.platform.mdd.cost,dp,depth,'linear'); %mooring cost
+% else %not within bounds, use spline extrapolation
+%     Pmooring = interp2(econ.platform.mdd.diameter, ...
+%         econ.platform.mdd.depth, ...
+%         econ.platform.mdd.cost,dp,depth,'spline'); %mooring cost
+% end
+Pmooring = interp2(econ.platform.inso.diameter, ...
+    econ.platform.inso.depth, ...
+    econ.platform.inso.cost,dp,depth,'linear'); %mooring cost
 if uc.SI < 12 %short term instrumentation
     triptime = 0; %attributed to instrumentation
     t_os = econ.vessel.t_ms/24; %[d]

@@ -227,7 +227,7 @@ else
 end
 t_i = interp1(econ.platform.d_i,econ.platform.t_i,depth, ...
     'linear','extrap')*inst_mult; %installation time
-Pinst = econ.vessel.speccost*(t_i/24); %platform instllation
+Pinst = econ.vessel.speccost*(t_i/24); %platform instllation cost
 
 % if dp < 8 %within bounds, use linear interpolation
 %     Pmooring = interp2(econ.platform.inso.diameter, ...

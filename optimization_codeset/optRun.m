@@ -9,7 +9,6 @@ opt.p_dev.d_size = calcDeviceVal('dieselsize',[],econ.diessize_n);
 opt.p_dev.d_burn = calcDeviceVal('dieselburn',[],econ.diesburn_n);
 [opt.p_dev.b,~,opt.p_dev.kWhmax] = calcDeviceVal('agm',[],econ.batt_n);
 
-
 if pm == 1 %WIND
     data = prepWind(data,uc);
     [output,opt] = optWind(opt,data,atmo,batt,econ,uc,bc,turb);
@@ -44,7 +43,7 @@ elseif pm == 3 %WAVE
     results.cw_avg = output.min.cw_avg;
     results.cwr_avg = output.min.cwr_avg;
 elseif pm == 4 %DIESEL
-    data = prepDies(data,uc);
+    data = prepDies(data,econ,uc);
     [output,opt] = optDies(opt,data,atmo,batt,econ,uc,bc,dies);
 end
 

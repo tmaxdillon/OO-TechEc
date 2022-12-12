@@ -107,18 +107,31 @@ econ.diesmass_n = 1;                %[~]
 econ.diessize_n = 1;                %[~]   
 econ.diesburn_n = 1;                %[~]   
 %platform 
-load('mdd_output.mat')
-econ.platform.mdd.cost = cost;          %mooring cost lookup matrix
-econ.platform.mdd.depth = depth;        %mooring cost lookup depth
-econ.platform.mdd.diameter = diameter;  %mooring cost lookup diameter
-load('mdd_output_inso.mat')
-econ.platform.inso.cost = cost;
-econ.platform.inso.depth = depth;
-econ.platform.inso.diameter = diameter;
-econ.platform.inso.boundary = 1; %1: multi-mooring, 2: 8m diameter limit
-econ.platform.inso.boundary_di = 12; %[m] for multi-mooring
-econ.platform.inso.boundary_mf = 3; %multi line factor
-clear cost depth diameter e_subsurface e_tension w_tension
+% load('mdd_output.mat') - old (paper 1) mooring model
+% econ.platform.mdd.cost = cost;          %mooring cost lookup matrix
+% econ.platform.mdd.depth = depth;        %mooring cost lookup depth
+% econ.platform.mdd.diameter = diameter;  %mooring cost lookup diameter
+% clear cost depth diameter e_subsurface e_tension w_tension
+if pm == 2 || pm == 4 %solar or diesel
+    load('mdd_output_inso.mat')
+    econ.platform.inso.cost = cost;
+    econ.platform.inso.depth = depth;
+    econ.platform.inso.diameter = diameter;
+    econ.platform.inso.boundary = 1; %1: multi-mooring, 2: 8m diameter limit
+    econ.platform.inso.boundary_di = 12; %[m] for multi-mooring
+    econ.platform.inso.boundary_mf = 3; %multi line factor
+elseif pm == 3 %wave
+    load('mdd_output_wave.mat')
+    econ.platform.wave.cost = cost;
+    econ.platform.wave.depth = depth;
+    econ.platform.wave.diameter = diameter;
+elseif pm == 1 %wind
+    load('mdd_output_wind.mat')
+    econ.platform.wind.cost = cost;
+    econ.platform.wind.depth = depth;
+    econ.platform.wind.diameter = diameter;
+end
+clear cost depth diameter
 econ.platform.wf = 5;               %weight factor (of light ship)
 econ.platform.steel = 600;          %[$/metric ton]
 econ.platform.t_i = [6 12];         %[h] added h for inst
