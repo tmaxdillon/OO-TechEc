@@ -3,10 +3,19 @@
 %% run optimization
 
 optInputs
+if pm == 1
+    scens = {'optimistic durability','conservative'};
+elseif pm == 2
+    scens = {'automated','human'};
+elseif pm == 3
+    scens = opt.wavescens;
+elseif pm == 4
+    scens = {'default'};
+end
 T = tic;
 if opt.sens && ~opt.alllocuses %multiple simulations, sensitivity
     disp(['Sensitivity for ' char(opt.usecases(c)) ' use case at ' loc ...
-        ' under the ' char(opt.scens(econ.wave.scen)) ...
+        ' under the ' char(scens(econ.wave.scen)) ...
         ' beginning now.'])
     multStruct = doSens([],[],batchtype,batchscen,batchloc,batchc);
     disp(['Sensitivity complete after ' ...
@@ -18,10 +27,10 @@ elseif opt.tdsens && ~opt.alllocuses %two dimensional sensitivity analysis
         num2str(round(toc(T)/60,2)) ' minutes.'])
 elseif opt.alllocuses %run all dimensions for a power module / scenario
     disp(['All locations and use cases for the '  ...
-        char(opt.scens(econ.wave.scen)) ' scenario beginning now.'])
+        char(scens(econ.wave.scen)) ' scenario beginning now.'])
     allLocUses = doAllLocUses(batchtype,batchpm,batchscen,batchloc,batchc);
     disp(['All locations and use cases for the ' ...
-        char(opt.scens(econ.wave.scen)) ...
+        char(scens(econ.wave.scen)) ...
         ' scenario complete after ' num2str(round(toc(T)/60,2)) ... 
         ' minutes.'])
 elseif opt.allscenuses %run all dimensions for a location
@@ -34,21 +43,28 @@ elseif opt.allscenuses %run all dimensions for a location
         ' minutes.'])
 elseif opt.senssm
     if pm == 1
-        [tiv,tcm,twf,cis,rsp,cos,tef,szo, ...
-            lft,dtc,osv,spv,tmt,eol,dep,bcc,bhc,utp,ild,sdr,s0] = ...
-            doSensSM1(batchtype,batchpm,batchscen,batchloc,batchc);
+        
     elseif pm == 2
-        [pvd,pcm,pwf,pve, ...
-            lft,dtc,osv,spv,tmt,eol,dep,bcc,bhc,utp,ild,sdr,s0] = ...
-            doSensSM2(batchtype,batchpm,batchscen,batchloc,batchc);
     elseif pm == 3
-        [wiv,wcm,whl,ect, ...
-            lft,dtc,osv,spv,tmt,eol,dep,bcc,bhc,utp,ild,sdr,s0] = ...
-            doSensSM3(batchtype,batchpm,batchscen,batchloc,batchc);
-    elseif pm == 4
-        [giv,fco,fca,fsl,oci,gcm, ...
-            lft,dtc,osv,spv,tmt,eol,dep,bcc,bhc,utp,ild,sdr,s0] = ...
-            doSensSM4(batchtype,batchpm,batchscen,batchloc,batchc);
+    [wiv,wcm,whl,ild,osv,sdr,utp,bhc,dep,dtc,lft,spv,tmt,bcc,bbt,eol, ...
+        s0] = ...
+        doSensSMw(batchtype,batchscen,batchloc,batchc);
+        wiv = s1;
+        wcm = s2;
+        whl = s3;
+        ild = s4;
+        osv = s5;
+        sdr = s6;
+        utp = s7;
+        bhc = s8;
+        dep = s9;
+        dtc = s10;
+        lft = s11;
+        spv = s12;
+        tmt = s13;
+        bcc = s14;
+        bbt = s15;
+        eol = s16;
     end
 else %just one simulation
     disp(['Optimization (' char(loc) ', pm: ' num2str(pm), ...
@@ -83,7 +99,7 @@ else %just one simulation
         num2str(round(toc(tTot),2)) ' seconds.'])
 end
 
-clear i tTot
+clear i tTot batchtype
 uc = uc(c); %for debugging
 
 % load train

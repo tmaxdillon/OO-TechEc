@@ -11,7 +11,7 @@ opt.sens = 0;
 opt.tdsens = 0;
 opt.senssm = 0;
 opt.highresobj = 0;
-pm = 2; %power module, 1:Wi 2:In 3:Wa 4:Di
+pm = 1; %power module, 1:Wi 2:In 3:Wa 4:Di
 c = 2;  %use case 1:ST 2:LT
 loc = 'irmSea'; %location
 %batch = false;
@@ -33,7 +33,7 @@ if isequal(batchtype,'ssm')
     opt.tdsens = 0;
     opt.senssm = 1;
     opt.highresobj = 0;
-    pm = 3;
+    pm = batchpm;
     c = batchc;
     loc = batchloc;
     %batch = true;
@@ -97,6 +97,15 @@ opt.locations = {'argBasin';'cosEndurance_wa'; ...
 opt.powermodules = {'wind';'inso';'wave';'dies'};
 opt.usecases = {'short term';'long term'};
 opt.wavescens = {'Conservative';'Optimistic Cost';'Optimistic Durability'};
+if pm == 1
+    opt.scens = {'optimistic durability','conservative'};
+elseif pm == 2
+    opt.scens = {'automated','human'};
+elseif pm == 3
+    opt.scens = opt.wavescens;
+elseif pm == 4
+    opt.scens = {'default'};
+end
 
 %ECONOMIC
 %polynomial fits
@@ -193,9 +202,9 @@ turb.eta = 0.35;            %[~] guess
 turb.clearance = 4;         %[m] surface to bottom of swept area clearance
 turb.wf = 70;               %[kg/kW]
 %turb.nu = 0.26;
-turb.spar_t = 0.04;         %[m] spar thickness
-turb.spar_ar = 6;           %aspect ratio 
-turb.spar_bm = 10;           %buoyancy multiplier
+% turb.spar_t = 0.04;         %[m] spar thickness
+% turb.spar_ar = 6;           %aspect ratio 
+% turb.spar_bm = 10;           %buoyancy multiplier
 %solar parameters
 inso.rated = 1;             %[kW/m^2] from Brian
 inso.eff = 0.18;            %[~] from Devin (may trail off when off of MPP)
