@@ -173,8 +173,7 @@ for i = 1:opt.S
             multStruct(i).data.met =  rmfield(multStruct(i).data.met,flds);
         elseif pm == 3         
             multStruct(i).data = rmfield(multStruct(i).data,'met');
-            multStruct(i).data.wave = rmfield(multStruct(i).data.wave, ...
-                'deployment');
+            multStruct(i).data.wave = rm
         elseif pm == 4
             multStruct(i).data = rmfield(multStruct(i).data,'met');
             multStruct(i).data = rmfield(multStruct(i).data,'wave');           
