@@ -5,6 +5,10 @@ function [p,val,xmax] = calcDeviceVal(type,xq,n)
 %and: https://www.mathworks.com/matlabcentral/answers/94272-how-do-i-constrain-
 %a-fitted-curve-through-specific-points-like-the-origin-in-matlab
 
+%inflaton updates:
+turb_inf = 1.19; %turbine inflation 2018 -> 2022
+dgen_inf = 1.15; %diesel generator inflation 2020 -> 2022
+
 if isequal(type,'turbine')
     turbineLibrary
     x = zeros(1,length(turbineLib));
@@ -12,7 +16,7 @@ if isequal(type,'turbine')
     %unpack into arrays
     for i = 1:length(turbineLib)
         x(i) = turbineLib(i).kW;
-        y(i) = turbineLib(i).cost;
+        y(i) = turbineLib(i).cost*turb_inf;
     end
 elseif isequal(type,'agm')
     batteryLibrary_agm
@@ -49,7 +53,7 @@ elseif isequal(type,'dieselcost')
     %unpack into arrays
     for i = 1:length(diesLib)
         x(i) = diesLib(i).kW;
-        y(i) = diesLib(i).cost;
+        y(i) = diesLib(i).cost*dgen_inf;
     end
 elseif isequal(type,'dieselmass')
     dieselLibrary
