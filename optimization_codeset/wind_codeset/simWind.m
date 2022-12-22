@@ -99,9 +99,10 @@ nvi = nbr + econ.wind.lambda*uc.lifetime; %number of vessel interventions
 %-kW cost goes up x2
 %-turb repair goes down by 1/2
 %-assuming yes...
-kWcost = 2*polyval(opt.p_dev.t,kW)*econ.wind.marinization; %turbine
+kWcost = 2*polyval(opt.p_dev.t,kW)*econ.wind.marinization ...
+    *econ.wind.tcm; %turbine
 Icost = 2*(econ.wind.installed - 0.5*kWcost/ ...
-    (kW*econ.wind.marinization))*kW; %installation
+    (kW*econ.wind.marinization*econ.wind.tcm))*kW; %installation
 if Icost < 0, Icost = 0; end
 if bc == 1 %lead acid
     if Smax < opt.p_dev.kWhmax %less than linear region

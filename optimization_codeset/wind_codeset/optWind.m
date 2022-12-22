@@ -6,12 +6,12 @@ opt.kW_m = opt.bf.M*2; %[kW] (up to 8 kW for wind)
 opt.Smax_1 = 1;
 opt.Smax_n = opt.bf.N; %[kWh]
 
-%set sensitivity modifiers to 1 if absent
+%set sensitivity modifiers to value if existing
 if isfield(data,'depth_mod')
-    data.depth_mod = data.depth_mod; %depth modifier
+    data.depth = data.depth_mod; %depth modifier
 end
 if isfield(data,'dist_mod')
-    data.dist_mod = data.dist_mod; %dist to coast modifier
+    data.dist = data.dist_mod; %dist to coast modifier
 end
 if isfield(econ.vessel,'tmt_enf') && ...
         (opt.sens || opt.tdsens || opt.senssm) && ...
@@ -28,7 +28,7 @@ switch econ.wind.scen
         econ.wind.lambda = econ.wind.highfail; %vessel interventions
 end
 %if sensitivity analysis
-if isfield(econ.wave,'lambda_mod')
+if isfield(econ.wind,'lambda_mod')
     econ.wind.lambda = econ.wind.lambda_mod; %lamdba modifier
 end
 

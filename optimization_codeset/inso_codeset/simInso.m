@@ -200,10 +200,10 @@ pvci = inso.pvci; %pv cleaning interval
 nbr = ceil((12*uc.lifetime/batt_lft-1)); %number of battery replacements
 
 %economic modeling
-Mcost = econ.inso.module*kW*econ.inso.marinization; %module
-Icost = econ.inso.installation*kW; %installation
-Ecost = econ.inso.electrical*kW; %electrical infrastructure
-Strcost = econ.inso.structural*kW; %structural infrastructure
+Mcost = econ.inso.module*kW*econ.inso.marinization*econ.inso.pcm; %module
+Icost = econ.inso.installation*kW*econ.inso.pcm; %installation
+Ecost = econ.inso.electrical*kW*econ.inso.pcm; %electrical infrastructure
+Strcost = econ.inso.structural*kW*econ.inso.pcm; %structural infrastructure
 if bc == 1 %lead acid
     if Smax < opt.p_dev.kWhmax %less than linear region
         Scost = polyval(opt.p_dev.b,Smax);

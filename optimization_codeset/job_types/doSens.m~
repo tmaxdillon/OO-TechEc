@@ -78,148 +78,120 @@ for i = 1:opt.S
     elseif isequal(opt.tuned_parameter,'fco')
         econ.dies.fcost = opt.tuning_array(i);
     elseif isequal(opt.tuned_parameter,'fca')
-        dies.fmax = opt.tuning_array(i);
+        econ.dies.fmax = opt.tuning_array(i);
     elseif isequal(opt.tuned_parameter,'fsl')
-        dies.ftmax = opt.tuning_array(i);
+        turb.szo = opt.tuning_array(i);
     elseif isequal(opt.tuned_parameter,'oci')
-        dies.oilint = opt.tuning_array(i);
+        turb.szo = opt.tuning_array(i);
     elseif isequal(opt.tuned_parameter,'gcm')
-        econ.dies.gcm = opt.tuning_array(i);
-    %all
-    elseif isequal(opt.tuned_parameter,'lft')
-        uc(c).lifetime = opt.tuning_array(i);
-    elseif isequal(opt.tuned_parameter,'dtc')
-        data.dist_mod = opt.tuning_array(i);
-    elseif isequal(opt.tuned_parameter,'osv')
-        econ.vessel.osvcost = opt.tuning_array(i);
-    elseif isequal(opt.tuned_parameter,'spv')
-        econ.vessel.speccost = opt.tuning_array(i);
-    elseif isequal(opt.tuned_parameter,'tmt')
-        econ.vessel.tmt_enf = opt.tuning_array(i);
-    elseif isequal(opt.tuned_parameter,'eol')
-        batt.EoL = opt.tuning_array(i);
-    elseif isequal(opt.tuned_parameter,'dep')
-        data.depth_mod = opt.tuning_array(i);
-    elseif isequal(opt.tuned_parameter,'bcc') 
-        batt.cost = opt.tuning_array(i);
-    elseif isequal(opt.tuned_parameter,'bhc')
-        econ.batt.enclmult = opt.tuning_array(i);
-    elseif isequal(opt.tuned_parameter,'utp')
-        uc(c).uptime = opt.tuning_array(i);
-    elseif isequal(opt.tuned_parameter,'ild')
-        uc(c).draw = opt.tuning_array(i);
-    elseif isequal(opt.tuned_parameter,'sdr')
-        batt.sdr = opt.tuning_array(i);
-    else
-        error(['sensitivity variable ' opt.tuned_parameter ...
-            ' doesn''t align!'])
+        turb.szo = opt.tuning_array(i);
+        
+
+        
+        
+        
+    if isequal(opt.tuned_parameter,'wcp')
+        wave.cutout_prctile = opt.tuning_array(i);
     end
-% 
-%         
-%         
-%         
-%     if isequal(opt.tuned_parameter,'wcp')
-%         wave.cutout_prctile = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'wrp')
-%         wave.rated_prctile = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'wes')
-%         econ.wave.enf_scen = opt.tuning_array(:,i);
-%     end
-%     if isequal(opt.tuned_parameter,'utp')
-%         uc(c).uptime = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'load')
-%         uc(c).draw = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'zo')
-%         atmo.zo = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'imf')
-%         econ.inso.marinization = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'btm')
-%         batt.t_add_m = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'mbt')
-%         batt.t_add_min = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'mzm')
-%         econ.wind.marinization = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'sbm')
-%         turb.spar_bm = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'tiv')
-%         uc(c).turb.lambda = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'twf')
-%         turb.wf = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'ild')
-%         uc(c).draw = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'osv')
-%         econ.vessel.osvcost = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'nbl')
-%         batt.lc_nom = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'sdr')
-%         batt.sdr = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'utp')
-%         uc(c).uptime = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'bhc')
-%         econ.batt.enclmult = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'dep')
-%         data.depth_mod = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'dtc')
-%         data.dist_mod = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'cwm')
-%         wave.cw_mod = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'wiv')
-%         econ.wave.lambda_mod = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'wcm')
-%         econ.wave.costmult_mod = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'whl')
-%         wave.house = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'hra')
-%         wave.Hs_ra = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'tra')
-%         wave.Tp_ra = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'mbl')
-%         batt.lc_max = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'lft')
-%         uc(c).lifetime = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'spv')
-%         econ.vessel.speccost = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'tmt')
-%         econ.vessel.tmt_enf = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'bcc')
-%         batt.cost = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'bbt')
-%         batt.T = opt.tuning_array(i);
-%     end
-%     if isequal(opt.tuned_parameter,'eol')
-%         batt.EoL = opt.tuning_array(i);
-%     end
+    if isequal(opt.tuned_parameter,'wrp')
+        wave.rated_prctile = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'wes')
+        econ.wave.enf_scen = opt.tuning_array(:,i);
+    end
+    if isequal(opt.tuned_parameter,'utp')
+        uc(c).uptime = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'load')
+        uc(c).draw = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'zo')
+        atmo.zo = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'imf')
+        econ.inso.marinization = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'btm')
+        batt.t_add_m = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'mbt')
+        batt.t_add_min = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'mzm')
+        econ.wind.marinization = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'sbm')
+        turb.spar_bm = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'tiv')
+        uc(c).turb.lambda = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'twf')
+        turb.wf = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'ild')
+        uc(c).draw = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'osv')
+        econ.vessel.osvcost = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'nbl')
+        batt.lc_nom = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'sdr')
+        batt.sdr = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'utp')
+        uc(c).uptime = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'bhc')
+        econ.batt.enclmult = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'dep')
+        data.depth_mod = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'dtc')
+        data.dist_mod = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'cwm')
+        wave.cw_mod = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'wiv')
+        econ.wave.lambda_mod = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'wcm')
+        econ.wave.costmult_mod = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'whl')
+        wave.house = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'hra')
+        wave.Hs_ra = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'tra')
+        wave.Tp_ra = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'mbl')
+        batt.lc_max = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'lft')
+        uc(c).lifetime = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'spv')
+        econ.vessel.speccost = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'tmt')
+        econ.vessel.tmt_enf = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'bcc')
+        batt.cost = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'bbt')
+        batt.T = opt.tuning_array(i);
+    end
+    if isequal(opt.tuned_parameter,'eol')
+        batt.EoL = opt.tuning_array(i);
+    end
     [multStruct(i).output,multStruct(i).opt] =  ...
         optRun(pm,opt,data,atmo,batt,econ,uc(c),bc, ...
         inso,turb,wave,dies);

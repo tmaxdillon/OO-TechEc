@@ -169,8 +169,9 @@ econ.vessel.t_ms = 2;               %[h] time on site for maint (spec)
 % econ.batt.encl.cap = 10;            %[kWh]
 econ.batt.enclmult = 1;             %multiplier on battery cost for encl
 %wind
-econ.wind.installed = 10117;        %[$/kW] installed cost (DWR, 2017)
+%econ.wind.installed = 10117;        %[$/kW] installed cost (DWR, 2017)
 econ.wind.installed = 5120;         %[$/kW] installed cost (DWR, 2022)
+econ.wind.tcm = 1;                  %turbine cost multiplier (sens var)
 %econ.wind.mim = 137/49;             %marine installment multiplier (CoWR)
 econ.wind.marinization = 1.8;       %[CoWR]
 econ.wind.lowfail = 0;              %failures per year (optimistic)
@@ -181,6 +182,7 @@ econ.inso.installation = 160;       %[$/kW]
 econ.inso.electrical = 310;         %[$/kW]
 econ.inso.structural = 90;         %[$/kW]
 econ.inso.marinization = 1.2;       %[~]
+econ.inso.pcm = 1;                  %cost multiplier (sens var)
 %wave costs
 econ.wave.scenarios = 3;            %number of scenarios
 econ.wave.costmult_con = 10;         %conservative cost multiplier
@@ -193,6 +195,7 @@ econ.dies.enclcost = 5000*1.19;     %[$], 2018->2022
 econ.dies.enclcap = 1.5;            %[m^3]
 econ.dies.autostart = 3000*1.15;    %[$], 2020->2022
 econ.dies.fail = .2;                %failures per year
+econ.dies.gcm = 1;                  %generator cost multiplier (sens var)
 
 %ENERGY
 %wind parameters

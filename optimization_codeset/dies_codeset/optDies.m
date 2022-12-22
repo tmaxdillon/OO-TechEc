@@ -13,6 +13,12 @@ end
 if isfield(data,'dist_mod')
     data.dist = data.dist_mod; %dist to coast modifier
 end
+if isfield(econ.vessel,'tmt_enf') && ...
+        (opt.sens || opt.tdsens || opt.senssm) && ...
+        isequal(opt.tuned_parameter,'tmt')
+    econ.vessel.t_mosv = econ.vessel.tmt_enf; %osv maintenance time
+    econ.vessel.t_ms = econ.vessel.tmt_enf; %spec maintenance time
+end
 
 %check to make sure coarse mesh will work
 opt.fmin = false;
