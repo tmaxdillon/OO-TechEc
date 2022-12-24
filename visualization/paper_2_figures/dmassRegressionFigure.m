@@ -159,5 +159,5 @@ leg = legend(h);
 set(leg,'Position',[.65 .35 .01 .01])
 grid on
 
-print(reg,['../Research/OO-TechEc/wave-comparison/' ...
+print(reg,['~/Dropbox (MREL)/Research/OO-TechEc/wave-comparison/' ...
     'paper_figures/dmassreg'],'-dpng','-r600')

@@ -63,6 +63,8 @@ for i = 1:opt.S
         inso.wf = opt.tuning_array(i);
     elseif isequal(opt.tuned_parameter,'pve')
         inso.eff = opt.tuning_array(i);
+    elseif isequal(opt.tuned_parameter,'rai')
+        inso.rated = opt.tuning_array(i);
     %wave
     elseif isequal(opt.tuned_parameter,'wiv')
         econ.wave.lambda_mod = opt.tuning_array(i);

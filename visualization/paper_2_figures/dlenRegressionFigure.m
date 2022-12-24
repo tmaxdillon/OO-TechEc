@@ -1,4 +1,4 @@
-set(0,'defaulttextinterpreter','none')
+set(0,'defaulttextinterpreter','tex')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
@@ -155,5 +155,5 @@ leg = legend(h);
 set(leg,'Position',[.725 .85 .01 .01])
 grid on
 
-print(reg,['../Research/OO-TechEc/wave-comparison/' ...
+print(reg,['~/Dropbox (MREL)/Research/OO-TechEc/wave-comparison/' ...
     'paper_figures/dvolreg'],'-dpng','-r600')

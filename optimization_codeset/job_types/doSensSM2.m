@@ -1,9 +1,9 @@
-function [pvd,pcm,pwf,pve, ...
+function [pvd,pcm,pwf,pve,rai, ...
     lft,dtc,osv,spv,tmt,eol,dep,bcc,bhc,utp,ild,sdr,s0] ...
     = doSensSM2(batchtype,batchpm,batchscen,batchloc,batchc)
 
 n = 10; %sensitivity discretization
-rsv = 4; %resource specific variables
+rsv = 5; %resource specific variables
 
 tTot = tic;
 optInputs %load inputs
@@ -22,6 +22,8 @@ tp{3} = 'pwf'; %panel weight factor
 ta(3,:) = linspace(10,100,n);
 tp{4} = 'pve'; %panel efficiency
 ta(4,:) = linspace(0.14,0.5,n);
+tp{5} = 'rai'; %rated irradiance
+ta(5,:) = linspace(0.6,1.5,n);
 
 tp{rsv+1} = 'lft'; %lifetime [years]
 ta(rsv+1,:) = linspace(1,10,n);
@@ -52,6 +54,7 @@ pvd = doSens(ta(1,:),tp{1},batchtype,batchpm,batchscen,batchloc,batchc);
 pcm = doSens(ta(2,:),tp{2},batchtype,batchpm,batchscen,batchloc,batchc);
 pwf = doSens(ta(3,:),tp{3},batchtype,batchpm,batchscen,batchloc,batchc);
 pve = doSens(ta(4,:),tp{4},batchtype,batchpm,batchscen,batchloc,batchc);
+rai = doSens(ta(5,:),tp{5},batchtype,batchpm,batchscen,batchloc,batchc);
 
 lft = doSens(ta(1+rsv,:),tp{1+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
 dtc = doSens(ta(2+rsv,:),tp{2+rsv},batchtype,batchpm,batchscen,batchloc,batchc);

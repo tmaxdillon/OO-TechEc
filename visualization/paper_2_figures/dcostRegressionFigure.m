@@ -1,9 +1,9 @@
-set(0,'defaulttextinterpreter','none')
+set(0,'defaulttextinterpreter','tex')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
-clearvars -except xf yf xlab ylab legendname alphavar x y n p
+clearvars -except xf yf xlab ylab legendname alphavar x y n p xlimmax
 if ~exist('xf','var')
     type = 'dieselcost';
     n = 1;
@@ -152,5 +152,5 @@ leg = legend(h);
 set(leg,'Position',[.725 .35 .01 .01])
 grid on
 
-print(reg,['../Research/OO-TechEc/wave-comparison/' ...
+print(reg,['~/Dropbox (MREL)/Research/OO-TechEc/wave-comparison/' ...
     'paper_figures/dcostreg'],'-dpng','-r600')

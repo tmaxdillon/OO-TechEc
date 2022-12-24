@@ -258,6 +258,11 @@ if inso.cleanstrat == 1 || econ.inso.scen == 1
 %         nvi = nbr;
 %     end
 elseif inso.cleanstrat == 4 %cleaning every other winter
+    if uc.SI > 6
+        nvi = length(data.wint_clean_ind);
+    else
+        nvi = nbr;
+    end
     nvi = length(data.wint_clean_ind);
 end
 if uc.SI < 12 %short term instrumentation
