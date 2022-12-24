@@ -132,6 +132,7 @@ for l = 1:3
 end
 xlabel(xl)
 ylabel('Cost [%]')
+ylim([.25 1.5])
 set(ax(1),'FontSize',14)
 set(ax(1),'LineWidth',1.1)
 legend('show','location','southoutside')
@@ -144,6 +145,7 @@ for l = 1:3
 end
 xlabel(xl)
 ylabel('Cost [%]')
+ylim([.25 1.5])
 set(ax(2),'FontSize',14)
 set(ax(2),'LineWidth',1.1)
 legend('show','location','southoutside')

@@ -6,7 +6,7 @@ function [p,val,xmax] = calcDeviceVal(type,xq,n)
 %a-fitted-curve-through-specific-points-like-the-origin-in-matlab
 
 %inflaton updates:
-turb_inf = 1.19; %turbine inflation 2018 -> 2022 (or no change?)
+turb_inf = 1; %turbine inflation 2018 -> 2022 (or no change?)
 dgen_inf = 1.15; %diesel generator inflation 2020 -> 2022
 
 if isequal(type,'turbine')

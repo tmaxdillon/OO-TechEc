@@ -105,7 +105,7 @@ nvi = econ.wave.lambda*uc.lifetime + nbr; %vessel interventions
 
 %economic modeling
 kWcost = 2*econ.wave.costmult*polyval(opt.p_dev.t,kW); %wec
-Icost = (econ.wind.installed - (0.5*kWcost)/ ...
+Icost = 2*(econ.wind.installed - (0.5*kWcost)/ ...
     (kW*econ.wave.costmult))*kW; %installation
 if Icost < 0, Icost = 0; end
 if bc == 1 %lead acid
@@ -147,7 +147,7 @@ else
     C_v = econ.vessel.osvcost;
 end
 vesselcost = C_v*(nvi*(2*triptime + t_os)); %vessel cost
-wecrepair = 1/2*(0.5)*kWcost*(nvi); %wec repair cost
+wecrepair = 1/2*(0.5)*(kWcost+Icost)*(nvi); %wec repair cost
 if wecrepair < 0, wecrepair = 0; end %if nvi = 0, wec repair must be 0
 battreplace = Scost*nbr; %number of battery replacements
 CapEx = Pmooring + Pinst + Pmtrl + ...

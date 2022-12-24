@@ -202,8 +202,10 @@ nbr = ceil((12*uc.lifetime/batt_lft-1)); %number of battery replacements
 %economic modeling
 Mcost = econ.inso.module*kW*econ.inso.marinization*econ.inso.pcm; %module
 Icost = econ.inso.installation*kW*econ.inso.pcm; %installation
-Ecost = econ.inso.electrical*kW*econ.inso.pcm; %electrical infrastructure
-Strcost = econ.inso.structural*kW*econ.inso.pcm; %structural infrastructure
+Ecost = econ.inso.electrical*kW*econ.inso.marinization ...
+    *econ.inso.pcm; %electrical infrastructure
+Strcost = econ.inso.structural*kW*econ.inso.marinization ...
+    *econ.inso.pcm; %structural infrastructure
 if bc == 1 %lead acid
     if Smax < opt.p_dev.kWhmax %less than linear region
         Scost = polyval(opt.p_dev.b,Smax);
@@ -243,18 +245,20 @@ Pmooring = interp2(econ.platform.inso.diameter, ...
     econ.platform.inso.cost,dp,depth,'linear'); %mooring cost
 if inso.cleanstrat == 1 || econ.inso.scen == 1
     nvi = nbr;
-elseif inso.cleanstrat == 2
-    if uc.SI > 6
-        nvi = ceil((12*uc.lifetime/inso.pvci-1));
-    else
-        nvi = nbr;
-    end
-elseif inso.cleanstrat == 3 || inso.cleanstrat == 4
-    if uc.SI > 6
-        nvi = length(data.wint_clean_ind);
-    else
-        nvi = nbr;
-    end
+% elseif inso.cleanstrat == 2
+%     if uc.SI > 6
+%         nvi = ceil((12*uc.lifetime/inso.pvci-1));
+%     else
+%         nvi = nbr;
+%     end
+% elseif inso.cleanstrat == 3 || inso.cleanstrat == 4
+%     if uc.SI > 6
+%         nvi = length(data.wint_clean_ind);
+%     else
+%         nvi = nbr;
+%     end
+elseif inso.cleanstrat == 4 %cleaning every other winter
+    nvi = length(data.wint_clean_ind);
 end
 if uc.SI < 12 %short term instrumentation
     triptime = 0; %attributed to instrumentation

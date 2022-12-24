@@ -89,7 +89,7 @@ for i = 1:opt.S
     elseif isequal(opt.tuned_parameter,'lft')
         uc(c).lifetime = opt.tuning_array(i);
     elseif isequal(opt.tuned_parameter,'dtc')
-        data.dist_mod = opt.tuning_array(i);
+        data.dist_mod = opt.tuning_array(i)*1000; %convert from km to m
     elseif isequal(opt.tuned_parameter,'osv')
         econ.vessel.osvcost = opt.tuning_array(i);
     elseif isequal(opt.tuned_parameter,'spv')

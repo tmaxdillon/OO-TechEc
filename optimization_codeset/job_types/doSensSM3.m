@@ -19,7 +19,7 @@ ta(1,:) = linspace(0,2.25,n);
 tp{2} = 'wcm'; %wec cost multiplier
 ta(2,:) = linspace(2,14,n);
 tp{3} = 'whl'; %wec hotel load
-ta(3,:) = linspace(0,18,n);
+ta(3,:) = linspace(0,.18,n);
 tp{4} = 'ect'; %wec conversion and transmission efficiency
 ta(4,:) = linspace(0.45,0.9,n);
 

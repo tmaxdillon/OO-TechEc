@@ -1,8 +1,9 @@
-function [tiv,tcm,twf,cis,rsp,cos,tef,szo, ...
+function [tiv,tcm,twf,cis,rsp,cos,szo, ...
     lft,dtc,osv,spv,tmt,eol,dep,bcc,bhc,utp,ild,sdr,s0] ...
     = doSensSM1(batchtype,batchpm,batchscen,batchloc,batchc)
 
 n = 10; %sensitivity discretization
+rsv = 7; %resource specific variables
 
 tTot = tic;
 optInputs %load inputs
@@ -24,58 +25,58 @@ ta(4,:) = linspace(0,6.75,n);
 tp{5} = 'rsp'; %rated speed
 ta(5,:) = linspace(8,14.75,n);
 tp{6} = 'cos'; %cut out speed
-ta(6,:) = linspace(22,40,n);
-tp{7} = 'tef'; %turbine efficiency
-ta(7,:) = linspace(0.25,.475,n);
-tp{8} = 'szo'; %surface roughness
-ta(8,:) = linspace(0.005,0.02,n);
+ta(6,:) = linspace(16,34,n);
+% tp{7} = 'tef'; %turbine efficiency
+% ta(7,:) = linspace(0.25,.475,n);
+tp{7} = 'szo'; %surface roughness
+ta(7,:) = linspace(0.005,0.02,n);
 
-tp{9} = 'lft'; %lifetime [years]
-ta(9,:) = linspace(1,10,n);
-tp{10} = 'dtc'; %distance to coast [km]
-ta(10,:) = linspace(10,1400,n);
-tp{11} = 'osv'; %offshore suppport vessel cost [$/day]
-ta(11,:) = linspace(250,42750,n);
-tp{12} = 'spv'; %specialized vessel cost [$/day]
-ta(12,:) = linspace(7500,97500,n);
-tp{13} = 'tmt'; %time spent on site for power system maintenance [h]
-ta(13,:) = linspace(1,12,n);
-tp{14} = 'eol'; %battery end of life [percent as decimal]
-ta(14,:) = linspace(.05,27.5,n);
-tp{15} = 'dep'; %water depth [m]
-ta(15,:) = linspace(120,5500,n);
-tp{16} = 'bcc'; %battery cell cost [$/kWh]
-ta(16,:) = linspace(66,786,n);
-tp{17} = 'bhc'; %battery housing cost (multiplier)
-ta(17,:) = linspace(0.25,2.5,n);
-tp{18} = 'utp'; %uptime percent [percent as decimal]
-ta(18,:) = linspace(0.8,1,n);
-tp{19} = 'ild'; %instrumentation load [W]
-ta(19,:) = linspace(100,400,n);
-tp{20} = 'sdr'; %self-discharge rate of battery [%/month]
-ta(20,:) = linspace(0,15,n);
-    
+tp{rsv+1} = 'lft'; %lifetime [years]
+ta(rsv+1,:) = linspace(1,10,n);
+tp{rsv+2} = 'dtc'; %distance to coast [km]
+ta(rsv+2,:) = linspace(10,1400,n);
+tp{rsv+3} = 'osv'; %offshore suppport vessel cost [$/day]
+ta(rsv+3,:) = linspace(250,42750,n);
+tp{rsv+4} = 'spv'; %specialized vessel cost [$/day]
+ta(rsv+4,:) = linspace(7500,97500,n);
+tp{rsv+5} = 'tmt'; %time spent on site for power system maintenance [h]
+ta(rsv+5,:) = linspace(1,12,n);
+tp{rsv+6} = 'eol'; %battery end of life [percent as decimal]
+ta(rsv+6,:) = linspace(.05,27.5,n);
+tp{rsv+7} = 'dep'; %water depth [m]
+ta(rsv+7,:) = linspace(120,5500,n);
+tp{rsv+8} = 'bcc'; %battery cell cost [$/kWh]
+ta(rsv+8,:) = linspace(66,786,n);
+tp{rsv+9} = 'bhc'; %battery housing cost (multiplier)
+ta(rsv+9,:) = linspace(0.25,2.5,n);
+tp{rsv+10} = 'utp'; %uptime percent [percent as decimal]
+ta(rsv+10,:) = linspace(0.8,1,n);
+tp{rsv+11} = 'ild'; %instrumentation load [W]
+ta(rsv+11,:) = linspace(100,400,n);
+tp{rsv+12} = 'sdr'; %self-discharge rate of battery [%/month]
+ta(rsv+12,:) = linspace(0,15,n);
+  
 tiv = doSens(ta(1,:),tp{1},batchtype,batchpm,batchscen,batchloc,batchc);
 tcm = doSens(ta(2,:),tp{2},batchtype,batchpm,batchscen,batchloc,batchc);
 twf = doSens(ta(3,:),tp{3},batchtype,batchpm,batchscen,batchloc,batchc);
 cis = doSens(ta(4,:),tp{4},batchtype,batchpm,batchscen,batchloc,batchc);
 rsp = doSens(ta(5,:),tp{5},batchtype,batchpm,batchscen,batchloc,batchc);
 cos = doSens(ta(6,:),tp{6},batchtype,batchpm,batchscen,batchloc,batchc);
-tef = doSens(ta(7,:),tp{7},batchtype,batchpm,batchscen,batchloc,batchc);
-szo = doSens(ta(8,:),tp{8},batchtype,batchpm,batchscen,batchloc,batchc);
+%tef = doSens(ta(7,:),tp{7},batchtype,batchpm,batchscen,batchloc,batchc);
+szo = doSens(ta(7,:),tp{8},batchtype,batchpm,batchscen,batchloc,batchc);
 
-lft = doSens(ta(9,:),tp{9},batchtype,batchpm,batchscen,batchloc,batchc);
-dtc = doSens(ta(10,:),tp{10},batchtype,batchpm,batchscen,batchloc,batchc);
-osv = doSens(ta(11,:),tp{11},batchtype,batchpm,batchscen,batchloc,batchc);
-spv = doSens(ta(12,:),tp{12},batchtype,batchpm,batchscen,batchloc,batchc);
-tmt = doSens(ta(13,:),tp{13},batchtype,batchpm,batchscen,batchloc,batchc);
-eol = doSens(ta(14,:),tp{14},batchtype,batchpm,batchscen,batchloc,batchc);
-dep = doSens(ta(15,:),tp{15},batchtype,batchpm,batchscen,batchloc,batchc);
-bcc = doSens(ta(16,:),tp{16},batchtype,batchpm,batchscen,batchloc,batchc);
-bhc = doSens(ta(17,:),tp{17},batchtype,batchpm,batchscen,batchloc,batchc);
-utp = doSens(ta(18,:),tp{18},batchtype,batchpm,batchscen,batchloc,batchc);
-ild = doSens(ta(19,:),tp{19},batchtype,batchpm,batchscen,batchloc,batchc);
-sdr = doSens(ta(20,:),tp{20},batchtype,batchpm,batchscen,batchloc,batchc);
+lft = doSens(ta(1+rsv,:),tp{1+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
+dtc = doSens(ta(2+rsv,:),tp{2+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
+osv = doSens(ta(3+rsv,:),tp{3+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
+spv = doSens(ta(4+rsv,:),tp{4+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
+tmt = doSens(ta(5+rsv,:),tp{5+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
+eol = doSens(ta(6+rsv,:),tp{6+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
+dep = doSens(ta(7+rsv,:),tp{7+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
+bcc = doSens(ta(8+rsv,:),tp{8+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
+bhc = doSens(ta(9+rsv,:),tp{9+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
+utp = doSens(ta(10+rsv,:),tp{10+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
+ild = doSens(ta(11+rsv,:),tp{11+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
+sdr = doSens(ta(12+rsv,:),tp{12+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
 
 %get S0, default results
 optInputs %load inputs
