@@ -76,6 +76,8 @@ for i = 1:opt.S
         wave.house = opt.tuning_array(i);
     elseif isequal(opt.tuned_parameter,'ect')        
         wave.eta_ct = opt.tuning_array(i);
+    elseif isequal(opt.tuned_parameter,'rhs')        
+        wave.Hs_ra = opt.tuning_array(i);
     %dies
     elseif isequal(opt.tuned_parameter,'giv')
         econ.dies.fail = opt.tuning_array(i);

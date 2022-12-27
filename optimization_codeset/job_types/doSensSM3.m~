@@ -1,9 +1,9 @@
-function [wiv,wcm,whl,ect,rhs, ...
+function [wiv,wcm,whl,ect, ...
     lft,dtc,osv,spv,tmt,eol,dep,bcc,bhc,utp,ild,sdr,s0] ...
     = doSensSM3(batchtype,batchpm,batchscen,batchloc,batchc)
 
 n = 10; %sensitivity discretization
-rsv = 5; %resource specific variables
+rsv = 4; %resource specific variables
 
 tTot = tic;
 optInputs %load inputs
@@ -22,8 +22,8 @@ tp{3} = 'whl'; %wec hotel load
 ta(3,:) = linspace(0,.18,n);
 tp{4} = 'ect'; %wec conversion and transmission efficiency
 ta(4,:) = linspace(0.45,0.9,n);
-tp{5} = 'rhs'; %rated hs
-ta(5,:) = linspace(1.5,6,n);
+tp{5} = 'ect'; %wec conversion and transmission efficiency
+ta(5,:) = linspace(0.45,0.9,n);
 
 tp{rsv+1} = 'lft'; %lifetime [years]
 ta(rsv+1,:) = linspace(1,10,n);
@@ -54,7 +54,6 @@ wiv = doSens(ta(1,:),tp{1},batchtype,batchpm,batchscen,batchloc,batchc);
 wcm = doSens(ta(2,:),tp{2},batchtype,batchpm,batchscen,batchloc,batchc);
 whl = doSens(ta(3,:),tp{3},batchtype,batchpm,batchscen,batchloc,batchc);
 ect = doSens(ta(4,:),tp{4},batchtype,batchpm,batchscen,batchloc,batchc);
-rhs = doSens(ta(5,:),tp{5},batchtype,batchpm,batchscen,batchloc,batchc);
 
 lft = doSens(ta(1+rsv,:),tp{1+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
 dtc = doSens(ta(2+rsv,:),tp{2+rsv},batchtype,batchpm,batchscen,batchloc,batchc);

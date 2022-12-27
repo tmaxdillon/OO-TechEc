@@ -1,10 +1,5 @@
 %created by Trent Dillon on January 15th 2019
 
-%final updates
-%1. adjust upper bound of wind optimization to Gr = 8 kw (line 5 of
-%optWind.m)
-%2. fix rotor height calculation (line 24 of simWind.m)
-
 %% run optimization
 
 optInputs
@@ -47,7 +42,7 @@ elseif opt.senssm
             lft,dtc,osv,spv,tmt,eol,dep,bcc,bhc,utp,ild,sdr,s0] = ...
             doSensSM2(batchtype,batchpm,batchscen,batchloc,batchc);
     elseif pm == 3
-        [wiv,wcm,whl,ect, ...
+        [wiv,wcm,whl,ect,rhs, ...
             lft,dtc,osv,spv,tmt,eol,dep,bcc,bhc,utp,ild,sdr,s0] = ...
             doSensSM3(batchtype,batchpm,batchscen,batchloc,batchc);
     elseif pm == 4
