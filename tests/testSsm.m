@@ -1,8 +1,7 @@
 ucs = {'st','lt'};
-uc = 1;
 path = '~/Dropbox (MREL)/MATLAB/OO-TechEc/output_data/tests/';
 
-%for uc = 2
+for uc = 1:2
     for i = 1:3
         optSave(path,['wiodt_' char(ucs(uc))],'ssm',1,1,i,uc)
         optSave(path,['wicot_' char(ucs(uc))],'ssm',1,2,i,uc)
@@ -13,4 +12,4 @@ path = '~/Dropbox (MREL)/MATLAB/OO-TechEc/output_data/tests/';
         optSave(path,['wodut_' char(ucs(uc))],'ssm',3,3,i,uc)
         optSave(path,['dgent_' char(ucs(uc))],'ssm',4,1,i,uc)
     end
-%end
+end

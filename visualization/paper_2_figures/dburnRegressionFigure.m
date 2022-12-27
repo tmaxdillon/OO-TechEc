@@ -163,4 +163,4 @@ set(leg,'Position',[.55 .85 .01 .01])
 grid on
 
 print(reg,['~/Dropbox (MREL)/Research/OO-TechEc/wave-comparison/' ...
-    'paper_figures/dmassreg'],'-dpng','-r600')
+    'paper_figures/dburnreg'],'-dpng','-r600')

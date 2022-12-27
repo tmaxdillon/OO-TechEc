@@ -2,7 +2,7 @@ function [output,opt] = optWind(opt,data,atmo,batt,econ,uc,bc,turb)
 
 %set kW and Smax mesh
 opt.kW_1 = 0.1;
-opt.kW_m = opt.bf.M*2; %[kW] (up to 8 kW for wind)
+opt.kW_m = opt.bf.M; %[kW] (up to 8 kW for wind)
 opt.Smax_1 = 1;
 opt.Smax_n = opt.bf.N; %[kWh]
 

@@ -29,7 +29,7 @@ ta(6,:) = linspace(16,34,n);
 % tp{7} = 'tef'; %turbine efficiency
 % ta(7,:) = linspace(0.25,.475,n);
 tp{7} = 'szo'; %surface roughness
-ta(7,:) = linspace(0.005,0.02,n);
+ta(7,:) = linspace(0.005,0.05,n);
 
 tp{rsv+1} = 'lft'; %lifetime [years]
 ta(rsv+1,:) = linspace(1,10,n);
@@ -63,7 +63,7 @@ cis = doSens(ta(4,:),tp{4},batchtype,batchpm,batchscen,batchloc,batchc);
 rsp = doSens(ta(5,:),tp{5},batchtype,batchpm,batchscen,batchloc,batchc);
 cos = doSens(ta(6,:),tp{6},batchtype,batchpm,batchscen,batchloc,batchc);
 %tef = doSens(ta(7,:),tp{7},batchtype,batchpm,batchscen,batchloc,batchc);
-szo = doSens(ta(7,:),tp{8},batchtype,batchpm,batchscen,batchloc,batchc);
+szo = doSens(ta(7,:),tp{7},batchtype,batchpm,batchscen,batchloc,batchc);
 
 lft = doSens(ta(1+rsv,:),tp{1+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
 dtc = doSens(ta(2+rsv,:),tp{2+rsv},batchtype,batchpm,batchscen,batchloc,batchc);

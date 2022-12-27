@@ -57,6 +57,8 @@ for i = 1:opt.S
     %inso
     elseif isequal(opt.tuned_parameter,'pvd')
         inso.deg = opt.tuning_array(i);
+    elseif isequal(opt.tuned_parameter,'psr')
+        atmo.soil = opt.tuning_array(i);
     elseif isequal(opt.tuned_parameter,'pcm')
         econ.inso.pcm = opt.tuning_array(i);
     elseif isequal(opt.tuned_parameter,'pwf')
