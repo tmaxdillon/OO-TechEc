@@ -25,7 +25,7 @@ ta(4,:) = linspace(6,60,n);
 tp{5} = 'oci'; %oil change interval
 ta(5,:) = linspace(100,1450,n);
 tp{6} = 'gcm'; %generator cost multiplier
-ta(6,:) = linspace(0.1,1.225,n);
+ta(6,:) = linspace(0.1,1.9,n);
 
 tp{rsv+1} = 'lft'; %lifetime [years]
 ta(rsv+1,:) = linspace(1,10,n);

@@ -15,11 +15,11 @@ uc = uc(c);
 opt.S = n; %for command window notification
 
 tp{1} = 'pvd'; %panel degradation
-ta(1,:) = linspace(0,1.8,n);
+ta(1,:) = linspace(.1,1.9,n);
 tp{2} = 'psr'; %panel soil rate
 ta(2,:) = linspace(0,45,n);
 tp{3} = 'pcm'; %panel cost muliplier (applies to other categories too) 
-ta(3,:) = linspace(0.1,1.225,n);
+ta(3,:) = linspace(0.1,1.9,n);
 tp{4} = 'pwf'; %panel weight factor
 ta(4,:) = linspace(10,100,n);
 tp{5} = 'pve'; %panel efficiency
