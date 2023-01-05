@@ -1,9 +1,9 @@
-function [giv,fco,fca,fsl,oci,gcm, ...
+function [giv,fco,fca,fsl,oci,gcm,pmm, ...
     lft,dtc,osv,spv,tmt,eol,dep,bcc,bhc,utp,ild,sdr,s0] ...
     = doSensSM4(batchtype,batchpm,batchscen,batchloc,batchc)
 
 n = 10; %sensitivity discretization
-rsv = 6; %resource specific variables
+rsv = 7; %resource specific variables
 
 tTot = tic;
 optInputs %load inputs
@@ -26,6 +26,8 @@ tp{5} = 'oci'; %oil change interval
 ta(5,:) = linspace(100,1450,n);
 tp{6} = 'gcm'; %generator cost multiplier
 ta(6,:) = linspace(0.1,1.9,n);
+tp{7} = 'pmm'; %platform material multiplier
+ta(7,:) = linspace(3,12,n);
 
 tp{rsv+1} = 'lft'; %lifetime [years]
 ta(rsv+1,:) = linspace(1,10,n);
@@ -58,6 +60,7 @@ fca = doSens(ta(3,:),tp{3},batchtype,batchpm,batchscen,batchloc,batchc);
 fsl = doSens(ta(4,:),tp{4},batchtype,batchpm,batchscen,batchloc,batchc);
 oci = doSens(ta(5,:),tp{5},batchtype,batchpm,batchscen,batchloc,batchc);
 gcm = doSens(ta(6,:),tp{6},batchtype,batchpm,batchscen,batchloc,batchc);
+pmm = doSens(ta(7,:),tp{7},batchtype,batchpm,batchscen,batchloc,batchc);
 
 lft = doSens(ta(1+rsv,:),tp{1+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
 dtc = doSens(ta(2+rsv,:),tp{2+rsv},batchtype,batchpm,batchscen,batchloc,batchc);

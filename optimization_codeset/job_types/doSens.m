@@ -92,6 +92,8 @@ for i = 1:opt.S
     elseif isequal(opt.tuned_parameter,'gcm')
         econ.dies.gcm = opt.tuning_array(i);
     %all
+    elseif isequal(opt.tuned_parameter,'pmm')
+        econ.platform.wf = opt.tuning_array(i);        
     elseif isequal(opt.tuned_parameter,'lft')
         uc(c).lifetime = opt.tuning_array(i);
     elseif isequal(opt.tuned_parameter,'dtc')

@@ -11,7 +11,7 @@ opt.sens = 0;
 opt.tdsens = 0;
 opt.senssm = 0;
 opt.highresobj = 0;
-pm = 4; %power module, 1:Wi 2:In 3:Wa 4:Di
+pm = 2; %power module, 1:Wi 2:In 3:Wa 4:Di
 c = 2;  %use case 1:ST 2:LT
 loc = 'argBasin'; %location
 %batch = false;
@@ -142,7 +142,7 @@ elseif pm == 1 %wind
 end
 clear cost depth diameter
 econ.platform.wf = 5;               %weight factor (of light ship)
-econ.platform.steel = 730;          %[$/metric ton], steelbenchmarker
+econ.platform.steel = 2000;          %[$/metric ton], steelbenchmarker
 econ.platform.t_i = [6 12];         %[h] added h for inst
 econ.platform.d_i = [500 5000];     %[m] depth for inst cost
 %econ.platform.moorcost = 5.23;      %[$/(m-m)] cost of mooring (no AR)
@@ -204,7 +204,7 @@ turb.ura = 11;              %[m/s] awea
 turb.uco = 30;              %[m/s] guess
 turb.eta = 0.35;            %[~] guess
 turb.clearance = 4;         %[m] surface to bottom of swept area clearance
-turb.wf = 70;               %[kg/kW]
+turb.wf = 15;               %[kg/kW]
 %turb.nu = 0.26;
 % turb.spar_t = 0.04;         %[m] spar thickness
 % turb.spar_ar = 6;           %aspect ratio 
@@ -214,7 +214,7 @@ inso.rated = 1;             %[kW/m^2] from Brian
 inso.eff = 0.18;            %[~] from Devin (may trail off when off of MPP)
 inso.deg = 0.5;             %[%/year]
 %inso.pvci = 24;             %[months] cleaning interval
-inso.wf = 60;               %[kg/m^2] weight factor
+inso.wf = 30;               %[kg/m^2] weight factor
 inso.debug = false;          %toggle debugging kW/kWh combo for shooter
 inso.shootdebug = false;    %toggle debugging pvci shooter
 inso.shoottol = 5;          %months

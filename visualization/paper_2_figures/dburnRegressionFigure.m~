@@ -1,11 +1,11 @@
-set(0,'defaulttextinterpreter','tex')
+set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
 clearvars -except xf yf xlab ylab legendname alphavar x y n p xlimmax
 if ~exist('xf','var')
-    type = 'dieselcost';
+    type = 'dieselburn';
     n = 1;
     xmax = 22; %[kw]
     if isequal(type,'turbine')
@@ -56,10 +56,14 @@ if ~exist('xf','var')
             x(i) = diesLib(i).kW;
             y(i) = diesLib(i).cost;
         end
-        ylab = {'Market','Cost','[$1000s]'};
+        ylab = '[$]';
     elseif isequal(type,'dieselmass')
         xf = 0:0.01:xmax; %kW
         xlab = 'Rated Power [kW]';
+        xlimmax = 22;
+        legendname = 'Generators';
+        alphavar = 'Mass';
+        dieselLibrary
         dieselLibrary
         x = zeros(1,length(diesLib));
         y = zeros(1,length(diesLib));
@@ -72,18 +76,24 @@ if ~exist('xf','var')
     elseif isequal(type,'dieselsize')
         xf = 0:0.01:xmax; %kW
         xlab = 'Rated Power [kW]';
+        xlimmax = 22;
+        legendname = 'Generators';
+        alphavar = 'Volume';
         dieselLibrary
         x = zeros(1,length(diesLib));
         y = zeros(1,length(diesLib));
         %unpack into arrays
         for i = 1:length(diesLib)
             x(i) = diesLib(i).kW;
-            y(i) = diesLib(i).d;
+            y(i) = diesLib(i).d.^3;
         end
-        ylab = '[m]';
+        ylab = '[m^3]';
     elseif isequal(type,'dieselburn')
         xf = 0:0.01:xmax; %kW
         xlab = 'Rated Power [kW]';
+        xlimmax = 22;
+        legendname = 'Generators';
+        alphavar = 'Burn Rate';
         dieselLibrary
         x = zeros(1,length(diesLib));
         y = zeros(1,length(diesLib));
@@ -92,7 +102,7 @@ if ~exist('xf','var')
             x(i) = diesLib(i).kW;
             y(i) = diesLib(i).c;
         end
-        ylab = '[l/h]';
+        ylab = '[L/h]';
     end
     
     yf = zeros(length(xf),length(n));
@@ -121,13 +131,13 @@ for j=1:length(n)
     %     h(j) = plot(xf,yf(:,j)./(xf*1000)',color(j),'DisplayName',[num2str(n(j)) ...
     %         ' order polynomial fit'],'LineWidth',1.4); % $1000/x by x
     %boundedline(x,y,delta,'alpha','transparency',.1)
-    h(j) = plot(xf,yf(:,j)/1000,'Color',blue,'DisplayName', ...
-        ['Trend'], ...
+    h(j) = plot(xf,yf(:,j),'Color',blue,'DisplayName', ...
+        ['Linear Fit'], ...
         'LineWidth',lw); % $1000/x by x
     hold on
 end
 hold on
-h(j+1) = scatter(x,y/1000,ms,'.','k','DisplayName',legendname);
+h(j+1) = scatter(x,y,ms,'.','k','DisplayName',legendname);
 ylabel(ylab)
 xlabel(xlab)
 ylh = get(gca,'ylabel');
@@ -149,8 +159,8 @@ set(gca,'Position',axpos)
 % set(gca,'xticklabel',num2str(get(gca,'xtick')','%.1f'))
 % set(gca,'yticklabel',num2str(get(gca,'ytick')','%d'))
 leg = legend(h);
-set(leg,'Position',[.725 .35 .01 .01])
+set(leg,'Position',[.55 .85 .01 .01])
 grid on
 
 print(reg,['~/Dropbox (MREL)/Research/OO-TechEc/wave-comparison/' ...
-    'paper_figures/dcostreg'],'-dpng','-r600')
+    'paper_figures/dburnreg'],'-dpng','-r600')

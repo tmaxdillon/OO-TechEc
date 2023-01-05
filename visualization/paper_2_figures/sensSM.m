@@ -6,7 +6,7 @@ set(0,'defaulttextinterpreter','tex')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
-%pm = 3;
+%pm = 1;
 printon = true;
 
 path = '~/Dropbox (MREL)/MATLAB/OO-TechEc/output_data/oossm_out/';
@@ -180,7 +180,7 @@ ann = {'(a)','(b)','(c)','(d)','(e)','(f)','(g)','(h)','(i)','(j)', ...
 
 ssm_allscen = figure;
 set(gcf,'Units','inches')
-set(gcf,'Position', [1, 1, 6.5, 6])
+set(gcf,'Position', [1, 1, 6.5, 5.9])
 
 %possible color schemes
 % col = colormap(brewermap(10,'Dark2')); %colors (after figure set)
@@ -258,7 +258,7 @@ for a = 1:size(array_ssm,1)
 %     YTickString{2} = ['$$\begin{array}{c} \mathrm{Total} \\' ...
 %         '\mathrm{Cost} \\ \end{array}$$'];
       %percent tick labels
-    xt_yadj = -2;
+    xt_yadj = -4;
     %ylim([.25 mean([max(squeeze(max(cost(:,:,:),[],1:2))./t0(:)) 1])])
     ylim([.25 1.75])
     yticks([0 0.5 1 1.5 2])
@@ -413,7 +413,7 @@ xlen = .95;
 ylen = .95;
 xmarg = .4;
 ymarg = .35;
-yoff = 1;
+yoff = .9;
 for a = 1:size(array_ssm,1)
     set(ax(a),'Units','Inches','Position', ...
         [xoff+(rem(a-1,4)*(xlen+xmarg)) ...

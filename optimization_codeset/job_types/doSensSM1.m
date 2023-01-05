@@ -1,9 +1,9 @@
-function [tiv,tcm,twf,cis,rsp,cos,szo, ...
+function [tiv,tcm,twf,cis,rsp,cos,szo,pmm, ...
     lft,dtc,osv,spv,tmt,eol,dep,bcc,bhc,utp,ild,sdr,s0] ...
     = doSensSM1(batchtype,batchpm,batchscen,batchloc,batchc)
 
 n = 10; %sensitivity discretization
-rsv = 7; %resource specific variables
+rsv = 8; %resource specific variables
 
 tTot = tic;
 optInputs %load inputs
@@ -30,6 +30,8 @@ ta(6,:) = linspace(16,34,n);
 % ta(7,:) = linspace(0.25,.475,n);
 tp{7} = 'szo'; %surface roughness
 ta(7,:) = linspace(0.005,0.05,n);
+tp{8} = 'pmm'; %platform material multiplier
+ta(8,:) = linspace(3,12,n);
 
 tp{rsv+1} = 'lft'; %lifetime [years]
 ta(rsv+1,:) = linspace(1,10,n);
@@ -64,6 +66,7 @@ rsp = doSens(ta(5,:),tp{5},batchtype,batchpm,batchscen,batchloc,batchc);
 cos = doSens(ta(6,:),tp{6},batchtype,batchpm,batchscen,batchloc,batchc);
 %tef = doSens(ta(7,:),tp{7},batchtype,batchpm,batchscen,batchloc,batchc);
 szo = doSens(ta(7,:),tp{7},batchtype,batchpm,batchscen,batchloc,batchc);
+pmm = doSens(ta(8,:),tp{8},batchtype,batchpm,batchscen,batchloc,batchc);
 
 lft = doSens(ta(1+rsv,:),tp{1+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
 dtc = doSens(ta(2+rsv,:),tp{2+rsv},batchtype,batchpm,batchscen,batchloc,batchc);
