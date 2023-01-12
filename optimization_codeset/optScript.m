@@ -1,7 +1,7 @@
 %created by Trent Dillon on January 15th 2019
 
 %final changes
-%-run without platform mass
+%-run with adjusted nvi for simInso (commented out overwrite)
 
 %% run optimization
 

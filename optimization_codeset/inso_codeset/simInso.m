@@ -263,7 +263,7 @@ elseif inso.cleanstrat == 4 %cleaning every other winter
     else
         nvi = nbr;
     end
-    nvi = length(data.wint_clean_ind);
+    %nvi = length(data.wint_clean_ind);
 end
 if uc.SI < 12 %short term instrumentation
     triptime = 0; %attributed to instrumentation
