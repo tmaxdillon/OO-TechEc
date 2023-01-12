@@ -87,18 +87,20 @@ end
 results = figure;
 set(gcf,'Units','inches')
 set(gcf, 'Position', [1, 1, 6.5, 7])
-fs = 4; %annotation font size
+fs = 5.5; %annotation font size
 fs2 = 8; %axis font size
-fs3 = 6; %eol font size
-yaxhpos = -.25; %
-cmult = 1.28; %cost axis multiplier
-gmult = 1.35; %generation axis multiplier
-bmult = 1.5; %battery axis multiplier
-blmult = 3; %battery cycle axis multiplier 
-cfmult = 1.25; %capacity factor axis multiplier
+fs3 = 5.5; %eol font size
+yaxhpos = -.2; %
+cmult = 1.6; %cost axis multiplier
+gmult = 1.15; %generation axis multiplier
+bmult = 1.3; %battery axis multiplier
+dmult = 1.1; %diameter axis multiplier
+blmult = 2.1; %battery cycle axis multiplier 
+cfmult = 1; %capacity factor axis multiplier
 cbuff = 10; %cost text buffer
 gbuff = .5; %generation text buffer
 bbuff = 10;  %battery text buffer
+dbuff = .35; %diameter text buffer
 blbuff = 1.3; %battery cycle text buffer
 cfbuff = .025; %capacity factor text buffer
 
@@ -111,7 +113,7 @@ xlab = {'\begin{tabular}{c} \\ Argentine \\ Basin \end{tabular}'; ...
     '\begin{tabular}{c} \\ Irminger \\ Sea \end{tabular}'};
 pms = {'Solar: Automated','Solar: Human','Wind: Opt. Durability',...
     'Wind: Conservative','Wave: Opt. Durability','Wave: Opt. Cost', ...
-    'Wave: Opt. Cons','Diesel'};
+    'Wave: Conservative','Diesel'};
 leg = {'Mooring','WEC CapEx','Battery CapEx','WEC OpEx', ...
     'Battery OpEx','Vessel'};
 
@@ -121,6 +123,14 @@ col(1,:) = [0,0,51]/256; %platform cost
 col([2 4],:) = flipud(brewermap(2,'purples')); %generation cost
 col([3 5],:) = flipud(brewermap(2,'blues')); %storage cost
 col(6,:) = [238,232,170]/256; %vessel cost
+insocol = [255 130 130]/256; %inso
+dgencol = [160 160 160]/256; %dies capex
+wavecol = [153,153,255]/256; %wave capex
+windcol = [132 235 163]/256; %wind capex
+% insocol = [255 170 170]/256; %inso opex
+% dgencol = [175 175 175]/256; %dies opex
+% wavecol = [170 170 255]/256; %wave opex
+% windcol = [170 255 170]/256; %wind opex
 orpink(1,:) = [255,170,150];
 orpink(2,:) = [255,170,159];
 orpink(3,:) = [255,170,179];
@@ -138,14 +148,14 @@ MaxGroupWidth = 0.75;
 groupOffset = MaxGroupWidth/NumStacksPerGroup;
 %SET BARS HARD CODE
 xbase = [0 3 6];
-subgap = .2;
+subgap = .25;
 groupgap = .1;
-bwidth = 0.06;
+bwidth = 0.075;
 
 %plot
 for c = 1:nu
     
-    ax(1,c) = subplot(7,nu,c+[0 2 4]);
+    ax(1,c) = subplot(8,nu,c+[0 2 4]);
     hold on
     for i = 1:NumStacksPerGroup
         Y = squeeze(costdata(:,i,:,c));
@@ -178,8 +188,8 @@ for c = 1:nu
         if c == 1 && i == np
             leg = legend(h(i,:,c),leg,'Location','northeast');
             leg.FontSize = fs3;
-            leg.Position(1) = .28;
-            leg.Position(2) = .83;
+            leg.Position(1) = .145;
+            leg.Position(2) = .87;
         end
         %set text
         x = get(h(i,c),'XData');
@@ -195,7 +205,7 @@ for c = 1:nu
     set(h(:,:,c),'Barwidth',bwidth)
     hold off;
     set(gca,'XTickMode','manual');
-    set(gca,'XTick',xbase+1);
+    set(gca,'XTick',xbase+1);    
     set(gca,'XTickLabelMode','manual');
     set(gca,'XTickLabel',[]);
     set(gca,'FontSize',fs2)
@@ -213,7 +223,7 @@ for c = 1:nu
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
     else
-        text(1.15,.5,'(a)','Units','Normalized', ...
+        text(1.05,.5,'(a)','Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...
             'FontSize',fs2);
         set(gca,'YTickLabel',[])
@@ -222,7 +232,7 @@ for c = 1:nu
     ylim([0 cmult*max(max(max(sum(costdata,3))))])
     linkaxes(ax(1,:),'y')
     
-    ax(2,c) = subplot(7,nu,6+c);
+    ax(2,c) = subplot(8,nu,6+c);
     hold on
     for i = 1:NumStacksPerGroup
         Y = squeeze(gendata(:,i,:,c));
@@ -231,28 +241,37 @@ for c = 1:nu
         h2(i,c) = bar(Y, 'stacked','FaceColor','flat');
         if i == 1
             xdatpos = xbase;
+            barcol = insocol;
         elseif i == 2
             xdatpos = subgap+xbase;
+            barcol = insocol;
         elseif i == 3
             xdatpos = 2*subgap+groupgap+xbase;
+            barcol = windcol;
         elseif i == 4
             xdatpos = 3*subgap+groupgap+xbase;
+            barcol = windcol;
         elseif i == 5
             xdatpos = 4*subgap+2*groupgap+xbase;
+            barcol = wavecol;
         elseif i == 6
             xdatpos = 5*subgap+2*groupgap+xbase;
+            barcol = wavecol;
         elseif i == 7
             xdatpos = 6*subgap+2*groupgap+xbase;
+            barcol = wavecol;
         elseif i == 8
             xdatpos = 7*subgap+3*groupgap+xbase;
+            barcol = dgencol;
         end
         set(h2(i,c),'XData',xdatpos);
         %set colors
-        h2(i,c).CData = gcol/256;
+        h2(i,c).CData = barcol;
         x = get(h2(i,c),'XData');
         for j = 1:length(Y)
-            tx = dpdata(j,i,1,c);
-            text(x(j),Y(j)+gbuff,[ num2str(tx,3) ' m'], ...
+            %tx = dpdata(j,i,1,c);
+            tx = gendata(j,i,1,c);
+            text(x(j),Y(j)+gbuff,[ num2str(tx,2) ' kW'], ...
                 'Rotation',90, ...
                 'HorizontalAlignment','left', ...
                 'verticalAlignment','middle', ...
@@ -277,47 +296,55 @@ for c = 1:nu
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
     else
-        text(1.15,.5,'(b)','Units','Normalized', ...
+        text(1.05,.5,'(b)','Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...
             'FontSize',fs2);
         set(gca,'YTickLabel',[])
     end
     grid on
     ylim([0 gmult*max(gendata(:))])
-    set(gca,'YTick',[0 2.5 5 7.5 10 12.5])
+    set(gca,'YTick',[0 5 10])
     linkaxes(ax(2,:),'y')
     
-    ax(3,c) = subplot(7,nu,8+c);
+    ax(3,c) = subplot(8,nu,8+c);
     hold on
     for i = 1:NumStacksPerGroup
         Y = squeeze(stordata(:,i,:,c));
         internalPosCount = i - ((NumStacksPerGroup+1) / 2);
         groupDrawPos = (internalPosCount)* groupOffset + groupBins;
-        h3(i,c) = bar(Y, 'stacked','FaceColor','flat');
+        h4(i,c) = bar(Y, 'stacked','FaceColor','flat');
         if i == 1
             xdatpos = xbase;
+            barcol = insocol;
         elseif i == 2
             xdatpos = subgap+xbase;
+            barcol = insocol;
         elseif i == 3
             xdatpos = 2*subgap+groupgap+xbase;
+            barcol = windcol;
         elseif i == 4
             xdatpos = 3*subgap+groupgap+xbase;
+            barcol = windcol;
         elseif i == 5
             xdatpos = 4*subgap+2*groupgap+xbase;
+            barcol = wavecol;
         elseif i == 6
             xdatpos = 5*subgap+2*groupgap+xbase;
+            barcol = wavecol;
         elseif i == 7
             xdatpos = 6*subgap+2*groupgap+xbase;
+            barcol = wavecol;
         elseif i == 8
             xdatpos = 7*subgap+3*groupgap+xbase;
+            barcol = dgencol;
         end
-        set(h3(i,c),'XData',xdatpos);
+        set(h4(i,c),'XData',xdatpos);
         %set colors
-        h3(i,c).CData = bcol/256;
-        x = get(h3(i,c),'XData');
+        h4(i,c).CData = barcol;
+        x = get(h4(i,c),'XData');
         for j = 1:length(Y)
-            tx = round(massdata(j,i,1,c));
-            text(x(j),Y(j)+bbuff,[ num2str(tx,'%i') ' kg'], ...
+            tx = round(stordata(j,i,1,c));
+            text(x(j),Y(j)+bbuff,[ num2str(tx,'%i') ' kWh'], ...
                 'Rotation',90, ...
                 'HorizontalAlignment','left', ...
                 'verticalAlignment','middle', ...
@@ -325,7 +352,7 @@ for c = 1:nu
         end
     end
     xlim([-0.5 8.5])
-    set(h3(:,c),'Barwidth',bwidth)
+    set(h4(:,c),'Barwidth',bwidth)
     hold off;
     set(gca,'XTickMode','manual');
     set(gca,'XTick',xbase+1);
@@ -349,37 +376,118 @@ for c = 1:nu
     end
     grid on
     ylim([0 bmult*max(stordata(:))])
-    set(gca,'YTick',[0 100 200 300 400])
+    set(gca,'YTick',[0 100 200 300 400 500])
     linkaxes(ax(3,:),'y')
     
-    ax(4,c) = subplot(7,nu,10+c);
+    ax(4,c) = subplot(8,nu,10+c);
     hold on
     for i = 1:NumStacksPerGroup
-        Y = squeeze(Ldata(:,i,:,c));
+        Y = squeeze(dpdata(:,i,:,c));
         internalPosCount = i - ((NumStacksPerGroup+1) / 2);
         groupDrawPos = (internalPosCount)* groupOffset + groupBins;
         h4(i,c) = bar(Y, 'stacked','FaceColor','flat');
         if i == 1
             xdatpos = xbase;
+            barcol = insocol;
         elseif i == 2
             xdatpos = subgap+xbase;
+            barcol = insocol;
         elseif i == 3
             xdatpos = 2*subgap+groupgap+xbase;
+            barcol = windcol;
         elseif i == 4
             xdatpos = 3*subgap+groupgap+xbase;
+            barcol = windcol;
         elseif i == 5
             xdatpos = 4*subgap+2*groupgap+xbase;
+            barcol = wavecol;
         elseif i == 6
             xdatpos = 5*subgap+2*groupgap+xbase;
+            barcol = wavecol;
         elseif i == 7
             xdatpos = 6*subgap+2*groupgap+xbase;
+            barcol = wavecol;
         elseif i == 8
             xdatpos = 7*subgap+3*groupgap+xbase;
+            barcol = dgencol;
         end
         set(h4(i,c),'XData',xdatpos);
         %set colors
-        h4(i,c).CData = cycol/256;
+        h4(i,c).CData = barcol;
         x = get(h4(i,c),'XData');
+        for j = 1:length(Y)
+            tx = dpdata(j,i,1,c);
+            text(x(j),Y(j)+dbuff,[num2str(tx,2) ' m'], ...
+                'Rotation',90, ...
+                'HorizontalAlignment','left', ...
+                'verticalAlignment','middle', ...
+                'FontSize',fs)
+        end
+    end
+    xlim([-0.5 8.5])
+    set(h4(:,c),'Barwidth',bwidth)
+    hold off;
+    set(gca,'XTickMode','manual');
+    set(gca,'XTick',xbase+1);
+    set(gca,'XTickLabelMode','manual');
+    %set(gca,'XTickLabel',opt.locations);
+    set(gca,'FontSize',fs2)
+    xtickangle(45)
+    if c == 1
+        ylabel({'Cost-','Optimal','Platform','Diameter','[m]'}, ...
+            'FontSize',fs2);
+        ylh = get(gca,'ylabel');
+        set(ylh,'Rotation',0,'Units', ...
+            'Normalized','Position',[yaxhpos .5 -1], ...
+            'VerticalAlignment','middle', ...
+            'HorizontalAlignment','center')
+    else
+        text(1.05,.5,'(d)','Units','Normalized', ...
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs2);
+        set(gca,'YTickLabel',[])
+    end
+    grid on
+    ylim([0 dmult*max(dpdata(:))])
+    set(gca,'YTick',[0 2.5 5 7.5 10])
+    linkaxes(ax(4,:),'y')
+    
+    ax(5,c) = subplot(8,nu,12+c);
+    hold on
+    for i = 1:NumStacksPerGroup
+        Y = squeeze(Ldata(:,i,:,c));
+        internalPosCount = i - ((NumStacksPerGroup+1) / 2);
+        groupDrawPos = (internalPosCount)* groupOffset + groupBins;
+        h6(i,c) = bar(Y, 'stacked','FaceColor','flat');
+        if i == 1
+            xdatpos = xbase;
+            barcol = insocol;
+        elseif i == 2
+            xdatpos = subgap+xbase;
+            barcol = insocol;
+        elseif i == 3
+            xdatpos = 2*subgap+groupgap+xbase;
+            barcol = windcol;
+        elseif i == 4
+            xdatpos = 3*subgap+groupgap+xbase;
+            barcol = windcol;
+        elseif i == 5
+            xdatpos = 4*subgap+2*groupgap+xbase;
+            barcol = wavecol;
+        elseif i == 6
+            xdatpos = 5*subgap+2*groupgap+xbase;
+            barcol = wavecol;
+        elseif i == 7
+            xdatpos = 6*subgap+2*groupgap+xbase;
+            barcol = wavecol;
+        elseif i == 8
+            xdatpos = 7*subgap+3*groupgap+xbase;
+            barcol = dgencol;
+        end
+        set(h6(i,c),'XData',xdatpos);
+        %set colors
+        h6(i,c).CData = barcol;
+        x = get(h6(i,c),'XData');
         for j = 1:length(Y)
             tx = round(Y(j),1);
             text(x(j),Y(j)+blbuff,num2str(tx), ...
@@ -390,10 +498,10 @@ for c = 1:nu
         end
     end
     xlim([-0.5 8.5])
-    set(h4(:,c),'Barwidth',bwidth)
+    set(h6(:,c),'Barwidth',bwidth)
     yl = yline(20,'--','Battery End of Life, \sigma_{EoL} = 20%', ...
         'Color',[.9 0 .2],'LabelVerticalAlignment', ...
-    'top','LabelHorizontalAlignment','left','FontSize',fs3, ...
+    'bottom','LabelHorizontalAlignment','left','FontSize',fs3, ...
     'LineWidth',.75,'FontName','cmr10');
     if c == 2
         yl.Label = '';
@@ -413,7 +521,7 @@ for c = 1:nu
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
     else
-        text(1.05,.5,'(d)','Units','Normalized', ...
+        text(1.05,.5,'(e)','Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...
             'FontSize',fs2);
         set(gca,'YTickLabel',[])
@@ -422,39 +530,47 @@ for c = 1:nu
     ylim([0 blmult*max(Ldata(:))])
     %set(gca,'YTick',[0 10 20 30 40])
     set(gca,'XTickLabels',[])
-    linkaxes(ax(4,:),'y')
+    linkaxes(ax(5,:),'y')
     
-    ax(5,c) = subplot(7,nu,12+c);
+    ax(6,c) = subplot(8,nu,14+c);
     hold on
     for i = 1:NumStacksPerGroup
         Y = squeeze(cfdata(:,i,:,c));
         internalPosCount = i - ((NumStacksPerGroup+1) / 2);
         groupDrawPos = (internalPosCount)* groupOffset + groupBins;
-        h5(i,c) = bar(Y, 'stacked','FaceColor','flat');
+        h6(i,c) = bar(Y, 'stacked','FaceColor','flat');
         if i == 1
             xdatpos = xbase;
+            barcol = insocol;
         elseif i == 2
             xdatpos = subgap+xbase;
+            barcol = insocol;
         elseif i == 3
             xdatpos = 2*subgap+groupgap+xbase;
+            barcol = windcol;
         elseif i == 4
             xdatpos = 3*subgap+groupgap+xbase;
+            barcol = windcol;
         elseif i == 5
             xdatpos = 4*subgap+2*groupgap+xbase;
+            barcol = wavecol;
         elseif i == 6
             xdatpos = 5*subgap+2*groupgap+xbase;
+            barcol = wavecol;
         elseif i == 7
             xdatpos = 6*subgap+2*groupgap+xbase;
+            barcol = wavecol;
         elseif i == 8
             xdatpos = 7*subgap+3*groupgap+xbase;
+            barcol = dgencol;
         end
-        set(h5(i,c),'XData',xdatpos);
+        set(h6(i,c),'XData',xdatpos);
         %set colors
-        h5(i,c).CData = cfcol/256;
-        x = get(h5(i,c),'XData');
+        h6(i,c).CData = barcol;
+        x = get(h6(i,c),'XData');
         for j = 1:length(Y)
             tx = round(Y(j),2);
-            text(x(j),Y(j)+cfbuff,num2str(tx), ...
+            text(x(j),Y(j)+cfbuff,num2str(tx,3), ...
                 'Rotation',90, ...
                 'HorizontalAlignment','left', ...
                 'verticalAlignment','middle', ...
@@ -462,7 +578,7 @@ for c = 1:nu
         end
     end
     xlim([-0.5 8.5])
-    set(h5(:,c),'Barwidth',bwidth)
+    set(h6(:,c),'Barwidth',bwidth)
     hold off;
     set(gca,'XTickMode','manual');
     set(gca,'XTick',xbase+1);
@@ -478,25 +594,56 @@ for c = 1:nu
             'VerticalAlignment','middle', ...
             'HorizontalAlignment','center')
     else
-        text(1.05,.5,'(e)','Units','Normalized', ...
+        text(1.05,.5,'(f)','Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...
             'FontSize',fs2);
         set(gca,'YTickLabel',[])
     end
     grid on
     ylim([0 cfmult*max(cfdata(:))])
-    linkaxes(ax(5,:),'y')
+    set(gca,'YTick',[0 .2 .4 .6 ])
+    linkaxes(ax(6,:),'y')
     
 end
 
+%widen axes
 for i = 1:size(ax,1)
-    xw = 2.5;
+    xw = 2.6;
     set(ax(i,:),'Units','Inches')
     axdim1 = get(ax(i,1),'Position');
     set(ax(i,1),'Position',[axdim1(1) axdim1(2) xw axdim1(4)])
     axdim2 = get(ax(i,2),'Position');
     set(ax(i,2),'Position',[axdim1(1)+xw+0.1 axdim2(2) xw axdim2(4)])
 end
+
+%heighten axes
+for i = size(ax,1):-1:1
+    yh = .65;
+    yo = .5;
+    ym = .2;
+    set(ax(i,:),'Units','Inches')
+    axdim1 = get(ax(i,1),'Position');
+    if i == 1
+        set(ax(i,1),'Position',[axdim1(1) yo+(6-i)*(yh+ym) axdim1(3) 3*yh])
+    else
+        set(ax(i,1),'Position',[axdim1(1) yo+(6-i)*(yh+ym) axdim1(3) yh])
+    end
+    axdim2 = get(ax(i,2),'Position');
+    if i == 1
+        set(ax(i,2),'Position',[axdim2(1) yo+(6-i)*(yh+ym) axdim2(3) 3*yh])
+    else
+        set(ax(i,2),'Position',[axdim2(1) yo+(6-i)*(yh+ym) axdim2(3) yh])
+    end
+end
+
+%turn off ticks
+for i = 1:size(ax,1)
+    for j = 1:size(ax,2)
+        ax(i,j).TickLength = [0 0];
+    end
+end
+
+
 
 print(results,['~/Dropbox (MREL)/Research/OO-TechEc/' ...
     'wave-comparison/paper_figures/results'],'-dpng','-r600')

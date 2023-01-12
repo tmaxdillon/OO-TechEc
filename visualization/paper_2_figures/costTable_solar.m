@@ -13,10 +13,9 @@
 %     'Vessel Operations' ...
 %     'Total'};
 
-T = table('Size',[10 5],'VariableTypes',{'string','string','string', ...
-    'string','string'});
+T = table('Size',[11 3],'VariableTypes',{'string','string','string'});
 
-wstruct = woco;
+wstruct = inhu;
 s = 2;
 
 % load('waveoptd')
@@ -29,56 +28,56 @@ for u = 1:2
 %     for s = 1:3
         for l = 1:3
             locs = [1 2 4];
-            tc = wstruct(locs(l),u).output.min.cost;
+            %tc = wstruct(locs(l),u).output.min.cost;
             c = wstruct(locs(l),u).output.min.Pmooring;
             T(1,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
             c = wstruct(locs(l),u).output.min.Pinst;
             T(2,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
-            c = wstruct(locs(l),u).output.min.Scost;
+            c = wstruct(locs(l),u).output.min.Pmtrl;
             T(3,l) = {['\$' ...
-                num2str(round(c/1000,1)) 'k']};
-            c = wstruct(locs(l),u).output.min.battencl;
+                num2str(round(c/1000,1)) 'k']}; 
+            c = wstruct(locs(l),u).output.min.Scost;
             T(4,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
-            c = wstruct(locs(l),u).output.min.kWcost;
+            c = wstruct(locs(l),u).output.min.battencl;
             T(5,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
-            c = wstruct(locs(l),u).output.min.Icost;
+            c = wstruct(locs(l),u).output.min.Mcost;
             T(6,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
-            c = wstruct(locs(l),u).output.min.battreplace;
+            c = wstruct(locs(l),u).output.min.Ecost;
             T(7,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
-            c = wstruct(locs(l),u).output.min.wecrepair;
+            c = wstruct(locs(l),u).output.min.Strcost;
             T(8,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
-            c = wstruct(locs(l),u).output.min.vesselcost;
+            c = wstruct(locs(l),u).output.min.Icost;
             T(9,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
-            c = wstruct(locs(l),u).output.min.cost;
+            c = wstruct(locs(l),u).output.min.battreplace;
             T(10,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
+            c = wstruct(locs(l),u).output.min.vesselcost;
+            T(11,l) = {['\$' ...
+                num2str(round(c/1000,1)) 'k']};
+            c = wstruct(locs(l),u).output.min.cost;
+            T(12,l) = {['\$' ...
+                num2str(round(c/1000,1)) 'k']};
         end
-        if s == 1 && u == 1
+        if u == 1 && s == 1
             T_st_optd = T;
-            csvname = 'T_st_wodu';
-        elseif s == 1 && u == 2
+            csvname = 'T_st_inau';
+        elseif u == 1 && s == 2
             T_lt_optd = T;
-            csvname = 'T_lt_wodu';
-        elseif s == 2 && u == 1
-            T_st_optc = T;
-            csvname = 'T_st_woco';
-        elseif s == 2 && u == 2
-            T_lt_optc = T;
-            csvname = 'T_lt_woco';
-        elseif s == 3 && u == 1
-            T_st_cons = T;
-            csvname = 'T_st_wcon';
-        elseif s == 3 && u == 2
-            T_lt_cons = T;
-            csvname = 'T_lt_wcon';
+            csvname = 'T_st_inhu';
+        elseif  u == 2 && s == 1
+            T_st_optd = T;
+            csvname = 'T_lt_inau';
+        elseif u == 2 && s == 2
+            T_lt_optd = T;
+            csvname = 'T_lt_inhu';
         end
         writetable(T,['~/Dropbox (MREL)/Research/OO-TechEc/wave-comparison/' ...
             'paper_figures/' csvname '.csv'],'Delimiter',',','QuoteStrings',false, ...
@@ -87,7 +86,7 @@ for u = 1:2
 end
 
 clearvars -except T_lt_cons T_st_cons T_lt_optc T_st_optc ...
-    T_lt_optd T_st_optd wcon wodu woco
+    T_lt_optd T_st_optd inau inhu
 
 
 % writetable(T_st_optd,['~/Dropbox (MREL)/Research/OO-TechEc/paper_figures/' ...

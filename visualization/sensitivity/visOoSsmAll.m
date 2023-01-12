@@ -84,6 +84,8 @@ visOoSsmOut('ild','wiod',wiod_ssm)
 visOoSsmOut('ild','wico',wico_ssm)
 visOoSsmOut('sdr','wiod',wiod_ssm)
 visOoSsmOut('sdr','wico',wico_ssm)
+visOoSsmOut('pmm','wiod',wiod_ssm)
+visOoSsmOut('pmm','wico',wico_ssm)
 %inso
 visOoSsmOut('pvd','inau',inau_ssm)
 visOoSsmOut('pvd','inhu',inhu_ssm)
@@ -117,6 +119,8 @@ visOoSsmOut('ild','inau',inau_ssm)
 visOoSsmOut('ild','inhu',inhu_ssm)
 visOoSsmOut('sdr','inau',inau_ssm)
 visOoSsmOut('sdr','inhu',inhu_ssm)
+visOoSsmOut('pmm','inau',inau_ssm)
+visOoSsmOut('pmm','inhu',inhu_ssm)
 %wave
 visOoSsmOut('wiv','wcon',wcon_ssm)
 visOoSsmOut('wiv','woco',woco_ssm)
@@ -185,6 +189,9 @@ visOoSsmOut('bhc','dgen',dgen_ssm)
 visOoSsmOut('utp','dgen',dgen_ssm)
 visOoSsmOut('ild','dgen',dgen_ssm)
 visOoSsmOut('sdr','dgen',dgen_ssm)
+visOoSsmOut('pmm','dgen',dgen_ssm)
+
+
 
 
 

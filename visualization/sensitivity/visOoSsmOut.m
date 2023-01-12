@@ -94,6 +94,8 @@ elseif isequal(par,'ild')
     xl = 'Instrumentation Load [W]';
 elseif isequal(par,'sdr')
     xl = 'Self Discharge Rate [%/month]';
+elseif isequal(par,'pmm')
+    xl = 'Barge Material Multiplier';
 end
 
 %unpack data structure

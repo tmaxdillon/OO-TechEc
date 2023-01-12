@@ -1,6 +1,6 @@
 clearvars -except array_ssm x0 t0 cost ta tp pm
 close all
-clearvars -except pm
+%clearvars -except pm
 set(0,'defaulttextinterpreter','tex')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
@@ -40,7 +40,7 @@ elseif pm == 4
     loadcell{4} = 'dgen_lt_2.mat';
     loadcell{5} = 'dgen_st_3.mat';
     loadcell{6} = 'dgen_lt_3.mat';
-    A = 2;
+    A = 3;
 end
 
 if ~exist('array_ssm','var')
@@ -54,8 +54,8 @@ if ~exist('array_ssm','var')
         tic
         load([path loadcell{i}])
         if pm == 1
-            array_ssm(1,:,i) = twf;
-            x0(1,i) = s0.turb.wf;
+            array_ssm(1,:,i) = pmm;
+            x0(1,i) = s0.econ.platform.wf;
             array_ssm(2,:,i) = cos;
             x0(2,i) = s0.turb.uco;
             array_ssm(3,:,i) = szo;
@@ -63,13 +63,15 @@ if ~exist('array_ssm','var')
         elseif pm == 2
             array_ssm(1,:,i) = pvd;
             x0(1,i) = s0.inso.deg;
-            array_ssm(2,:,i) = pwf;
-            x0(2,i) = s0.inso.wf;
+            array_ssm(2,:,i) = pmm;
+            x0(2,i) = s0.econ.platform.wf;
         elseif pm == 4
             array_ssm(2,:,i) = gcm;
             x0(2,i) = 11214/1000;
             array_ssm(1,:,i) = fco;
             x0(1,i) = s0.econ.dies.fcost;
+            array_ssm(3,:,i) = pmm;
+            x0(3,i) = s0.econ.platform.wf;
         end            
         t0(i) = s0.output.min.cost; %total cost of base case        
         for a = 1:A %across all 16 arrays
@@ -215,17 +217,20 @@ for a = 1:size(array_ssm,1)
         YTickString{4} = '100.5%';
         YTickString{5} = '200%';
     elseif pm == 2
-        ylim([.975 1.075])
-        yticks([1 1.025 1.05])
-        YTickString{1} = '100%';
-        YTickString{2} = '102.5%';
+        ylim([.95 1.125])
+        yticks([.95 1 1.05 1.1 1.15])
+        YTickString{1} = '95%';
+        YTickString{2} = '100%';
         YTickString{3} = '105%';
+        YTickString{4} = '110%';
+        YTickString{5} = '115%';
     elseif pm == 4
-        ylim([.75 1.1])
-        yticks([.8 .9 1])
+        ylim([.75 1.175])
+        yticks([.8 .9 1 1.1])
         YTickString{1} = '80%';
         YTickString{2} = '90%';
         YTickString{3} = '100%';
+        YTickString{4} = '110%';
     end
     set(gca,'YTickLabel',YTickString);
     set(gca,'FontSize',fs1)
@@ -341,6 +346,9 @@ for a = 1:size(array_ssm,1)
     elseif isequal(array_ssm(a,1).opt.tuned_parameter,'gcm')
         xlabel(({'Generator','Cost [$/kW]'}),'FontSize',fs2)
         xticklabels({num2str(xt(1),3),num2str(xt(2),3)})
+    elseif isequal(array_ssm(a,1).opt.tuned_parameter,'pmm')
+        xlabel(({'Platform','Mass Multiplier'}),'FontSize',fs2)
+        xticklabels({num2str(xt(1),3),num2str(xt(2),3)})
     end
     %set x axis label to a consistent position
     set(ax(a).XLabel,'units','normalized')
@@ -368,7 +376,7 @@ set(gcf,'Color','w');
 %         axesposition(a,2)+addbottom axesposition(a,3) ...
 %         axesposition(a,4)])
 % end
-if pm == 1
+if pm == 1 || pm == 4
     xoff = 1.4;
     xlen = .95;
     ylen = .95;

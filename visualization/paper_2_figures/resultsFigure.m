@@ -121,6 +121,14 @@ col(1,:) = [0,0,51]/256; %platform cost
 col([2 4],:) = flipud(brewermap(2,'purples')); %generation cost
 col([3 5],:) = flipud(brewermap(2,'blues')); %storage cost
 col(6,:) = [238,232,170]/256; %vessel cost
+insocol = [255 130 130]/256; %inso
+dgencol = [160 160 160]/256; %dies capex
+wavecol = [153,153,255]/256; %wave capex
+windcol = [132 235 163]/256; %wind capex
+insocol = [255 170 170]/256; %inso opex
+dgencol = [175 175 175]/256; %dies opex
+wavecol = [170 170 255]/256; %wave opex
+windcol = [170 255 170]/256; %wind opex
 orpink(1,:) = [255,170,150];
 orpink(2,:) = [255,170,159];
 orpink(3,:) = [255,170,179];
@@ -232,24 +240,32 @@ for c = 1:nu
         h2(i,c) = bar(Y, 'stacked','FaceColor','flat');
         if i == 1
             xdatpos = xbase;
+            barcol = insocol;
         elseif i == 2
             xdatpos = subgap+xbase;
+            barcol = insocol;
         elseif i == 3
             xdatpos = 2*subgap+groupgap+xbase;
+            barcol = windcol;
         elseif i == 4
             xdatpos = 3*subgap+groupgap+xbase;
+            barcol = windcol;
         elseif i == 5
             xdatpos = 4*subgap+2*groupgap+xbase;
+            barcol = wavecol;
         elseif i == 6
             xdatpos = 5*subgap+2*groupgap+xbase;
+            barcol = wavecol;
         elseif i == 7
             xdatpos = 6*subgap+2*groupgap+xbase;
+            barcol = wavecol;
         elseif i == 8
             xdatpos = 7*subgap+3*groupgap+xbase;
+            barcol = dgencol;
         end
         set(h2(i,c),'XData',xdatpos);
         %set colors
-        h2(i,c).CData = gcol/256;
+        h2(i,c).CData = barcol;
         x = get(h2(i,c),'XData');
         for j = 1:length(Y)
             tx = dpdata(j,i,1,c);

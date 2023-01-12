@@ -1,8 +1,6 @@
 % varnames = {'\begin{tabular}[c]{@{}l@{}}Argentine \\ Basin\end{tabular}' ...
 %     '\begin{tabular}[c]{@{}l@{}}Coastal \\ Endurance\end{tabular}' ...
-%     '\begin{tabular}[c]{@{}l@{}}Coastal \\ Pioneer\end{tabular}' ...
-%     '\begin{tabular}[c]{@{}l@{}}Irminger \\ Sea\end{tabular}' ...
-%     '\begin{tabular}[c]{@{}l@{}}Southern \\ Ocean\end{tabular}'};
+%     '\begin{tabular}[c]{@{}l@{}}Irminger \\ Sea\end{tabular}'};
 % rownames = { ...
 %     'Mooring Elements' ...
 %     'Mooring Installation' ...
@@ -15,77 +13,72 @@
 %     'Vessel Operations' ...
 %     'Total'};
 
-T = table('Size',[10 5],'VariableTypes',{'string','string','string', ...
-    'string','string'});
+T = table('Size',[11 3],'VariableTypes',{'string','string','string'});
+
+wstruct = dgen;
 
 % load('waveoptd')
 % load('waveoptc')
 % load('wavecons')
 
-allStruct = mergeWaWaWa(waveoptd,waveoptc,wavecons);
+%allStruct = mergeWaWaWa(wodu,woco,wavecons);
 
 for u = 1:2
-    for s = 1:3
-        for l = 1:5
-            tc = allStruct(l,s,u).output.min.cost;
-            c = allStruct(l,s,u).output.min.Pmooring;
+%     for s = 1:3
+        for l = [1,2,4]
+            %tc = wstruct(l,u).output.min.cost;
+            c = wstruct(l,u).output.min.Pmooring;
             T(1,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
-            c = allStruct(l,s,u).output.min.Pinst;
+            c = wstruct(l,u).output.min.Pinst;
             T(2,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
-            c = allStruct(l,s,u).output.min.Scost;
+            c = wstruct(l,u).output.min.Pmtrl;
             T(3,l) = {['\$' ...
-                num2str(round(c/1000,1)) 'k']};
-            c = allStruct(l,s,u).output.min.battencl;
+                num2str(round(c/1000,1)) 'k']}; 
+            c = wstruct(l,u).output.min.Scost;
             T(4,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
-            c = allStruct(l,s,u).output.min.kWcost;
+            c = wstruct(l,u).output.min.battencl;
             T(5,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
-            c = allStruct(l,s,u).output.min.Icost;
+            c = wstruct(l,u).output.min.kWcost;
             T(6,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
-            c = allStruct(l,s,u).output.min.battreplace;
+            c = wstruct(l,u).output.min.genencl;
             T(7,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
-            c = allStruct(l,s,u).output.min.wecrepair;
+            c = wstruct(l,u).output.min.fuel;
             T(8,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
-            c = allStruct(l,s,u).output.min.vesselcost;
+            c = wstruct(l,u).output.min.battreplace;
             T(9,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
-            c = allStruct(l,s,u).output.min.cost;
+            c = wstruct(l,u).output.min.genrepair;
             T(10,l) = {['\$' ...
                 num2str(round(c/1000,1)) 'k']};
+            c = wstruct(l,u).output.min.vesselcost;
+            T(11,l) = {['\$' ...
+                num2str(round(c/1000,1)) 'k']};
+            c = wstruct(l,u).output.min.cost;
+            T(12,l) = {['\$' ...
+                num2str(round(c/1000,1)) 'k']};
         end
-        if s == 1 && u == 1
+        if u == 1
             T_st_optd = T;
-            csvname = 'T_st_optd';
-        elseif s == 1 && u == 2
+            csvname = 'T_st_dgen';
+        elseif u == 2
             T_lt_optd = T;
-            csvname = 'T_lt_optd';
-        elseif s == 2 && u == 1
-            T_st_optc = T;
-            csvname = 'T_st_optc';
-        elseif s == 2 && u == 2
-            T_lt_optc = T;
-            csvname = 'T_lt_optc';
-        elseif s == 3 && u == 1
-            T_st_cons = T;
-            csvname = 'T_st_cons';
-        elseif s == 3 && u == 2
-            T_lt_cons = T;
-            csvname = 'T_lt_cons';
+            csvname = 'T_lt_dgen';
         end
-        writetable(T,['~/Dropbox (MREL)/Research/OO-TechEc/paper_figures/' ...
-                csvname '.csv'],'Delimiter',',','QuoteStrings',false, ...
+        writetable(T,['~/Dropbox (MREL)/Research/OO-TechEc/wave-comparison/' ...
+            'paper_figures/' csvname '.csv'],'Delimiter',',','QuoteStrings',false, ...
                 'WriteVariableNames',false)
-    end
+%     end
 end
 
 clearvars -except T_lt_cons T_st_cons T_lt_optc T_st_optc ...
-    T_lt_optd T_st_optd
+    T_lt_optd T_st_optd dgen
 
 
 % writetable(T_st_optd,['~/Dropbox (MREL)/Research/OO-TechEc/paper_figures/' ...
