@@ -117,7 +117,7 @@ xlab = {'\begin{tabular}{l} Argentine \\ Basin \end{tabular}'; ...
     '\begin{tabular}{l} Irminger \\ Sea \end{tabular}'; ...
     '\begin{tabular}{l} Southern \\ Ocean \end{tabular}'};
 pms = {'Solar','Diesel','Wave','Wind'};
-leg = {'CapEx','OpEx'};
+%leg = {'CapEx','OpEx'};
 
 %colors
 cols = 2;

@@ -1,5 +1,9 @@
 function [data,econ] = prepInso(data,inso,econ,uc)
 
+%NOTE: prepInso should be adapted to utilize extendToLifeTime()
+%-line 13 for loop is unnecessary
+%-line 47 extension mirrors data problematically
+
 inso_in = data.met.shortwave_irradiance;
 time_in = data.met.time;
 

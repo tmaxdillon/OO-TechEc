@@ -23,22 +23,22 @@ if ~exist('wiod','var') && ~exist('wico','var') && ...
         for uc = 1:2
             disp(['Loading l = ' num2str(l) ' & uc = ' char(ucs(uc)) ...
                 ' after ' num2str(toc(tt)/60,2) ' minutes.'])
-            wiod_ssm(l,uc) = load([path 'wiod_' ucs{uc} '_' num2str(l)]);
-            disp(['      wiod loaded after ' num2str(toc(tt)/60,2) ' mins...'])
-            wico_ssm(l,uc) = load([path 'wico_' ucs{uc} '_' num2str(l)]);
-            disp(['      wico loaded after ' num2str(toc(tt)/60,2) ' mins...'])
+%             wiod_ssm(l,uc) = load([path 'wiod_' ucs{uc} '_' num2str(l)]);
+%             disp(['      wiod loaded after ' num2str(toc(tt)/60,2) ' mins...'])
+%             wico_ssm(l,uc) = load([path 'wico_' ucs{uc} '_' num2str(l)]);
+%             disp(['      wico loaded after ' num2str(toc(tt)/60,2) ' mins...'])
             inhu_ssm(l,uc) = load([path 'inhu_' ucs{uc} '_' num2str(l)]);
             disp(['      inhu loaded after ' num2str(toc(tt)/60,2) ' mins...'])
             inau_ssm(l,uc) = load([path 'inau_' ucs{uc} '_' num2str(l)]);
             disp(['      inau loaded after ' num2str(toc(tt)/60,2) ' mins...'])
-            woco_ssm(l,uc) = load([path 'woco_' ucs{uc} '_' num2str(l)]);
-            disp(['      woco loaded after ' num2str(toc(tt)/60,2) ' mins...'])
-            wcon_ssm(l,uc) = load([path 'wcon_' ucs{uc} '_' num2str(l)]);
-            disp(['      wcon loaded after ' num2str(toc(tt)/60,2) ' mins...'])
-            wodu_ssm(l,uc) = load([path 'wodu_' ucs{uc} '_' num2str(l)]);
-            disp(['      wodu loaded after ' num2str(toc(tt)/60,2) ' mins...'])
-            dgen_ssm(l,uc) = load([path 'dgen_' ucs{uc} '_' num2str(l)]);
-            disp(['      dgen loaded after ' num2str(toc(tt)/60,2) ' mins...'])
+%             woco_ssm(l,uc) = load([path 'woco_' ucs{uc} '_' num2str(l)]);
+%             disp(['      woco loaded after ' num2str(toc(tt)/60,2) ' mins...'])
+%             wcon_ssm(l,uc) = load([path 'wcon_' ucs{uc} '_' num2str(l)]);
+%             disp(['      wcon loaded after ' num2str(toc(tt)/60,2) ' mins...'])
+%             wodu_ssm(l,uc) = load([path 'wodu_' ucs{uc} '_' num2str(l)]);
+%             disp(['      wodu loaded after ' num2str(toc(tt)/60,2) ' mins...'])
+%             dgen_ssm(l,uc) = load([path 'dgen_' ucs{uc} '_' num2str(l)]);
+%             disp(['      dgen loaded after ' num2str(toc(tt)/60,2) ' mins...'])
         end
     end
 end

@@ -6,8 +6,8 @@ set(0,'defaulttextinterpreter','tex')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
-pm = 1;
-printon = true;
+pm = 2;
+printon = false;
 
 path = '~/Dropbox (MREL)/MATLAB/OO-TechEc/output_data/oossm_out/';
 if pm == 1
