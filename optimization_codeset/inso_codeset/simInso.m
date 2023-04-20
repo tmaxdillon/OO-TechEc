@@ -86,8 +86,8 @@ while cont
             batt_L(t) = 0;
         elseif rem(t,batt.bdi) == 0 %evaluate degradation on interval
             batt_L(t:t+batt.bdi) = batDegModel(S(fbi:t)/(1000*Smax), ...
-                batt.T,3600*t,batt.rf_os,ID);
-            if batt_L > batt.EoL %new battery
+                batt.T,3600*(t-fbi),batt.rf_os,ID);
+            if batt_L(t) > batt.EoL %new battery
                 fbi = t+1;
                 S(t) = Smax*1000;
                 if ~exist('batt_lft','var')
