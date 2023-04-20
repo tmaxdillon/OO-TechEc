@@ -90,6 +90,7 @@ if feature('numcores') < 36
     opt.bf.n = 2;
     opt.bf.m = 2;
 end
+opt.wsc = 10; %number of work station cores (wss)
 
 %strings
 opt.locations = {'argBasin';'cosEndurance_wa'; ...
@@ -361,7 +362,7 @@ opt.bf.M = 8; %[kW] max kW in grid
 opt.bf.N = 500; %[kWh] max Smax in grid
 opt.bf.M_hros = [2 4 5 1 1.75]; %[kW], high res os
 opt.bf.N_hros = [350 500 500 300 350]; %[kWh], high res os
-opt.bf.maxworkers = 36; %maximum cores
+%opt.bf.maxworkers = 36; %maximum cores
 % opt.nm.m = 5; %input grid resolution for rated power
 % opt.nm.n = 5; %input grid resolution for storage
 % opt.nm.many = false; %seed many initial points into nelder

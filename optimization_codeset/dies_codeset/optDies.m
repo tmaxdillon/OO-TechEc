@@ -46,14 +46,17 @@ X = zeros(m*n,1);
 %set number of cores
 if isempty(gcp('nocreate')) %no parallel pool running
     cores = feature('numcores'); %find number of cofes
-    if cores > 2 %only start if using HPC
+    if cores > opt.wsc %only start if using HPC
         parpool(cores);
+        maxworkers = cores;
+    else
+        maxworkers = 0;
     end
 end
 %parallel computing via parfor
 tGrid = tic;
 disp(['Populating grid values: m=' num2str(m) ', n=' num2str(n)])
-parfor (i = 1:m*n,opt.bf.maxworkers)
+parfor (i = 1:m*n,maxworkers)
     [C_temp(i),S_temp(i)] = ...
         simDies(K(i),S(i),opt,data,atmo,batt,econ,uc,bc,dies);
     if S_temp(i) == 0 %update obj val X
