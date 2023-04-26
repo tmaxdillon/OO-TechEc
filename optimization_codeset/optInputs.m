@@ -264,10 +264,10 @@ lfp.dmax = 0;              %maximum depth of discharge
 lfp.cost = 466;             %[$/kWh] - irena2020electricty
 lfp.lcm = 1;%battery life cycle model, 1:bolun 2:dyn_lc 3:fixed_lc
 lfp.T = 15;                 %[C] temperature
-%lfp.EoL = 0.2;              %battery end of life
-lfp.EoL = 0.02;              %battery end of life
+lfp.EoL = 0.2;              %battery end of life
+%lfp.EoL = 0.02;              %battery end of life
 lfp.rf_os = true;           %toggle using open source rainflow
-lfp.bdi = 2190;              %battery degradation evaluation interaval
+lfp.bdi = 2190;              %[h] battery degradation evaluation interaval
 bc = 2; %battery chemistry 1:AGM 2:LFP
 if bc == 1 %agm chemistry
     batt = agm;

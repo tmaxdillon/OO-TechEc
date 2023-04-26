@@ -50,7 +50,7 @@ for t = 1:length(wind)
         batt_L(t:t+batt.bdi) = batDegModel(S(fbi:t)/(1000*Smax), ...
             batt.T,3600*(t-fbi),batt.rf_os,ID);
         if batt_L(t) > batt.EoL %new battery
-            fbi = t+1;
+            fbi = t;
             S(t) = Smax*1000; 
             if ~exist('batt_lft','var')
                 batt_lft = t*dt*(1/8760)*(12); %[mo] battery lifetime
@@ -68,7 +68,11 @@ for t = 1:length(wind)
         P(t) = 0; %[W]
     end
     %find next battery storage level
-    cf = batt_L(t)*Smax*1000; %[Wh] capacity fading
+    if t == fbi
+        cf = 0; %fresh battery
+    else
+        cf = batt_L(t)*Smax*1000; %[Wh] capacity fading
+    end
     sd = S(t)*(batt.sdr/100)*(1/(30*24))*dt; %[Wh] self discharge
     S(t+1) = dt*(P(t) - uc.draw) + S(t) - sd; %[Wh]
     if S(t+1) > (Smax*1000 - cf) %dump power if larger than battery capacity

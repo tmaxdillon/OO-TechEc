@@ -88,7 +88,7 @@ while cont
             batt_L(t:t+batt.bdi) = batDegModel(S(fbi:t)/(1000*Smax), ...
                 batt.T,3600*(t-fbi),batt.rf_os,ID);
             if batt_L(t) > batt.EoL %new battery
-                fbi = t;
+                fbi = t+1;
                 S(t) = Smax*1000;
                 if ~exist('batt_lft','var')
                     batt_lft = t*dt*(1/8760)*(12); %[mo] battery lifetime
@@ -114,15 +114,18 @@ while cont
                 inso.eff*kW*1000*(swso(t)/(inso.rated*1000)); %[W]
         end
         %find next storage state
-        if t == fbi 
-            cf = 0; %fresh battery
-        else
-            cf = batt_L(t)*Smax*1000; %[Wh] capacity fading
-        end
+        cf = batt_L(t)*Smax*1000; %[Wh] capacity fading
         sd = S(t)*(batt.sdr/100)*(1/(30*24))*dt; %[Wh] self discharge
         S(t+1) = dt*(P(t) - uc.draw) + S(t) - sd; %[Wh]
         if S(t+1) > (Smax*1000 - cf) %dump power if over limit           
             D(t) = S(t+1) - (Smax*1000 - cf); %[Wh]
+            if ~isequal(batt_L(t-1),batt_L(t)) %change in batt_L
+                %don't attribute capacity fade to D
+                D(t) = D(t) - b
+            end
+            if D(t) > kW*1000
+                pause;
+            end
             S(t+1) = Smax*1000 - cf; %[Wh]
         elseif S(t+1) <= Smax*batt.dmax*1000 %bottomed out
             S(t+1) = dt*P(t) + S(t) - sd; %[Wh] save what's left, L = 0

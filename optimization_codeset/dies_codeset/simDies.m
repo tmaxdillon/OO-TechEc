@@ -43,14 +43,18 @@ for t = 1:length(time)
         batt_L(t:t+batt.bdi) = batDegModel(S(fbi:t)/(1000*Smax), ...
             batt.T,3600*(t-fbi),batt.rf_os,ID);
         if batt_L(t) > batt.EoL %new battery
-            fbi = t+1;
+            fbi = t;
             S(t) = Smax*1000; 
             if ~exist('batt_lft','var')
                 batt_lft = t*dt*(1/8760)*(12); %[mo] battery lifetime
             end
         end
     end
-    cf = batt_L(t)*Smax*1000; %[Wh] capacity fading
+    if t == fbi
+        cf = 0; %fresh battery
+    else
+        cf = batt_L(t)*Smax*1000; %[Wh] capacity fading
+    end
     sd = S(t)*(batt.sdr/100)*(1/(30*24))*dt; %[Wh] self discharge
     if ~charging %generator off
         S(t+1) = dt*(-1*uc.draw) + S(t) - sd;

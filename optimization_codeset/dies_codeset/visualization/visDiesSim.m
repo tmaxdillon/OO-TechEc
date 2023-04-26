@@ -1,7 +1,7 @@
 function [] = visDiesSim(optStruct)
 
 data = optStruct.data;
-data = prepDies(data,optStruct.uc);
+data = prepDies(data,optStruct.econ,optStruct.uc);
 output = optStruct.output;
 
 %extend time values
