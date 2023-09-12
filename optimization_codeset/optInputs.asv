@@ -144,7 +144,7 @@ end
 clear cost depth diameter
 econ.platform.wf = 5;               %weight factor (of light ship)
 econ.platform.steel = 800;          %[$/metric ton], steelbenchmarker
-econ.platform.steel_fab = 5;        %fabrication mutiplier, Geoff Cramm
+eci
 econ.platform.t_i = [6 12];         %[h] added h for inst
 econ.platform.d_i = [500 5000];     %[m] depth for inst cost
 %econ.platform.moorcost = 5.23;      %[$/(m-m)] cost of mooring (no AR)

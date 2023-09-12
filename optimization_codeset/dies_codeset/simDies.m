@@ -119,6 +119,7 @@ elseif bc == 2 %lithium phosphate
 end
 battencl = econ.batt.enclmult*Scost; %battery enclosure cost
 Pmtrl = (1/1000)*econ.platform.wf*econ.platform.steel* ...
+    econ.platform.steel_fab* ...
     polyval(opt.p_dev.d_mass,kW); %platform material
 dp = polyval(opt.p_dev.d_size,kW);
 if dp < 2, dp = 2; end %this will always occur - diesel platform = 2m

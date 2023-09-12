@@ -222,6 +222,7 @@ elseif bc == 2 %lithium phosphate
 end
 battencl = econ.batt.enclmult*Scost; %battery enclosure cost
 Pmtrl = (1/1000)*econ.platform.wf*econ.platform.steel* ...
+    econ.platform.steel_fab* ...
     inso.wf*kW/(inso.rated*inso.eff); %platform material
 dp = getInsoDiameter(kW,inso);
 if dp < 2, dp = 2; end
