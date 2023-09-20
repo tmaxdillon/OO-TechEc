@@ -44,14 +44,14 @@ C_temp = zeros(m*n,1);
 S_temp = zeros(m*n,1);
 X = zeros(m*n,1);
 %set number of cores
-if isempty(gcp('nocreate')) %no parallel pool running
-    cores = feature('numcores'); %find number of cofes
-    if cores > opt.wsc %only start if using HPC
-        parpool(cores);
-        maxworkers = cores;
-    else
-        maxworkers = 0;
+cores = feature('numcores'); %find number of cofes
+if cores > opt.wsc %only start if using HPC
+    maxworkers = cores;
+    if isempty(gcp('nocreate')) %no parallel pool running
+        parpool(cores);        
     end
+else
+    maxworkers = 0;
 end
 %parallel computing via parfor
 tGrid = tic;

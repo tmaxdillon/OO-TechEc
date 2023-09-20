@@ -1,17 +1,8 @@
-function [output,opt] = optInso(opt,data,atmo,batt,econ,uc,bc,inso)
+function [output,opt] = optWind(opt,data,atmo,batt,econ,uc,bc,turb)
 
 %set kW and Smax mesh
-opt.kW_1 = 0.5;
-if econ.platform.inso.boundary == 2
-    opt.kW_m = 9.0477; %corresponds to 8m
-else
-    if econ.platform.inso.boundary_di == 12
-        opt.kW_m = 20.3575; %corresponds to 12m
-    else
-        error('update econ.platform.inso.boundary_di')
-    end
-end
-%opt.kW_m = opt.bf.M*2; %[kW], up to 16 kW for inso
+opt.kW_1 = 0.1;
+opt.kW_m = opt.bf.M; %[kW] (up to 8 kW for wind)
 opt.Smax_1 = 1;
 opt.Smax_n = opt.bf.N; %[kWh]
 
@@ -29,16 +20,27 @@ if isfield(econ.vessel,'tmt_enf') && ...
     econ.vessel.t_ms = econ.vessel.tmt_enf; %spec maintenance time
 end
 
+%set econ scenario
+switch econ.wind.scen
+    case 1 %optimistic durability
+        econ.wind.lambda = econ.wind.lowfail; %vessel interventions
+    case 2 %conservative
+        econ.wind.lambda = econ.wind.highfail; %vessel interventions
+end
+%if sensitivity analysis
+if isfield(econ.wind,'lambda_mod')
+    econ.wind.lambda = econ.wind.lambda_mod; %lamdba modifier
+end
+
 %check to make sure coarse mesh will work
 opt.fmin = false;
 check_s = 0;
 while ~check_s
-    [~,check_s] = simInso(opt.kW_m/2,opt.Smax_n/2,opt,data, ...
-        atmo,batt,econ,uc,bc,inso);
+    [~,check_s] = simWind(opt.kW_m/2,opt.Smax_n/2,opt,data, ... 
+        atmo,batt,econ,uc,bc,turb);
     if ~check_s
-        %opt.kW_m = 2*opt.kW_m;
-        opt.Smax_n = 2*opt.Smax_n; 
-        %increasing panel size increases surface float size
+        opt.kW_m = 2*opt.kW_m;
+        opt.Smax_n = 2*opt.Smax_n;
     end
 end
 
@@ -56,9 +58,9 @@ X = zeros(m*n,1);
 %set number of cores
 cores = feature('numcores'); %find number of cofes
 if cores > opt.wsc %only start if using HPC
-    maxworkers = cores;
+    parpool(cores);
     if isempty(gcp('nocreate')) %no parallel pool running
-        parpool(cores);        
+        maxworkers = cores;
     end
 else
     maxworkers = 0;
@@ -68,7 +70,7 @@ tGrid = tic;
 disp(['Populating grid values: m=' num2str(m) ', n=' num2str(n)])
 parfor (i = 1:m*n,maxworkers)
     [C_temp(i),S_temp(i)] = ...
-        simInso(K(i),S(i),opt,data,atmo,batt,econ,uc,bc,inso);
+        simWind(K(i),S(i),opt,data,atmo,batt,econ,uc,bc,turb);
     if S_temp(i) == 0 %update obj val X
         X(i) = inf;
     else
@@ -85,20 +87,20 @@ disp('Brute forcing global minimum...')
 output.min.kW = opt.kW(I(1));
 output.min.Smax = opt.Smax(I(2));
 [output.min.cost,output.min.surv,output.min.CapEx,output.min.OpEx,...
-    output.min.Mcost,output.min.Scost,output.min.Ecost, ... 
-    output.min.Icost, ...
-    output.min.Strcost,output.min.Pmtrl,output.min.Pinst,... 
-    output.min.Pmooring,output.min.vesselcost, ...
-    output.min.battreplace,output.min.battencl, ...
+    output.min.kWcost,output.min.Scost,output.min.Icost, ... 
+    output.min.Pmtrl,output.min.Pinst,...
+    output.min.Pmooring,output.min.vesselcost, ... 
+    output.min.turbrepair,output.min.battreplace,output.min.battencl, ...
     output.min.triptime,output.min.nvi,output.min.batt_L, ...
     output.min.batt_lft,output.min.dp, ...
-    output.min.S,output.min.P,output.min.D,output.min.L, ... 
-    output.min.eff_t,output.min.pvci] ...
-    = simInso(output.min.kW,output.min.Smax, ...
-    opt,data,atmo,batt,econ,uc,bc,inso);
+    output.min.S,output.min.P,output.min.D,output.min.L] ...
+    = simWind(output.min.kW,output.min.Smax, ... 
+    opt,data,atmo,batt,econ,uc,bc,turb);
 output.min.batt_dyn_lc = batt.lc_nom*(output.min.Smax/ ...
     (output.min.Smax - (min(output.min.S)/1000)))^batt.beta;
 output.min.CF = mean(output.min.P)/(1000*output.min.kW);
+output.min.rotor_h = turb.clearance + ... 
+    sqrt(1000*2*output.min.kW/(atmo.rho_a*pi*turb.ura^3)); %rotor height
 %cycles per year
 % output.min.cyc60 = countCycles(output.min.S,output.min.Smax,60)/ ...
 %     (length(data.wave.time)/8760);
@@ -106,5 +108,6 @@ output.min.CF = mean(output.min.P)/(1000*output.min.kW);
 %     (length(data.wave.time)/8760);
 % output.min.cyc100 = countCycles(output.min.S,output.min.Smax,100)/ ...
 %     (length(data.wave.time)/8760);
+
 end
 
