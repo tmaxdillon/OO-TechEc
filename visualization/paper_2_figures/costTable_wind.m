@@ -15,8 +15,8 @@
 
 T = table('Size',[11 3],'VariableTypes',{'string','string','string'});
 
-wstruct = wiod;
-s = 1;
+wstruct = wico;
+s = 2;
 
 % load('waveoptd')
 % load('waveoptc')
@@ -76,9 +76,12 @@ for u = 1:2
             T_lt_optd = T;
             csvname = 'T_lt_wico';
         end
-        writetable(T,['~/Dropbox (MREL)/Research/OO-TechEc/wave-comparison/' ...
+%         writetable(T,['~/Dropbox (MREL)/Research/OO-TechEc/wave-comparison/' ...
+%             'paper_figures/' csvname '.csv'],'Delimiter',',','QuoteStrings',false, ...
+%             'WriteVariableNames',false)
+        writetable(T,['~/Documents/OO-TechEc/' ...
             'paper_figures/' csvname '.csv'],'Delimiter',',','QuoteStrings',false, ...
-                'WriteVariableNames',false)
+            'WriteVariableNames',false)
 %     end
 end
 

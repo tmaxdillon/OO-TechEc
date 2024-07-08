@@ -29,7 +29,8 @@ ta(6,:) = linspace(16,34,n);
 % tp{7} = 'tef'; %turbine efficiency
 % ta(7,:) = linspace(0.25,.475,n);
 tp{7} = 'szo'; %surface roughness
-ta(7,:) = linspace(0.005,0.05,n);
+%ta(7,:) = linspace(0.005,0.05,n);
+ta(7,:) = linspace(0.05,0.5,n);
 tp{8} = 'pmm'; %platform material multiplier
 ta(8,:) = linspace(3,12,n);
 

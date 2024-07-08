@@ -7,12 +7,12 @@ opt.bf.m = 500;
 opt.bf.n = 500;
 opt.allscenuses = 0;
 opt.alllocuses = 0;
-opt.sens = 0;
+opt.sens = 1;
 opt.tdsens = 0;
 opt.senssm = 0;
 opt.highresobj = 0;
 pm = 2; %power module, 1:Wi 2:In 3:Wa 4:Di
-c = 2;  %use case 1:ST 2:LT
+c = 1;  %use case 1:ST 2:LT
 loc = 'cosEndurance_wa'; %location
 %batch = false;
 if ~exist('batchtype','var')
@@ -68,18 +68,18 @@ elseif isequal(batchtype,'hros')
     loc = batchloc;
     %batch = true;
 elseif isequal(batchtype,'sens')
-    opt.tuning_array = linspace(0,2.25,10);
-    opt.tuned_parameter = 'wiv';
+    opt.tuning_array = linspace(0.05,0.5,10);
+    opt.tuned_parameter = 'szo';
     econ.wave.scen = batchscen; 
-    opt.bf.m = 100;
-    opt.bf.n = 100;
+    opt.bf.m = 500;
+    opt.bf.n = 500;
     opt.allscenuses = 0;
     opt.alllocuses = 0;
     opt.sens = 1;
     opt.tdsens = 0;
     opt.senssm = 0;
     opt.highresobj = 0;
-    pm = 3;
+    pm = 1;
     c = batchc;
     loc = batchloc;
     %batch = true;
@@ -343,8 +343,10 @@ if ~isfield(opt,'tuning_array') && ~isfield(opt,'tuned_parameter')
 % opt.tuned_parameter = 'dep'; %depth modifier
 % opt.tuning_array = linspace(uc(c).lifetime-3,uc(c).lifetime+3,10);
 % opt.tuned_parameter = 'lft'; %lifetime
-    opt.tuning_array = linspace(10,1400,10)*1000;
-    opt.tuned_parameter = 'dtc'; %distance to coast [OPEX]
+% opt.tuning_array = linspace(10,1400,10)*1000;
+% opt.tuned_parameter = 'dtc'; %distance to coast [OPEX]
+opt.tuning_array = linspace(0.05,0.5,10);
+opt.tuned_parameter = 'szo';
 end
 
 %opt 2D sens

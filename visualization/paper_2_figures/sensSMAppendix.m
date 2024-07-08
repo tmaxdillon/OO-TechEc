@@ -1,6 +1,6 @@
-clearvars -except array_ssm x0 t0 cost ta tp pm
+%clearvars -except array_ssm x0 t0 cost ta tp pm
 close all
-%clearvars -except pm
+clearvars -except pm
 set(0,'defaulttextinterpreter','tex')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
@@ -9,7 +9,8 @@ set(0,'DefaultAxesFontName', 'cmr10')
 pm = 4;
 printon = true;
 
-path = '~/Dropbox (MREL)/MATLAB/OO-TechEc/output_data/oossm_out/';
+% path = '~/Dropbox (MREL)/MATLAB/OO-TechEc/output_data/oossm_out/';
+path = '~/MATLAB/OO-TechEc/output_data/oossm_out/';
 if pm == 1
     loadcell{1} = 'wico_st_1.mat';
     loadcell{2} = 'wico_lt_1.mat';
@@ -421,7 +422,10 @@ newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits,'FontSize',fs1);
 
 if printon
-    print(ssm_allscen,['~/Dropbox (MREL)/Research/OO-TechEc/' ...
-        'wave-comparison/paper_figures/' ...
+    %     print(ssm_allscen,['~/Dropbox (MREL)/Research/OO-TechEc/' ...
+    %         'wave-comparison/paper_figures/' ...
+    %         'ssma_' num2str(pm)],'-dpng','-r600')
+    print(ssm_allscen, ...
+        ['~/Documents/OO-TechEc/paper_figures/results',  ...
         'ssma_' num2str(pm)],'-dpng','-r600')
 end

@@ -6,10 +6,11 @@ set(0,'defaulttextinterpreter','tex')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
-pm = 2;
-printon = false;
+pm = 1;
+printon = true;
 
-path = '~/Dropbox (MREL)/MATLAB/OO-TechEc/output_data/oossm_out/';
+% path = '~/Dropbox (MREL)/MATLAB/OO-TechEc/output_data/oossm_out/';
+path = '~/MATLAB/OO-TechEc/output_data/oossm_out/';
 if pm == 1
     loadcell{1} = 'wico_st_1.mat';
     loadcell{2} = 'wico_lt_1.mat';
@@ -444,9 +445,12 @@ newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits,'FontSize',fs1);
 
 if printon
-    print(ssm_allscen,['~/Dropbox (MREL)/Research/OO-TechEc/' ...
-        'wave-comparison/paper_figures/' ...
-        'ssm_' num2str(pm)],'-dpng','-r600')
+%     print(ssm_allscen,['~/Dropbox (MREL)/Research/OO-TechEc/' ...
+%         'wave-comparison/paper_figures/' ...
+%         'ssm_' num2str(pm)],'-dpng','-r600')
+    print(ssm_allscen, ...
+    ['~/Documents/OO-TechEc/paper_figures/results',  ...
+    'ssm_' num2str(pm)],'-dpng','-r600')
 end
 
 
